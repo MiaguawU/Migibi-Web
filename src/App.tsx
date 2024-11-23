@@ -16,7 +16,9 @@ import Plan2 from './Front/Plan2';
 import Recetas from './Front/Recetas';
 import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
+import Acceder from './Front/Acceder';
 
+// Menú principal de navegación
 const mainItems: MenuProps['items'] = [
   { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
   { label: <Link to="/conocenos">Conócenos</Link>, key: 'conocenos' },
@@ -27,15 +29,18 @@ const mainItems: MenuProps['items'] = [
   { label: <Link to="/refri">Refri</Link>, key: 'refri' },
 ];
 
+// Menú de perfil
 const profileItem: MenuProps['items'] = [
   { label: <Link to="/perfil"><img src={btPerfil} alt="Perfil" className="img-perfil" /></Link>, key: 'perfil' },
 ];
 
+// Componente principal
 function App() {
   return (
     <Router>
       <div>
         <header>
+          {/* Menú con Ant Design */}
           <div className="custom-menu">
             <Menu
               mode="horizontal"
@@ -48,7 +53,15 @@ function App() {
               className="profile-link"
             />
           </div>
+          {/* Menú manual con Link */}
+          <nav style={{ marginTop: '10px' }}>
+            <Link to="/" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Inicio</Link>
+            <Link to="/perfil" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Perfil</Link>
+            <Link to="/refri" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Refri</Link>
+            <Link to="/acceder" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Acceder</Link>
+          </nav>
         </header>
+
         <main>
           <Routes>
             <Route path="/" element={<Inicio />} />
@@ -61,6 +74,7 @@ function App() {
             <Route path="/recetas" element={<Recetas />} />
             <Route path="/refri" element={<Refri />} />
             <Route path="/edReceta" element={<EDreceta />} />
+            <Route path="/acceder" element={<Acceder />} />
           </Routes>
         </main>
       </div>

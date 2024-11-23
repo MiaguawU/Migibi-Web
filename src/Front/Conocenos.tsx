@@ -1,5 +1,4 @@
 
-
 export default function Inicio() {
     return (
       <>
@@ -7,6 +6,7 @@ export default function Inicio() {
         <p>Hello there.<br />How do you do?</p>
       </>
     );
+
   }
   
-  
+

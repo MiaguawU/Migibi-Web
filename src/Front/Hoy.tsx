@@ -1,5 +1,4 @@
 
-
 export default function Inicio() {
     return (
       <>
@@ -8,5 +7,3 @@ export default function Inicio() {
       </>
     );
   }
-  
-  
