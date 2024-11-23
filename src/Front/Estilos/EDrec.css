@@ -6,9 +6,6 @@
     max-width: 800px;
     gap: 20px;
 }
-.todo{
-    position: relative;
-}
 .tiempo{
     display: flex;
     justify-content: space-between;
@@ -27,12 +24,12 @@
 }
 
 .imgCom{
-    width: 120%;
-    height: 120%;
+    width: 30px;
+    height: 30px;
 }
 .imgEd{
-    width: 110%;
-    height: 110%;
+    width: 20px;
+    height: 20px;
 }
 .f2{
     display: flex;
@@ -57,4 +54,24 @@
     width: 100%;
     max-width: 800px;
     gap: 20px;
+}
+.todo{
+    border-radius: 10px;
+    border: 3px solid; 
+    border-color: #3E7E1E;
+    width: 700px;
+    height: 400px;
+    background-color: #E3FFCB;
+    position: relative;
+    color: #86A071;
+}
+
+p{
+    color: #86A071;
+}
+
+.btImg{
+    border: none;
+    background-color: transparent;
+    width: 40px;
 }

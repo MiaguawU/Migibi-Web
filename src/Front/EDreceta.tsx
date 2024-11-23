@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Button, Select, Input, Tooltip } from "antd";
+import { Button, Select, Input, Tooltip, Form, TimePicker } from "antd";
 import def from '../Img/defRec.png';
 import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
-import './Estilos/EDrec.css'
+import './Estilos/EDrec.css';
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
   console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
@@ -57,33 +57,24 @@ const NumericInput = (props: NumericInputProps) => {
   );
 };
 
+const { TextArea } = Input;
 
-export default function Inicio() {
+export default function EDreceta() {
+  const [form] = Form.useForm();
   const [value, setValue] = useState('');
+
+  const onReset = () => {
+    form.resetFields();
+  };
     return (
       <div className='todo'>
+        <Form>
         <div className='receta'>
           <div className='f1'>
             <img src={def}/>
             <div className='tiempo'>
               <p>Tiempo:</p>
-            <NumericInput style={{ width: 120 }} value={value} onChange={setValue} />
-            <Select
-              labelInValue
-              defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Jack (100)',
-                },
-                {
-                  value: 'lucy',
-                  label: 'Lucy (101)',
-                },
-              ]}
-            />
+              <TimePicker minuteStep={15} secondStep={10} hourStep={1} />
             </div>
             <div className='tipo'>
                 <p>Tipo:</p>
@@ -108,8 +99,8 @@ export default function Inicio() {
           </div>
           <div className='f2'>
             <p>Receta</p>
-            <Button><img src={btEd} className='imgEd'/></Button>
-            <Button><img src={btCom} className='imgCom'/></Button>
+            <Button className='btImg' ><img src={btEd} className='imgEd'/></Button>
+            <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
               <div>
 
               </div>
@@ -142,12 +133,18 @@ export default function Inicio() {
               </div>
               <div className='proceso'>
                 <p>Procedimiento</p>
-                <p></p>
+                <TextArea
+        placeholder="input here"
+        className="custom"
+        style={{ height: 50 }}
+      />
               </div>
           </div>
+          
         </div>
-        <Button>Agregar</Button>
-        <Button>Reset</Button>
+        <Button htmlType="submit" >Agregar</Button>
+        <Button htmlType="button" onClick={onReset} >Reset</Button>
+        </Form>
       </div>
     );
   }
