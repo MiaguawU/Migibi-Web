@@ -26,16 +26,21 @@
     width: 100%;
     gap: 2.5%; /* Usamos una proporción similar para todos los contenedores */
 }
-
+p{
+    font-family: 'Jomhuria, sans-serif';
+    color: #86A071;
+    font-size: 20px;
+    font-weight: bold;
+}
 
 
 .todo {
     border-radius: 10px;
     border: 3px solid;
     border-color: #3E7E1E;
-    width: 70%; /* 70% del ancho de su contenedor */
-    max-width: 1200px; /* Para no exceder un tamaño máximo específico */
-    height: 50vh; /* 50% de la altura del viewport (pantalla) */
+    width: 90%; 
+    max-width: 1000px; 
+    height: 70vh; 
     background-color: #E3FFCB;
     position: relative;
     margin: 0 auto; /* Centrar el contenedor */
