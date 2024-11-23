@@ -1,0 +1,68 @@
+/* Cambiar colores del menú */
+.custom-menu {
+    background-color: #6E9A65; /* Fondo verde oscuro */
+    color: white; /* Texto blanco */
+    font-weight: lighter;
+    height: 90px;
+    border-bottom: none; /* Eliminar bordes */
+    align-items: center;
+    font-size: 16px;
+    display: flex; /* Flexbox para alinear elementos */
+    justify-content: space-between; /* Enlaces iniciales a la izquierda, perfil a la derecha */
+    padding: 0 20px;
+  }
+  
+  /* Estilo general de los ítems del menú */
+  .custom-menu .ant-menu-item {
+    background-color: #6E9A65 !important; /* Fondo transparente para igualar el color del nav */
+    color: white; /* Texto blanco inicial */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
+  }
+  
+  /* Fondo del ítem cuando está seleccionado */
+  .custom-menu .ant-menu-item-selected {
+    background-color: #6E9A65 !important; /* Fondo igual que el nav */
+    color: #CDFFAD !important; /* Texto en color especial para el seleccionado */
+    border-bottom: 2px solid #B3CD8F; /* Línea verde clara */
+  }
+  
+  /* Estilo para enlaces dentro de los ítems */
+  .custom-menu .ant-menu-item a {
+    color: white; /* Texto blanco inicial */
+    transition: color 0.3s ease; /* Transición suave del color */
+    text-decoration: none; /* Eliminar subrayado */
+  }
+  
+  /* Hover: cambia el color del texto */
+  .custom-menu .ant-menu-item:hover a {
+    color: #C4FFB1; /* Verde claro */
+  }
+  
+  /* Activo o seleccionado: cambia el color del texto */
+  .custom-menu .ant-menu-item-active a,
+  .custom-menu .ant-menu-item-selected a {
+    color: #CDFFAD; /* Verde intermedio */
+  }
+  
+  /* Fondo verde más oscuro para el elemento seleccionado */
+  .custom-menu .ant-menu-item:hover {
+    background-color: #81c784 !important; /* Fondo verde claro */
+  }
+  
+  /* Elimina el borde azul predeterminado de Ant Design */
+  .custom-menu .ant-menu-item::after {
+    content: ''; /* Sobrescribe el pseudo-elemento */
+    border-bottom: none !important; /* Quita la línea azul */
+  }
+  
+  /* Ajustar tamaños de imágenes */
+  .img-inicio {
+    width: 100px;
+    height: 60px;
+  }
+  
+  .img-perfil {
+    width: 50px;
+    height: 50px;
+  }
+  

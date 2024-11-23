@@ -1,0 +1,60 @@
+.receta{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+}
+.todo{
+    position: relative;
+}
+.tiempo{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+}
+.tipo{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+}
+
+.imgCom{
+    width: 120%;
+    height: 120%;
+}
+.imgEd{
+    width: 110%;
+    height: 110%;
+}
+.f2{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+}
+.calorias{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+}
+.porciones{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+}

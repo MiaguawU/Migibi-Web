@@ -1,0 +1,70 @@
+.recetas-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 20px;
+  }
+  
+  .search-bar {
+    flex: 1;
+  }
+  
+  .cont {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    background-color: #CAE2B5;
+    border: 1px solid #3E7E1E;
+    border-radius: 10px;
+    padding: 10px;
+    width: 300px;
+  }
+  
+  .img-rec {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .fila1,
+  .fila2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .edit {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .btA {
+    background-color: #CAE2B5;
+    border-color: #3E7E1E;
+    color: #86A071;
+    border: 1px solid #3E7E1E;
+    border-radius: 10px;
+    padding: 5px 20px;
+  }
+  
+  .btE{
+    background-color: transparent;
+  }
