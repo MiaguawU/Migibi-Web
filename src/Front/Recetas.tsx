@@ -52,25 +52,28 @@ export default function Recetas() {
   const IReditar = () =>{
     navigate('/edReceta');
   };
+  const IRver = () =>{
+    navigate('/verR');
+  };
 
   
   return (
     <div className="recetas-container">
-      <div className="header">
-      <Space direction="vertical" style={{ width: '100%' }}>
-      <Select {...sharedProps} {...selectProps} />
+      <div className="header" >
+      <Space direction="vertical" style={{ width: '100%' }} className='buscar'>
+      <Select {...sharedProps} {...selectProps}  />
       
     </Space>
-        <Button className="btA" onClick={IReditar}>Agregar</Button>
+        <Button className="btA" onClick={IRver}>Agregar</Button>
       </div>
       <div className="cont">
         <div className="card">
           <img src={def} className="img-rec" alt="Imagen de receta por defecto" />
           <div className="fila1">
-            <div>
+            <div className='porciones'>
               <h3>Receta</h3>
-              <h3>/Porciones</h3>
-              <Link to="/edReceta">
+              <h3 >/Porciones</h3>
+              <Link to="/edReceta" className='btD'>
                 <img src={btEditar} alt="Editar receta" className="edit" />
               </Link>
             </div>
@@ -79,11 +82,11 @@ export default function Recetas() {
             </Button>
           </div>
           <div className="fila2">
-            <img src={cal} alt="Calorías" />
-            <p>Calorías</p>
-            <img src={tiempo} alt="Tiempo" />
-            <p>Tiempo</p>
-            <Button className='btE'>
+            <img src={cal} alt="Calorías" className='img' />
+            <p className='txA' >Calorías</p>
+            <img src={tiempo} alt="Tiempo" className='img2'/>
+            <p className='txA'>Tiempo</p>
+            <Button className='btC'>
               <img src={btCom} alt="Compartir receta" className="edit" />
             </Button>
           </div>

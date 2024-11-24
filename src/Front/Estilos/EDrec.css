@@ -14,41 +14,227 @@
     max-height: 20px;
 }
 
+.btUp .anticon-upload {
+    color: #86A071; /* Color del ícono cuando el botón está en estado normal */
+  }
+  
+  /* Color cuando el botón está en hover */
+  .btUp:hover .anticon-upload {
+    color: #3E7E1E;
+  }
 
+  .btUp:hover{
+    border-color: #3E7E1E !important;
+  }
+  
 
 .receta {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    border-radius: 10px;
+    width: 1200px;
+    position: relative;
+    right: 150px;
+    padding: 30px;
+    border: 1px solid;
+    border-color: #3E7E1E;
+    background-color: #E3FFCB;
     gap: 2.5%; /* Proporción de separación entre los elementos */
 }
 
-.tiempo, .tipo, .f2, .calorias, .porciones {
+   .calorias{
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     gap: 2.5%; /* Usamos una proporción similar para todos los contenedores */
+    background-color: #CEDFAC;
+    border: 1px solid;
+    border-color: #3E7E1E;
+    border-radius: 10px;
+    max-height: 50px;
+    position: relative;
+    bottom: 35px;
+    left: 100px;
 }
-p{
+.nC{
+    border-color: #3E7E1E;
+    right: 10px;
+}
+.txc{
+    font-size: 25px;
+    padding: 20px;
+    position: relative;
+    top: 15px;
+}
+
+.porciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 2.5%; /* Usamos una proporción similar para todos los contenedores */
+    background-color: #CEDFAC;
+    border: 1px solid;
+    border-color: #3E7E1E;
+    border-radius: 10px;
+    max-height: 50px;
+    position: relative;
+    top: 15px;
+    max-width: 200px;
+}
+.nP{
+    border-color: #3E7E1E;
+    right: 10px;
+}
+.txp{
+    font-size: 25px;
+    padding: 20px;
+    position: relative;
+    top: 15px;
+}
+
+.f2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 2.5%; /* Usamos una proporción similar para todos los contenedores */
+    position: relative;
+    bottom: 200px;
+}
+.f3{
+    display: flex;
+    width: 100%;
+    position: relative;
+    right: 200px;
+}
+
+.rect{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 2.5%; /* Usamos una proporción similar para todos los contenedores */
+    position: relative;
+    top: 70px;
+    left: 15px;
+}
+.ing{
+    position: relative;
+    top: 240px;
+    right: 120px;
+}
+.proceso{
+    position: relative;
+    top: 40px;
+    right: 200px;
+}
+.tiempo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-height: 50px;
+    max-width: 200px;
+    gap: 2.5%; 
+    background-color: #CEDFAC;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: #3E7E1E;
+    position: relative;
+    bottom: 10px;
+}
+.tipo{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-height: 50px;
+    max-width: 200px;
+    gap: 2.5%; 
+    background-color: #CEDFAC;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: #3E7E1E;
+    position: relative;
+    
+}
+
+.sl{
+    border-color: #3E7E1E !important;
+    border: 1px solid;
+    border-radius: 7px;
+    position: relative;
+    right: 10px;
+    
+}
+.sl2{
+    border-color: #3E7E1E !important;
+    border: 1px solid;
+    border-radius: 7px;
+    position: relative;
+    right: 10px;
+    
+}
+.tipo  .ant-input {  /* Borde verde oscuro */
+    color: #2c6b2f;  /* Texto verde oscuro */
+    font-size: 16px;  /* Ajusta el tamaño de la fuente */
+    padding: 8px 15px;  /* Espaciado dentro del input */
+    transition: all 0.3s ease;  /* Transición suave para el borde y fondo */
+  }
+.time:hover{
+    border-color: #3E7E1E;
+}
+.time{
+    border-color: #3E7E1E;
+    position: relative;
+    right: 10px;
+}
+p,h3{
     font-family: 'Jomhuria';
     color: #86A071;
-    font-size: 20px;
+}
+.nRec{
+    font-size: 40px;
+}
+.tx{
+    font-size: 25px;
+    padding: 20px;
+}
+.tx2{
+    font-size: 30px;
+    padding: 10px;
+    position: relative;
+    top: 20px;
+    
+}
+.txi{
+    font-size: 25px;
+    padding: 20px;
+    position: relative;
+    top: 12px;
 }
 
+.txt{
+    font-size: 25px;
+    padding: 20px;
+    top: 14px;
+    position: relative;
+}
 
 .todo {
-    border-radius: 10px;
-    border: 3px solid;
-    border-color: #3E7E1E;
+    
     width: 90%; 
     max-width: 1000px; 
     height: 70vh; 
-    background-color: #E3FFCB;
     position: relative;
     margin: 0 auto; /* Centrar el contenedor */
     padding: 2%; /* Espacio interno de 2% de su tamaño */
+    position: relative;
+    top: 20px;
 }
 
 .btImg {
@@ -56,6 +242,35 @@ p{
     background-color: transparent;
     max-width: 30px;
     max-height: 30px;
+    position: relative;
+    bottom: 22px;
+    left: 180px;
 }
 
+.btUp{
+    border: 1px solid;
+    border-color: #3E7E1E;
+    background-color: #CEDFAC;
+    max-width: 46px;
+    max-height: 30px;
+    position: relative;
+    bottom: 25px;
+    left: 220px;
+    width: 100%;
+}
 
+.btEn{
+    background-color: #CAE2B5 !important;
+    border: 1px solid;
+    border-color:#3E7E1E !important;
+    left: 840px;
+    bottom: 30px;
+}
+
+.btEn2{
+    background-color: #CAE2B5 !important;
+    border: 1px solid;
+    border-color:#3E7E1E !important;
+    left: 850px;
+    bottom: 30px;
+}

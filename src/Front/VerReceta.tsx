@@ -1,6 +1,6 @@
 import { UploadOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
-import Ingredientes from './Componentes/IngredientesRecetaEditar';
+import Ingredientes from './Componentes/IngredientesReceta';
 import type { UploadProps } from 'antd';
 import type { InputNumberProps } from 'antd';
 import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber } from "antd";
@@ -8,7 +8,7 @@ import def from '../Img/defRec.png';
 import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
 import './Estilos/EDrec.css';
-import Proceso from './Componentes/ProcedimientoEditar';
+import Proceso from './Componentes/Procedimiento';
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
   console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
@@ -94,46 +94,26 @@ export default function EDreceta() {
 
     return (
       <div className='todo'>
-        <Form>
         <div className='receta'>
           <div className='f1'>
             <img src={def}/>
-            <Upload {...props}>
-              <Button className='btUp' icon={<UploadOutlined />}></Button>
-            </Upload>
             <div className='tiempo'>
               <p className='txt'>Tiempo:</p>
-              <TimePicker minuteStep={15} secondStep={10} hourStep={1} className='time' placeholder="tiempo"/>
+              
             </div>
             <div className='tipo'>
                 <p className='txi'>Tipo:</p>
-                <Select
-              labelInValue
-              defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Jack (100)',
-                },
-                {
-                  value: 'lucy',
-                  label: 'Lucy (101)',
-                },
-              ]}
-              className='sl'
-            />
+                
             </div>
             <div className='porciones'>
               <p className='txp'>Porciones:</p>    
-              <InputNumber className='nP' min={1} max={100000} defaultValue={3} onChange={onChange} />
               </div>
           </div>
           <div className='f2'>
             
               <div className='rect'>
               <p className='nRec' >Receta</p>
+            <Button className='btImg' ><img src={btEd} className='imgEd'/></Button>
             <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
               </div>
               <div className='ing'>
@@ -144,24 +124,7 @@ export default function EDreceta() {
           <div className='f3'>
               <div className='calorias'>
               <p className='txc'>Calorias:</p>
-              <InputNumber min={1} max={100000} defaultValue={3} onChange={onChange} className='nC' />
-            <Select
-              labelInValue
-              defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Jack (100)',
-                },
-                {
-                  value: 'lucy',
-                  label: 'Lucy (101)',
-                },
-              ]}
-              className='sl2'
-            />
+              
               </div>
               
               <div className='proceso'>
@@ -170,9 +133,6 @@ export default function EDreceta() {
           </div>
           
         </div>
-        <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
-        <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
-        </Form>
       </div>
     );
   }

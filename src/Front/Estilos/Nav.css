@@ -1,68 +1,146 @@
-/* Cambiar colores del menú */
+
+
+.jomhuria-regular {
+  font-family: "Jomhuria", serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+label {
+  font-family: 'Jomhuria', serif;
+}
+
+/* Estilos del menú */
 .custom-menu {
-    background-color: #6E9A65; /* Fondo verde oscuro */
-    color: white; /* Texto blanco */
-    font-weight: lighter;
-    height: 90px;
-    border-bottom: none; /* Eliminar bordes */
-    align-items: center;
-    font-size: 16px;
-    display: flex; /* Flexbox para alinear elementos */
-    justify-content: space-between; /* Enlaces iniciales a la izquierda, perfil a la derecha */
-    padding: 0 20px;
+  background-color: #6E9A65;  /* Fondo verde oscuro */
+  color: white;  /* Texto blanco */
+  font-family: 'Jomhuria', serif;  /* Aplicar la fuente personalizada */
+  font-weight: lighter;
+  height: 90px;
+  border-bottom: none;  /* Eliminar bordes */
+  display: flex;  /* Flexbox para alinear elementos */
+  justify-content: space-between;  /* Enlaces a la izquierda, perfil a la derecha */
+  align-items: center;
+  font-size: 16px;
+  padding: 0 5%;  /* Espaciado de los lados */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
+}
+
+/* Estilo general de los ítems del menú */
+.custom-menu .ant-menu-item {
+  background-color: #6E9A65 !important;  /* Fondo transparente */
+  color: white;  /* Texto blanco */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-menu .ant-menu-item:hover {
+  background-color: #81c784 !important;  /* Fondo verde claro */
+}
+
+/* Fondo del ítem cuando está seleccionado */
+.custom-menu .ant-menu-item-selected {
+  background-color: #6E9A65 !important;  /* Fondo igual que el nav */
+  color: #CDFFAD !important;  /* Texto en verde claro para el seleccionado */
+  border-bottom: 2px solid #B3CD8F;  /* Línea verde clara debajo */
+}
+
+/* Estilo para enlaces dentro de los ítems */
+.custom-menu .ant-menu-item a {
+  color: white;  /* Texto blanco inicial */
+  transition: color 0.3s ease;  /* Transición suave */
+  text-decoration: none;  /* Eliminar subrayado */
+}
+
+/* Hover: cambia el color del texto */
+.custom-menu .ant-menu-item:hover a {
+  color: #C4FFB1;  /* Verde claro */
+}
+
+/* Activo o seleccionado: cambia el color del texto */
+.custom-menu .ant-menu-item-active a,
+.custom-menu .ant-menu-item-selected a {
+  color: #CDFFAD;  /* Verde intermedio */
+}
+
+/* Elimina el borde azul predeterminado de Ant Design */
+.custom-menu .ant-menu-item::after {
+  content: '';  /* Sobrescribe el pseudo-elemento */
+  border-bottom: none !important;  /* Quita la línea azul */
+}
+
+/* Ajustar tamaños de imágenes */
+.img-inicio {
+  width: 100px;
+  height: 60px;
+}
+
+.img-perfil {
+  width: 50px;
+  height: 50px;
+}
+
+/* Responsividad del menú para dispositivos pequeños */
+@media (max-width: 768px) {
+  .custom-menu {
+    display: none;  /* Ocultar el menú principal en pantallas pequeñas */
   }
-  
-  /* Estilo general de los ítems del menú */
-  .custom-menu .ant-menu-item {
-    background-color: #6E9A65 !important; /* Fondo transparente para igualar el color del nav */
-    color: white; /* Texto blanco inicial */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
+
+  .mobile-menu {
+    display: flex;  /* Mostrar el botón del menú en pantallas pequeñas */
+    justify-content: flex-end;
+    padding: 10px;
   }
-  
-  /* Fondo del ítem cuando está seleccionado */
-  .custom-menu .ant-menu-item-selected {
-    background-color: #6E9A65 !important; /* Fondo igual que el nav */
-    color: #CDFFAD !important; /* Texto en color especial para el seleccionado */
-    border-bottom: 2px solid #B3CD8F; /* Línea verde clara */
-  }
-  
-  /* Estilo para enlaces dentro de los ítems */
-  .custom-menu .ant-menu-item a {
-    color: white; /* Texto blanco inicial */
-    transition: color 0.3s ease; /* Transición suave del color */
-    text-decoration: none; /* Eliminar subrayado */
-  }
-  
-  /* Hover: cambia el color del texto */
-  .custom-menu .ant-menu-item:hover a {
-    color: #C4FFB1; /* Verde claro */
-  }
-  
-  /* Activo o seleccionado: cambia el color del texto */
-  .custom-menu .ant-menu-item-active a,
-  .custom-menu .ant-menu-item-selected a {
-    color: #CDFFAD; /* Verde intermedio */
-  }
-  
-  /* Fondo verde más oscuro para el elemento seleccionado */
-  .custom-menu .ant-menu-item:hover {
-    background-color: #81c784 !important; /* Fondo verde claro */
-  }
-  
-  /* Elimina el borde azul predeterminado de Ant Design */
-  .custom-menu .ant-menu-item::after {
-    content: ''; /* Sobrescribe el pseudo-elemento */
-    border-bottom: none !important; /* Quita la línea azul */
-  }
-  
-  /* Ajustar tamaños de imágenes */
-  .img-inicio {
-    width: 100px;
-    height: 60px;
-  }
-  
-  .img-perfil {
-    width: 50px;
-    height: 50px;
-  }
-  
+}
+
+/* Estilo del botón de menú móvil */
+.btA {
+  background-color: #CAE2B5;
+  border: 1px solid #3E7E1E;
+  color: #86A071;
+  border-radius: 10px;
+  padding: 5px 15px;
+  font-size: 16px;
+}
+
+/* Estilo del input de búsqueda */
+.recetas-container .buscar .ant-input {
+  background-color: #CAE2B5;  /* Fondo verde claro */
+  border: 0.5px solid #388e3c;  /* Borde verde oscuro */
+  color: #2c6b2f;  /* Texto verde oscuro */
+  font-family: 'Jomhuria', serif;  /* Usar la misma fuente personalizada */
+  font-size: 16px;  /* Ajustar tamaño de la fuente */
+  padding: 8px 15px;
+  transition: all 0.3s ease;  /* Transición suave para bordes y fondo */
+}
+
+/* Estilo cuando el input está enfocado */
+.recetas-container .buscar .ant-input:focus {
+  background-color: #CAE2B5;  /* Fondo verde más suave */
+  border-color: #66bb6a;  /* Borde verde más claro al enfocar */
+  box-shadow: 0 0 5px rgba(0, 150, 50, 0.6);  /* Sombra al enfocar */
+}
+
+/* Estilo del botón de búsqueda dentro del input */
+.recetas-container .buscar .ant-input-search-button {
+  background-color: #388e3c;  /* Botón verde oscuro */
+  color: white;  /* Texto blanco */
+  border: none;  /* Eliminar borde */
+  transition: background-color 0.3s ease;
+}
+
+/* Hover sobre el botón de búsqueda */
+.recetas-container .buscar .ant-input-search-button:hover {
+  background-color: #66bb6a;  /* Botón verde claro */
+}
+
+/* Estilo del select */
+.recetas-container .ant-select-selector {
+  border: 1px solid #388e3c !important;  /* Borde verde para el select */
+  background-color: #CAE2B5 !important;  /* Fondo verde claro */
+  color: #2c6b2f;  /* Texto verde oscuro */
+}
+
+.recetas-container .ant-select-selector:hover,
+.recetas-container .ant-select-selector:focus {
+  border-color: #66bb6a !important;  /* Borde verde claro al enfocar */
+}

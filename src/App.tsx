@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Menu } from 'antd';
+import { Menu, Button, Drawer } from 'antd';
 import type { MenuProps } from 'antd';
-import 'antd/dist/reset.css'; // Estilos base de Ant Design
+import 'antd/dist/reset.css';
 import './Front/Estilos/Nav.css';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
@@ -17,30 +17,34 @@ import Recetas from './Front/Recetas';
 import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
 import Acceder from './Front/Acceder';
+import VerR from './Front/VerReceta';
 
-// Menú principal de navegación
-const mainItems: MenuProps['items'] = [
+type ItemType = Required<MenuProps>['items'][number];
+
+const mainItems: ItemType[] = [
   { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
-  { label: <Link to="/conocenos">Conócenos</Link>, key: 'conocenos' },
-  { label: <Link to="/contactanos">Contáctanos</Link>, key: 'contactanos' },
-  { label: <Link to="/hoy">Hoy</Link>, key: 'hoy' },
-  { label: <Link to="/plan1">Plan</Link>, key: 'plan' },
-  { label: <Link to="/recetas">Recetas</Link>, key: 'recetas' },
-  { label: <Link to="/refri">Refri</Link>, key: 'refri' },
+  { label: <Link to="/conocenos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Conócenos</Link>, key: 'conocenos' },
+  { label: <Link to="/contactanos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Contáctanos</Link>, key: 'contactanos' },
+  { label: <Link to="/hoy" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Hoy</Link>, key: 'hoy' },
+  { label: <Link to="/plan1" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Plan</Link>, key: 'plan' },
+  { label: <Link to="/recetas" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Recetas</Link>, key: 'recetas' },
+  { label: <Link to="/refri" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Refri</Link>, key: 'refri' },
 ];
 
-// Menú de perfil
-const profileItem: MenuProps['items'] = [
+const profileItem: ItemType[] = [
   { label: <Link to="/perfil"><img src={btPerfil} alt="Perfil" className="img-perfil" /></Link>, key: 'perfil' },
 ];
 
-// Componente principal
 function App() {
+  const [isDrawerVisible, setDrawerVisible] = useState(false);
+
+  const showDrawer = () => setDrawerVisible(true);
+  const closeDrawer = () => setDrawerVisible(false);
+
   return (
     <Router>
       <div>
         <header>
-          {/* Menú con Ant Design */}
           <div className="custom-menu">
             <Menu
               mode="horizontal"
@@ -53,13 +57,19 @@ function App() {
               className="profile-link"
             />
           </div>
-          {/* Menú manual con Link */}
-          <nav style={{ marginTop: '10px' }}>
-            <Link to="/" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Inicio</Link>
-            <Link to="/perfil" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Perfil</Link>
-            <Link to="/refri" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Refri</Link>
-            <Link to="/acceder" style={{ margin: '0 15px', color: 'white', textDecoration: 'none' }}>Acceder</Link>
-          </nav>
+
+          {/* Botón de menú en pantallas pequeñas */}
+          <div className="mobile-menu">
+            <Button className="btA" onClick={showDrawer}>Menú</Button>
+            <Drawer
+              title="Opciones"
+              placement="right"
+              onClose={closeDrawer}
+              open={isDrawerVisible}
+            >
+              <Menu mode="vertical" items={[...mainItems, ...profileItem]} />
+            </Drawer>
+          </div>
         </header>
 
         <main>
@@ -75,6 +85,7 @@ function App() {
             <Route path="/refri" element={<Refri />} />
             <Route path="/edReceta" element={<EDreceta />} />
             <Route path="/acceder" element={<Acceder />} />
+            <Route path="/verR" element={<VerR />} />
           </Routes>
         </main>
       </div>
