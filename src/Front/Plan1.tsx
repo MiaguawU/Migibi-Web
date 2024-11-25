@@ -37,7 +37,7 @@ export default function Inicio() {
           </div>
         </div>
         <br />
-        <div style={{backgroundColor: '#D3E2B4', height: '45px', borderRadius: '10px',}}>
+        <div style={{backgroundColor: '#D3E2B4', height: '45px', borderRadius: '10px',}}> 
           <div style={{margin: '10px', marginTop: '5px',}}>
             <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071',}}>Jueves 10 de nobiembre 2024</a>      
           </div>
