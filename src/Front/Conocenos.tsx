@@ -1,138 +1,250 @@
 import React from "react";
-import { Layout, Row, Col, Card, Typography } from "antd";
+import "antd/dist/reset.css"; // Importa los estilos de Ant Design
+import { Layout, Row, Col, Card } from "antd";
+import imagefru from "../Img/imagefru.png";
+import imageman from "../Img/imageman.png";
+import imageplantapng from "../Img/imageplantapng.png";
 
 const { Content } = Layout;
-const { Title, Paragraph } = Typography;
 
-const ObjectivesPage: React.FC = () => {
+const Inicio: React.FC = () => {
   return (
-    <Layout style={{ backgroundColor: "#e0f5d9", minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh" }}>
+      {/* Content */}
       <Content style={{ padding: "20px" }}>
-        <Title level={2} style={{ textAlign: "center", color: "#66cc99" }}>
-          Nuestros objetivos
-        </Title>
-        <Row gutter={[16, 16]} justify="center">
-          {/* Primera fila: 2 columnas */}
-          <Col xs={24} sm={24} md={12}>
-            <Card
-              style={{ backgroundColor: "#d9f5cc" }}
-              bordered={false}
-              bodyStyle={{ padding: "20px" }}
-            >
-              <Title level={4} style={{ color: "#66cc99" }}>
-                Generales
-              </Title>
-              <Paragraph>
-                - Facilitar la distribución de productos alimentarios y reducir el desperdicio
-                de alimentos.
-              </Paragraph>
-              <Paragraph>
-                - Apoyar a consumidores, negocios y personas en la gestión de sus recursos
-                alimenticios de manera responsable y sostenible.
-              </Paragraph>
-              <Paragraph>
-                - Incrementar la transparencia en los procesos de distribución alimentaria.
-              </Paragraph>
-              <Paragraph>
-                - Promover una alimentación accesible y más equitativa para todos.
-              </Paragraph>
-            </Card>
-          </Col>
-          <Col xs={24} sm={24} md={12}>
-            <Card
-              style={{ backgroundColor: "#d9f5cc" }}
-              bordered={false}
-              bodyStyle={{ padding: "20px" }}
-            >
-              <Title level={4} style={{ color: "#66cc99" }}>
-                Particularidades
-              </Title>
-              <Paragraph>
-                - Expandir nuestro proceso global de distribución.
-              </Paragraph>
-              <Paragraph>
-                - Reducir los costos económicos para el usuario.
-              </Paragraph>
-              <Paragraph>
-                - Fomentar una mayor inclusión en el acceso a alimentos básicos.
-              </Paragraph>
-              <Paragraph>
-                - Facilitar la adopción de prácticas sostenibles.
-              </Paragraph>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Segunda fila: Contenedor central */}
-        <Row gutter={[16, 16]} justify="center" style={{ marginTop: "16px" }}>
-          <Col xs={24} sm={24} md={16}>
-            <Card
-              style={{ backgroundColor: "#d9f5cc", textAlign: "center" }}
-              bordered={false}
-              bodyStyle={{ padding: "20px" }}
-            >
-              <Title level={4} style={{ color: "#66cc99" }}>
-                Valores
-              </Title>
+        <section style={{ padding: "50px" }}>
+          {/* ¿Quiénes somos? */}
+          <h1
+            style={{
+              fontSize: "64px",
+              fontWeight: "bold",
+              color: "#6B8762",
+            }}
+          >
+            ¿Quiénes somos?
+          </h1>
+          <Row gutter={[16, 16]} align="middle">
+            {/* Columna para el texto */}
+            <Col xs={24} md={12}>
+              <p
+                style={{
+                  marginTop: "4px",
+                  fontSize: "36px",
+                  lineHeight: "1.5",
+                  maxWidth: "570px",
+                  textAlign: "left",
+                }}
+              >
+                Migibi es un proyecto innovador desarrollado por Cincode,
+                diseñado para revolucionar la gestión de alimentos
+                perecederos. Con nuestro enfoque en tecnología y
+                sostenibilidad, buscamos reducir el desperdicio de comida,
+                optimizar el inventario y brindar herramientas prácticas tanto
+                a negocios como a personas en su día a día.
+              </p>
+            </Col>
+            {/* Columna para la imagen */}
+            <Col xs={24} md={12}>
               <img
-                src="https://via.placeholder.com/400x200" // Reemplaza esta URL con tu imagen
-                alt="Valores"
-                style={{ maxWidth: "100%", margin: "16px 0", borderRadius: "8px" }}
+                src={imagefru}
+                alt="Frutas"
+                style={{
+                  width: "550px",
+                  height: "364px",
+                  objectFit: "cover",
+                  borderRadius: "8px"
+                }}
               />
-              <Paragraph>
-                Innovación: Buscamos soluciones tecnológicas que permitan eficientar procesos.
-              </Paragraph>
-              <Paragraph>
-                Confianza: Ofrecemos alimentos con la calidad que mereces.
-              </Paragraph>
-            </Card>
-          </Col>
-        </Row>
+            </Col>
+          </Row>
 
-        {/* Tercera fila: 2 columnas */}
-        <Row gutter={[16, 16]} justify="center" style={{ marginTop: "16px" }}>
-          <Col xs={24} sm={24} md={12}>
-            <Card
-              style={{ backgroundColor: "#d9f5cc" }}
-              bordered={false}
-              bodyStyle={{ padding: "20px" }}
-            >
-              <Title level={4} style={{ color: "#66cc99" }}>
-                Filosofía
-              </Title>
-              <Paragraph>
-                Apostamos por el cuidado del medio ambiente, promoviendo el uso
-                responsable de los recursos disponibles.
-              </Paragraph>
-              <Paragraph>
-                Fomentamos la transparencia en cada paso del proceso.
-              </Paragraph>
-            </Card>
-          </Col>
-          <Col xs={24} sm={24} md={12}>
-            <Card
-              style={{ backgroundColor: "#d9f5cc" }}
-              bordered={false}
-              bodyStyle={{ padding: "20px" }}
-            >
-              <Title level={4} style={{ color: "#66cc99" }}>
-                Políticas
-              </Title>
-              <Paragraph>
-                Nuestro sistema garantiza alimentos de calidad mediante estrictas normas
-                de seguridad.
-              </Paragraph>
-              <Paragraph>
-                Apoyamos la sustentabilidad a través del uso eficiente de recursos.
-              </Paragraph>
-            </Card>
-          </Col>
-        </Row>
+          <br></br>
+          <br></br>
+          <br></br>
+
+          {/* Nuestros Objetivos */}
+          <h1
+            style={{
+              fontSize: "64px",
+              fontWeight: "bold",
+              margin: "20px 0",
+              color: "#6B8762",
+            }}
+          >
+            Nuestros Objetivos
+          </h1>
+
+          <div style={{ height: 'auto', display: 'flex', justifyContent: 'center', padding: '0', margin:'0'}}>
+            <Row gutter= {40} style={{ width: '100%' }}>
+            <Col xs={24} sm={24} md={12} lg={12} style={{ padding: '8px' }}>
+            <Card style={{ backgroundColor: "#D3E2B4", display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ flex: 1, padding: '0' }}>
+          <h3 style={{ color: "#3E7E1E" }}>Generales</h3>
+          <ul style={{ color: "#3E7E1E" }}>
+            <li>Facilitar la administración de productos perecederos
+                y evitar el desperdicio de alimentos.</li>
+            <li>Ayudar a restaurantes, negocios y personas a planificar
+                compras, conocer la vida útil de sus productos y prever fechas de caducidad.</li>
+            <li>Proveer una herramienta intuitiva para
+                calcular con precisión la cantidad de alimentos necesarios para preparar cualquier receta.</li>
+            <li>Desarrollar software accesible y fácil de usar para gestionar inventarios.</li>
+            <li>Incorporar análisis de datos para optimizar la logística de distribución alimentaria.</li>
+            <li>Llevar a Migibi al mercado internacional en un plazo de tres años.</li>
+          </ul>
+        </div>
+      </Card>
+    </Col>
+    <Col xs={24} sm={24} md={12} lg={12} style={{ padding: '8px' }}>
+      <Card style={{ backgroundColor: "#D3E2B4", display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ flex: 1, padding:'0'}}>
+          <h3 style={{ color: "#3E7E1E" }}>Particulares</h3>
+          <ul style={{ color: "#3E7E1E" }}>
+            <li>Expandir nuestra presencia global identificando mercados emergentes en el sector alimentario.</li>
+            <li>Capacitar a los usuarios en el uso eficiente y consciente de los alimentos.</li>
+            <li>Promover la importancia de una gestión eficaz del inventario y la reducción del desperdicio.</li>
+          </ul>
+        </div>
+      </Card>
+    </Col>
+  </Row>
+</div>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+
+
+
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+            <Card style={{ borderRadius: "8px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#D3E2B4", // Fondo claro
+            padding: "20px", /*Espaciado interno*/}}
+   >
+     <h1
+       style={{
+         fontSize: "2rem",
+         fontWeight: "bold",
+         marginBottom: "16px", // Espaciado inferior
+         color: "#6B8762", // Color del título
+         textAlign: "left", // Alineado a la izquierda
+       }}
+     >
+       Valores
+     </h1>
+     <Row gutter={[16, 16]}>
+       {/* Columna para la imagen (izquierda) */}
+       <Col xs={24} md={12}>
+         <img
+           src={imageman}  // Cambia esta URL por la imagen que desees
+           alt="Descripción de la imagen"
+           style={{
+             width: "100%", // Ajusta el tamaño de la imagen
+             borderRadius: "8px", // Bordes redondeados
+             objectFit: "cover", // Para que la imagen se ajuste bien al espacio
+           }}
+         />
+       </Col>
+
+
+       {/* Columna para la lista (derecha) */}
+       <Col xs={24} md={12}>
+         <ul
+           style={{
+             margin: "0", // Quitar márgenes adicionales
+             paddingLeft: "20px", // Ajustar sangría para las viñetas
+             color: "#3E7E1E", // Color del texto
+             fontSize: "1.5rem", // Tamaño de fuente
+             lineHeight: "1.8", // Mejor legibilidad del texto
+             textAlign: "left", // Alineación del texto
+           }}
+         >
+           <li>Innovación: Buscamos soluciones tecnológicas que marquen la diferencia.</li>
+           <li>Calidad: Ofrecemos productos y servicios confiables y de alto estándar.</li>
+           <li>Compromiso: Estamos dedicados a cumplir nuestras promesas y objetivos.</li>
+           <li>Responsabilidad: Actuamos con ética y priorizamos el impacto positivo.</li>
+           <li>Colaboración: Fomentamos el trabajo en equipo con clientes y socios.</li>
+           <li>Sostenibilidad: Creemos en cuidar el planeta al mismo tiempo
+             que ayudamos a nuestros clientes.</li>
+         </ul>
+       </Col>
+     </Row>
+   </Card>
+ </Col>
+</Row>
+
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+
+          {/* Filosofía y Políticas */}
+          <Row gutter={[16, 16]} justify="center">
+            <Col xs={24} md={12}>
+              <Card
+                style={{
+                  borderRadius: "8px",
+                  backgroundColor: "#D3E2B4",
+                  padding: "20px",
+                }}
+              >
+                <h3 style={{ color: "#6B8762" }}>Filosofía</h3>
+                <p style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
+                  En Migibi, creemos en el poder transformador de la tecnología.
+                  Nuestra misión es mejorar la gestión de recursos alimentarios,
+                  promoviendo la eficiencia y un futuro más sostenible.
+                </p>
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                style={{
+                  borderRadius: "8px",
+                  backgroundColor: "#D3E2B4",
+                  padding: "20px",
+                }}
+              >
+                <h3 style={{ color: "#6B8762" }}>Políticas</h3>
+                <ul style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
+                  <li>Seguridad alimentaria.</li>
+                  <li>Transparencia e integridad.</li>
+                  <li>Cumplimiento normativo.</li>
+                </ul>
+              </Card>
+            </Col>
+          </Row>
+
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+          {/* Imagen final */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <img
+                src={imageplantapng}
+                alt="Planta"
+                style={{
+                  width: "317",
+                  height: "317",
+                  borderRadius: "8px",
+                  objectFit: "cover",
+                  textAlign: "left"
+                }}
+              />
+            </Col>
+          </Row>
+        </section>
       </Content>
     </Layout>
   );
 };
 
-export default ObjectivesPage;
+export default Inicio;
+
+
+
 
   
