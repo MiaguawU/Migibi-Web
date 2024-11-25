@@ -4,7 +4,7 @@
   right: 20px; /* Alinea la notificación a la derecha */
   width: 350px;
   height: 150px;
-  background-image: url('C:\Users\Cameron\Desktop\Batiz chamba\Proyecto 1\Migibi-Web\src\Img\Guardado.png'); /* Ruta a tu imagen */
+  background-image: url('../Img/Guardado.png'); /* Ruta a tu imagen */
   background-size: cover;
   background-position: center;
   border-radius: 12px;
@@ -22,7 +22,7 @@
   right: 20px; /* Alinea la notificación a la derecha */
   width: 350px;
   height: 150px;
-  background-image: url('C:\Users\Cameron\Desktop\Batiz chamba\Proyecto 1\Migibi-Web\src\Img\Error.png'); /* Ruta a tu imagen */
+  background-image: url('../Img/Error.png'); /* Ruta a tu imagen */
   background-size: cover;
   background-position: center;
   border-radius: 12px;
@@ -39,7 +39,7 @@
   right: 20px; /* Alinea la notificación a la derecha */
   width: 350px;
   height: 150px;
-  background-image: url('C:\Users\Cameron\Desktop\Batiz chamba\Proyecto 1\Migibi-Web\src\Img\Error2.png'); /* Ruta a tu imagen */
+  background-image: url('../Img/Error2.png'); /* Ruta a tu imagen */
   background-size: cover;
   background-position: center;
   border-radius: 12px;
@@ -57,7 +57,7 @@
   right: 20px;
   width: 350px;
   height: 150px;
-  background-image: url('C:\Users\Cameron\Desktop\Batiz chamba\Proyecto 1\Migibi-Web\src\Front\CambiarPlan.png'); /* Ruta de tu imagen */
+  background-image: url('../Img/CambiarPlan.jpeg'); /* Ruta de tu imagen */
   background-size: cover;
   background-position: center;
   border-radius: 12px;
