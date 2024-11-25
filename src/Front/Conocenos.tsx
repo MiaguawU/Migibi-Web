@@ -1,228 +1,138 @@
-import React, { useState } from 'react';
-import './Notificacion.css'; // Estilo personalizado
+import React from "react";
+import { Layout, Row, Col, Card, Typography } from "antd";
 
-const Conocenos = () => {
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [mostrarFormularioUsuario, setMostrarFormularioUsuario] = useState(false);
-  const [mostrarFormularioEmail, setMostrarFormularioEmail] = useState(false); // Estado para el tercer formulario (email)
-  const [plan, setPlan] = useState('');
-  const [usuario, setUsuario] = useState('');
-  const [email, setEmail] = useState(''); // Estado para el email
-  const [mostrarNotificacionExito, setMostrarNotificacionExito] = useState(false);
-  const [mostrarNotificacionError, setMostrarNotificacionError] = useState(false);
-  const [mostrarNotificacionUsuario, setMostrarNotificacionUsuario] = useState(false);
-  const [mostrarNotificacionEmail, setMostrarNotificacionEmail] = useState(false); // Estado para la nueva notificación de email
+const { Content } = Layout;
+const { Title, Paragraph } = Typography;
 
-  // Función para alternar la visibilidad del formulario del plan
-  const toggleFormulario = () => {
-    setMostrarFormulario(!mostrarFormulario);
-  };
-
-  // Función para alternar la visibilidad del formulario del usuario
-  const toggleFormularioUsuario = () => {
-    setMostrarFormularioUsuario(!mostrarFormularioUsuario);
-  };
-
-  // Función para alternar la visibilidad del formulario de email
-  const toggleFormularioEmail = () => {
-    setMostrarFormularioEmail(!mostrarFormularioEmail);
-  };
-
-  // Manejo de agregar plan
-  const handleAgregarPlan = () => {
-    if (plan.trim() === '') {
-      setMostrarNotificacionError(true);
-      setTimeout(() => {
-        setMostrarNotificacionError(false);
-      }, 3000);
-      return;
-    }
-
-    setMostrarNotificacionExito(true);
-    setTimeout(() => {
-      setMostrarNotificacionExito(false);
-    }, 3000);
-
-    setPlan('');
-    setMostrarFormulario(false);
-  };
-
-  // Manejo de agregar usuario
-  const handleAgregarUsuario = () => {
-    if (usuario.trim() === '') {
-      alert('Por favor, ingresa un nombre de usuario.');
-      return;
-    }
-
-    setMostrarNotificacionUsuario(true);
-    setTimeout(() => {
-      setMostrarNotificacionUsuario(false);
-    }, 3000);
-
-    setUsuario('');
-    setMostrarFormularioUsuario(false);
-  };
-
-  // Manejo de agregar email
-  const handleAgregarEmail = () => {
-    if (email.trim() === '') {
-      alert('Por favor, ingresa un email.');
-      return;
-    }
-
-    setMostrarNotificacionEmail(true);
-    setTimeout(() => {
-      setMostrarNotificacionEmail(false);
-    }, 3000);
-
-    setEmail('');
-    setMostrarFormularioEmail(false);
-  };
-
+const ObjectivesPage: React.FC = () => {
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Conócenos</h1>
-      <p>Bienvenido a nuestra sección de "Conócenos". Aquí puedes aprender más sobre nosotros y nuestros productos.</p>
+    <Layout style={{ backgroundColor: "#e0f5d9", minHeight: "100vh" }}>
+      <Content style={{ padding: "20px" }}>
+        <Title level={2} style={{ textAlign: "center", color: "#66cc99" }}>
+          Nuestros objetivos
+        </Title>
+        <Row gutter={[16, 16]} justify="center">
+          {/* Primera fila: 2 columnas */}
+          <Col xs={24} sm={24} md={12}>
+            <Card
+              style={{ backgroundColor: "#d9f5cc" }}
+              bordered={false}
+              bodyStyle={{ padding: "20px" }}
+            >
+              <Title level={4} style={{ color: "#66cc99" }}>
+                Generales
+              </Title>
+              <Paragraph>
+                - Facilitar la distribución de productos alimentarios y reducir el desperdicio
+                de alimentos.
+              </Paragraph>
+              <Paragraph>
+                - Apoyar a consumidores, negocios y personas en la gestión de sus recursos
+                alimenticios de manera responsable y sostenible.
+              </Paragraph>
+              <Paragraph>
+                - Incrementar la transparencia en los procesos de distribución alimentaria.
+              </Paragraph>
+              <Paragraph>
+                - Promover una alimentación accesible y más equitativa para todos.
+              </Paragraph>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={12}>
+            <Card
+              style={{ backgroundColor: "#d9f5cc" }}
+              bordered={false}
+              bodyStyle={{ padding: "20px" }}
+            >
+              <Title level={4} style={{ color: "#66cc99" }}>
+                Particularidades
+              </Title>
+              <Paragraph>
+                - Expandir nuestro proceso global de distribución.
+              </Paragraph>
+              <Paragraph>
+                - Reducir los costos económicos para el usuario.
+              </Paragraph>
+              <Paragraph>
+                - Fomentar una mayor inclusión en el acceso a alimentos básicos.
+              </Paragraph>
+              <Paragraph>
+                - Facilitar la adopción de prácticas sostenibles.
+              </Paragraph>
+            </Card>
+          </Col>
+        </Row>
 
-      <button onClick={toggleFormulario} style={{ margin: '10px 0' }}>
-        {mostrarFormulario ? 'Cancelar' : 'Agregar Plan'}
-      </button>
+        {/* Segunda fila: Contenedor central */}
+        <Row gutter={[16, 16]} justify="center" style={{ marginTop: "16px" }}>
+          <Col xs={24} sm={24} md={16}>
+            <Card
+              style={{ backgroundColor: "#d9f5cc", textAlign: "center" }}
+              bordered={false}
+              bodyStyle={{ padding: "20px" }}
+            >
+              <Title level={4} style={{ color: "#66cc99" }}>
+                Valores
+              </Title>
+              <img
+                src="https://via.placeholder.com/400x200" // Reemplaza esta URL con tu imagen
+                alt="Valores"
+                style={{ maxWidth: "100%", margin: "16px 0", borderRadius: "8px" }}
+              />
+              <Paragraph>
+                Innovación: Buscamos soluciones tecnológicas que permitan eficientar procesos.
+              </Paragraph>
+              <Paragraph>
+                Confianza: Ofrecemos alimentos con la calidad que mereces.
+              </Paragraph>
+            </Card>
+          </Col>
+        </Row>
 
-      {/* Primer formulario para el plan */}
-      {mostrarFormulario && (
-        <div style={{ marginTop: '20px' }}>
-          <input
-            value={plan}
-            onChange={(e) => setPlan(e.target.value)}
-            placeholder="Nombre del Plan"
-            style={{
-              width: '300px',
-              marginBottom: '10px',
-              padding: '8px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-            }}
-          />
-          <br />
-          <button
-            style={{
-              backgroundColor: '#1890ff',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-            onClick={handleAgregarPlan}
-          >
-            Agregar Plan
-          </button>
-        </div>
-      )}
-
-      <br />
-      <button onClick={toggleFormularioUsuario} style={{ margin: '10px 0' }}>
-        {mostrarFormularioUsuario ? 'Cancelar' : 'Agregar Usuario'}
-      </button>
-
-      {/* Segundo formulario para el nombre de usuario */}
-      {mostrarFormularioUsuario && (
-        <div style={{ marginTop: '20px' }}>
-          <input
-            value={usuario}
-            onChange={(e) => setUsuario(e.target.value)}
-            placeholder="Nombre de Usuario"
-            style={{
-              width: '300px',
-              marginBottom: '10px',
-              padding: '8px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-            }}
-          />
-          <br />
-          <button
-            style={{
-              backgroundColor: '#1890ff',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-            onClick={handleAgregarUsuario}
-          >
-            Agregar Usuario
-          </button>
-        </div>
-      )}
-
-      <br />
-      <button onClick={toggleFormularioEmail} style={{ margin: '10px 0' }}>
-        {mostrarFormularioEmail ? 'Cancelar' : 'Agregar Email'}
-      </button>
-
-      {/* Tercer formulario para el email */}
-      {mostrarFormularioEmail && (
-        <div style={{ marginTop: '20px' }}>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            style={{
-              width: '300px',
-              marginBottom: '10px',
-              padding: '8px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-            }}
-          />
-          <br />
-          <button
-            style={{
-              backgroundColor: '#1890ff',
-              color: '#fff',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-            onClick={handleAgregarEmail}
-          >
-            Agregar Email
-          </button>
-        </div>
-      )}
-
-      {/* Notificación de éxito (Plan) */}
-      {mostrarNotificacionExito && (
-        <div className="notificacion-con-imagen">
-         
-        </div>
-      )}
-
-      {/* Notificación de error (Plan vacío) */}
-      {mostrarNotificacionError && (
-        <div className="notificacion-con-imagen2">
-         
-        </div>
-      )}
-
-      {/* Notificación de éxito (Usuario) */}
-      {mostrarNotificacionUsuario && (
-        <div className="notificacion-con-imagen3">
-          
-        </div>
-      )}
-
-      {/* Notificación de éxito (Email) */}
-      {mostrarNotificacionEmail && (
-        <div className="notificacion-con-imagen4">
-          
-        </div>
-      )}
-    </div>
+        {/* Tercera fila: 2 columnas */}
+        <Row gutter={[16, 16]} justify="center" style={{ marginTop: "16px" }}>
+          <Col xs={24} sm={24} md={12}>
+            <Card
+              style={{ backgroundColor: "#d9f5cc" }}
+              bordered={false}
+              bodyStyle={{ padding: "20px" }}
+            >
+              <Title level={4} style={{ color: "#66cc99" }}>
+                Filosofía
+              </Title>
+              <Paragraph>
+                Apostamos por el cuidado del medio ambiente, promoviendo el uso
+                responsable de los recursos disponibles.
+              </Paragraph>
+              <Paragraph>
+                Fomentamos la transparencia en cada paso del proceso.
+              </Paragraph>
+            </Card>
+          </Col>
+          <Col xs={24} sm={24} md={12}>
+            <Card
+              style={{ backgroundColor: "#d9f5cc" }}
+              bordered={false}
+              bodyStyle={{ padding: "20px" }}
+            >
+              <Title level={4} style={{ color: "#66cc99" }}>
+                Políticas
+              </Title>
+              <Paragraph>
+                Nuestro sistema garantiza alimentos de calidad mediante estrictas normas
+                de seguridad.
+              </Paragraph>
+              <Paragraph>
+                Apoyamos la sustentabilidad a través del uso eficiente de recursos.
+              </Paragraph>
+            </Card>
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
   );
 };
 
-export default Conocenos;
+export default ObjectivesPage;
+
+  

@@ -1,104 +1,212 @@
 import React from "react";
-import "./stylesCO.css"; // Asegúrate de que el archivo CSS esté en la misma carpeta
+import { Layout, Form, Input, Button, Row, Col, Typography } from "antd";
+import {
+  MailOutlined,
+  InstagramOutlined,
+  WhatsAppOutlined,
+  FacebookOutlined,
+} from "@ant-design/icons";
 
-export default function Inicio() {
+const { Header, Content, Footer } = Layout;
+const { Title, Text } = Typography;
+
+const ContactPage: React.FC = () => {
+  const [form] = Form.useForm();
+
+  const onFinish = (values: any) => {
+    console.log("Submitted values:", values);
+  };
+
+  const onReset = () => {
+    form.resetFields();
+  };
+
   return (
-    <div className="container">
-      {/* Título */}
-      <div className="section-title">
-        <h1>Términos y Condiciones de Uso</h1>
-      </div>
-
-      {/* Fecha de última actualización */}
-      <div className="section-date">
-        <p>Fecha de última actualización: 21/11/2024</p>
-      </div>
-
-      {/* Introducción */}
-      <div className="section-intro">
-        <p>
-          Bienvenido a Migibi Eats, una aplicación móvil desarrollada por Cincode para facilitar la gestión de alimentos y recetas.
-          Al acceder y usar nuestra aplicación, aceptas los siguientes términos y condiciones. Por favor, léelos detenidamente antes de utilizar nuestros servicios.
-        </p>
-      </div>
-
-      {/* Sección 1 - Uso de la página */}
-      <div className="section">
-        <h2>1. Uso de la página</h2>
-        <div className="subsection">
-          <h3>1.1 Propósito:</h3>
-          <p>
-            Migibi Eats está diseñada para registrar alimentos, gestionar recetas, planificar menús semanales y generar listas de compras.
-          </p>
+    <Layout style={{ minHeight: "100vh", backgroundColor: "#e0f5d9" }}>
+      {/* Contenido principal */}
+      <Content style={{ padding: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "80vh",
+          }}
+        >
+          <div
+            style={{
+              border: "2px solid #3E7E1E",
+              borderRadius: "8px",
+              padding: "20px",
+              backgroundColor: "#D3E2B4",
+              maxWidth: "500px",
+              width: "90%",
+            }}
+          >
+            <h2 style={{ textAlign: "center", color: "#6E9A65" }}>
+              Contáctanos
+            </h2>
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              style={{ color: "#000" }}
+            >
+              <Form.Item
+                label="Nombre(s)"
+                name="nombre"
+                rules={[
+                  { required: true, message: "Por favor ingresa tu nombre" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Apellido paterno"
+                name="apellidoPaterno"
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingresa tu apellido paterno",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Apellido materno"
+                name="apellidoMaterno"
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingresa tu apellido materno",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Correo"
+                name="correo"
+                rules={[
+                  { required: true, message: "Por favor ingresa tu correo" },
+                  { type: "email", message: "Por favor ingresa un correo válido" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Asunto"
+                name="asunto"
+                rules={[
+                  { required: true, message: "Por favor ingresa el asunto" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Descripción"
+                name="descripcion"
+                rules={[
+                  {
+                    required: true,
+                    message: "Por favor ingresa la descripción",
+                  },
+                ]}
+              >
+                <Input.TextArea rows={4} />
+              </Form.Item>
+              <Form.Item>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <Button
+                    onClick={onReset}
+                    style={{ backgroundColor: "#6E9A65" }}
+                  >
+                    Restablecer
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    style={{
+                      backgroundColor: "#6E9A65",
+                      borderColor: "#66cc99",
+                    }}
+                  >
+                    Enviar
+                  </Button>
+                </div>
+              </Form.Item>
+            </Form>
+          </div>
         </div>
-        <div className="subsection">
-          <h3>1.2 Requisitos:</h3>
-          <p>
-            Para utilizar la aplicación, debes contar con un dispositivo que cumpla los requisitos mínimos especificados,
-            una conexión a internet estable y, en caso de ser necesario, una cuenta activa de Google.
-          </p>
-        </div>
-        <div className="subsection">
-          <h3>1.3 Acceso y Registro:</h3>
-          <ul>
-            <li>
-              El acceso requiere una cuenta de usuario, creada mediante registro con nombre y contraseña o mediante inicio de sesión con Google.
-            </li>
-            <li>
-              Es responsabilidad del usuario mantener la confidencialidad de su cuenta y contraseña.
-            </li>
-          </ul>
-        </div>
-      </div>
+      </Content>
 
-      {/* Sección 2 - Responsabilidades del Usuario */}
-      <div className="section">
-        <h2>2. Responsabilidades del Usuario</h2>
-        <p>2.1 Garantizas que los datos ingresados en la aplicación son precisos y actualizados.</p>
-        <p>2.2 El uso de Migibi Eats es únicamente para fines personales o empresariales relacionados con la gestión de alimentos.</p>
-        <p>2.3 Estás de acuerdo en no usar la aplicación para fines ilícitos, engañosos o malintencionados.</p>
-      </div>
+      {/* Pie de página */}
+      <Footer style={{ backgroundColor: "#6E9A65", padding: "40px 200px" }}>
+        <Row justify="center" gutter={[32, 32]}>
+          {/* Sección Inicio */}
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: "#fff" }}>
+              Inicio
+            </Title>
+            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
+              <li>Bienvenida</li>
+              <li>Propósito</li>
+              <li>Objetivos</li>
+              <li>Misión</li>
+              <li>Visión</li>
+            </ul>
+          </Col>
 
-      {/* Sección 3 - Limitaciones de Responsabilidad */}
-      <div className="section">
-        <h2>3. Limitaciones de Responsabilidad</h2>
-        <p>3.1 Migibi Eats no garantiza la disponibilidad ininterrumpida de sus servicios y no será responsable por interrupciones causadas por mantenimiento, actualizaciones o fallas técnicas.</p>
-        <p>3.2 La aplicación no es responsable de la calidad, seguridad o precisión de los datos ingresados por los usuarios, como las fechas de caducidad de alimentos.</p>
-      </div>
+          {/* Sección Nosotros */}
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: "#fff" }}>
+              Nosotros
+            </Title>
+            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
+              <li>Equipo</li>
+              <li>Organigrama</li>
+              <li>Valores</li>
+              <li>Filosofía</li>
+              <li>Políticas</li>
+            </ul>
+          </Col>
 
-      {/* Sección 4 - Propiedad Intelectual */}
-      <div className="section">
-        <h2>4. Propiedad Intelectual</h2>
-        <p>4.1 Todos los derechos, incluyendo el diseño, código y contenido de Migibi Eats, son propiedad de Cincode y están protegidos por las leyes de propiedad intelectual.</p>
-        <p>4.2 El usuario no puede reproducir, modificar, distribuir ni explotar la aplicación sin autorización previa.</p>
-      </div>
+          {/* Sección Migibi */}
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: "#fff" }}>
+              Migibi
+            </Title>
+            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
+              <li>Plan</li>
+              <li>HOY</li>
+            </ul>
+          </Col>
 
-      {/* Sección 5 - Modificaciones */}
-      <div className="section">
-        <h2>5. Modificaciones</h2>
-        <p>
-          Cincode se reserva el derecho de modificar los términos y condiciones en cualquier momento. Las modificaciones se notificarán a través de la aplicación o del correo electrónico registrado.
-        </p>
-      </div>
+          {/* Sección Contáctanos */}
+          <Col xs={24} sm={12} md={6}>
+            <Title level={4} style={{ color: "#fff" }}>
+              Contáctanos
+            </Title>
+            <Text style={{ color: "#fff" }}>correo.ejemplo@gmail.com</Text>
+            <div style={{ marginTop: "10px", fontSize: "20px" }}>
+              <MailOutlined style={{ color: "#fff", marginRight: "10px" }} />
+              <InstagramOutlined style={{ color: "#fff", marginRight: "10px" }} />
+              <WhatsAppOutlined style={{ color: "#fff", marginRight: "10px" }} />
+              <FacebookOutlined style={{ color: "#fff" }} />
+            </div>
+          </Col>
+        </Row>
 
-      {/* Sección 6 - Ley Aplicable y Jurisdicción */}
-      <div className="section">
-        <h2>6. Ley Aplicable y Jurisdicción</h2>
-        <p>
-          Este acuerdo se rige por las leyes de México. Cualquier disputa será resuelta en los tribunales de la CDMX.
-        </p>
-      </div>
-
-      {/* Contacto y agradecimientos */}
-      <div className="section">
-        <p>
-          Si tienes dudas o deseas ejercer tus derechos, puedes contactarnos en:
-          Correo electrónico: [Correo electrónico] Teléfono: [Número de contacto]
-        </p>
-        <p>
-          Gracias por confiar en Migibi Eats y en nuestro compromiso con la sostenibilidad y eficiencia alimentaria.
-        </p>
-      </div>
-    </div>
+        {/* Sección de términos y condiciones */}
+        <Row justify="center" style={{ marginTop: "30px" }}>
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            Términos y condiciones | Aviso de privacidad
+          </Text>
+        </Row>
+      </Footer>
+    </Layout>
   );
-}
+};
+
+export default ContactPage;
