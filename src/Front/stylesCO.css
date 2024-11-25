@@ -1,0 +1,65 @@
+/* Estilo global */
+body, .container {
+  font-family: 'Arial', sans-serif;
+  color: #333; /* Color oscuro para texto */
+}
+
+/* Contenedor principal */
+.container {
+  padding: 20px;
+  background-color: white;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Título principal */
+.section-title h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #4a9f65; /* Color verde oscuro */
+  text-align: center;
+}
+
+/* Fecha de última actualización */
+.section-date p {
+  font-size: 1.2rem;
+  color: #4a9f65; /* Color verde oscuro */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Introducción */
+.section-intro p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #4a9f65; /* Color verde oscuro */
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Secciones de contenido */
+.section {
+  margin-top: 25px;
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #4a9f65; /* Color verde oscuro */
+}
+
+.subsection h3 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #4a9f65; /* Color verde oscuro */
+  margin-top: 10px;
+}
+
+.subsection p, .subsection ul {
+  font-size: 1.1rem;
+  color: #333; /* Color oscuro para párrafos y listas */
+}
+
+.subsection ul {
+  margin-left: 20px;
+}
