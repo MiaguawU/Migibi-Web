@@ -10,6 +10,10 @@ import Inicio from './Front/Inicio';
 import Perfil from './Front/Perfil';
 import Conocenos from './Front/Conocenos';
 import Contactanos from './Front/contactanos';
+import Formulario from './Front/Formulario';
+import Formulario2 from './Front/Formulario2';
+
+
 import Hoy from './Front/Hoy';
 import Plan1 from './Front/Plan1';
 import Plan2 from './Front/Plan2';
@@ -23,6 +27,9 @@ const mainItems: MenuProps['items'] = [
   { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
   { label: <Link to="/conocenos">Conócenos</Link>, key: 'conocenos' },
   { label: <Link to="/contactanos">Contáctanos</Link>, key: 'contactanos' },
+  { label: <Link to="/formulario">Formulario</Link>, key: 'formulario' },
+  { label: <Link to="/formulario2">Formulario2</Link>, key: 'formulario2' },
+
   { label: <Link to="/hoy">Hoy</Link>, key: 'hoy' },
   { label: <Link to="/plan1">Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas">Recetas</Link>, key: 'recetas' },
@@ -68,6 +75,10 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/conocenos" element={<Conocenos />} />
             <Route path="/contactanos" element={<Contactanos />} />
+            <Route path="/formulario" element={<Formulario />} />
+            <Route path="/formulario2" element={<Formulario2 />} />
+
+
             <Route path="/hoy" element={<Hoy />} />
             <Route path="/plan1" element={<Plan1 />} />
             <Route path="/plan2" element={<Plan2 />} />
