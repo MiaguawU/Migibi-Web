@@ -10,7 +10,7 @@ import cuadros from "../Img/cuadros.png";
 import flechaizquierda from "../Img/flechaizquierda.png";
 import flechaderecha from "../Img/flechaderecha.png";
 import calendario from "../Img/calendario.png";
-import btagregar from "../Img/btagregar.png";
+import btagregar from "../Img/btagregar2.png";
 
 export default function Inicio() {  
   return (  
