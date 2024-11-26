@@ -79,6 +79,9 @@ label {
   height: 50px;
 }
 
+.mobile-menu {
+  display: none;
+}
 /* Responsividad del menú para dispositivos pequeños */
 @media (max-width: 768px) {
   .custom-menu {
@@ -89,6 +92,16 @@ label {
     display: flex;  /* Mostrar el botón del menú en pantallas pequeñas */
     justify-content: flex-end;
     padding: 10px;
+  }
+}
+
+@media (min-width: 769px) {
+  .custom-menu {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: none;
   }
 }
 

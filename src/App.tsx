@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Menu, Button, Drawer } from 'antd';
 import type { MenuProps } from 'antd';
@@ -35,41 +35,57 @@ const profileItem: ItemType[] = [
   { label: <Link to="/perfil"><img src={btPerfil} alt="Perfil" className="img-perfil" /></Link>, key: 'perfil' },
 ];
 
+
 function App() {
   const [isDrawerVisible, setDrawerVisible] = useState(false);
 
   const showDrawer = () => setDrawerVisible(true);
   const closeDrawer = () => setDrawerVisible(false);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <Router>
       <div>
-        <header>
-          <div className="custom-menu">
-            <Menu
-              mode="horizontal"
-              items={mainItems}
-              className="menu-links"
-            />
-            <Menu
-              mode="horizontal"
-              items={profileItem}
-              className="profile-link"
-            />
-          </div>
 
-          {/* Botón de menú en pantallas pequeñas */}
-          <div className="mobile-menu">
-            <Button className="btA" onClick={showDrawer}>Menú</Button>
-            <Drawer
-              title="Opciones"
-              placement="right"
-              onClose={closeDrawer}
-              open={isDrawerVisible}
-            >
-              <Menu mode="vertical" items={[...mainItems, ...profileItem]} />
-            </Drawer>
-          </div>
+        <header>
+            {isMobile ? (
+                <div className="mobile-menu">
+                <Button className="btA" onClick={showDrawer}>Menú</Button>
+                <Drawer
+                  title="Opciones"
+                  placement="right"
+                  onClose={closeDrawer}
+                  open={isDrawerVisible}
+                >
+                  <Menu mode="vertical" items={[...mainItems, ...profileItem]} />
+                </Drawer>
+              </div>
+            ) : (
+                <div className="custom-menu">
+                  <Menu
+                    mode="horizontal"
+                    items={mainItems}
+                    className="menu-links"
+                  />
+                  <Menu
+                    mode="horizontal"
+                    items={profileItem}
+                    className="profile-link"
+                  />
+                </div>
+            )}
         </header>
 
         <main>
