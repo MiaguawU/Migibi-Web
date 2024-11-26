@@ -1,17 +1,22 @@
 import React from "react";
 import "antd/dist/reset.css"; // Importa los estilos de Ant Design
-import { Layout, Row, Col, Card } from "antd";
+import { Layout, Row, Col, Card, Typography } from "antd";
+import {
+  MailOutlined,
+  InstagramOutlined,
+  WhatsAppOutlined,
+  FacebookOutlined,
+} from "@ant-design/icons";
 import imagefru from "../Img/imagefru.png";
 import imageman from "../Img/imageman.png";
 import imageplantapng from "../Img/imageplantapng.png";
 
-const { Content } = Layout;
+const { Content, Footer } = Layout;
+
+const { Title, Text } = Typography;
 
 const Inicio: React.FC = () => {
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {/* Content */}
-      <Content style={{ padding: "20px" }}>
         <section style={{ padding: "50px" }}>
           {/* ¿Quiénes somos? */}
           <h1
@@ -79,7 +84,7 @@ const Inicio: React.FC = () => {
             <Col xs={24} sm={24} md={12} lg={12} style={{ padding: '8px' }}>
             <Card style={{ backgroundColor: "#D3E2B4", display: 'flex', flexDirection: 'column', height: '100%' }}>
           <div style={{ flex: 1, padding: '0' }}>
-          <h3 style={{ color: "#3E7E1E" }}>Generales</h3>
+          <h2 style={{ color: "#3E7E1E" }}>Generales</h2>
           <ul style={{ color: "#3E7E1E" }}>
             <li>Facilitar la administración de productos perecederos
                 y evitar el desperdicio de alimentos.</li>
@@ -97,7 +102,7 @@ const Inicio: React.FC = () => {
     <Col xs={24} sm={24} md={12} lg={12} style={{ padding: '8px' }}>
       <Card style={{ backgroundColor: "#D3E2B4", display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ flex: 1, padding:'0'}}>
-          <h3 style={{ color: "#3E7E1E" }}>Particulares</h3>
+          <h2 style={{ color: "#3E7E1E" }}>Particulares</h2>
           <ul style={{ color: "#3E7E1E" }}>
             <li>Expandir nuestra presencia global identificando mercados emergentes en el sector alimentario.</li>
             <li>Capacitar a los usuarios en el uso eficiente y consciente de los alimentos.</li>
@@ -189,7 +194,7 @@ const Inicio: React.FC = () => {
                   padding: "20px",
                 }}
               >
-                <h3 style={{ color: "#6B8762" }}>Filosofía</h3>
+                <h2 style={{ color: "#6B8762" }}>Filosofía</h2>
                 <p style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
                   En Migibi, creemos en el poder transformador de la tecnología.
                   Nuestra misión es mejorar la gestión de recursos alimentarios,
@@ -205,7 +210,7 @@ const Inicio: React.FC = () => {
                   padding: "20px",
                 }}
               >
-                <h3 style={{ color: "#6B8762" }}>Políticas</h3>
+                <h2 style={{ color: "#6B8762" }}>Políticas</h2>
                 <ul style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
                   <li>Seguridad alimentaria.</li>
                   <li>Transparencia e integridad.</li>
@@ -237,8 +242,6 @@ const Inicio: React.FC = () => {
             </Col>
           </Row>
         </section>
-      </Content>
-    </Layout>
   );
 };
 

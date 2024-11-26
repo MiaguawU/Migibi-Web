@@ -18,6 +18,7 @@ import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
 import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
+import MainLayout from './Front/MainLayout';
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -57,6 +58,7 @@ function App() {
 
   return (
     <Router>
+    <MainLayout>
       <div>
 
         <header>
@@ -104,6 +106,7 @@ function App() {
           </Routes>
         </main>
       </div>
+    </MainLayout>
     </Router>
   );
 }

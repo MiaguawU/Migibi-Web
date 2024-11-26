@@ -22,9 +22,7 @@ const ContactPage: React.FC = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor: "#e0f5d9" }}>
-      {/* Contenido principal */}
-      <Content style={{ padding: "20px" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#e0f5d9", paddingTop: "10px"}}>
         <div
           style={{
             display: "flex",
@@ -50,13 +48,32 @@ const ContactPage: React.FC = () => {
               form={form}
               layout="vertical"
               onFinish={onFinish}
-              style={{ color: "#000" }}
+              style={{ color: "#6B8762" }}
             >
               <Form.Item
                 label="Nombre(s)"
                 name="nombre"
+                style={{ color: "#6B8762" }}
                 rules={[
                   { required: true, message: "Por favor ingresa tu nombre" },
+                  {
+                    validator: (_, value) => {
+                      const regexText = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
+                      const regexXML = /^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/;
+        
+                      if (!value) {
+                        return Promise.reject("Este campo es obligatorio");
+                      }
+        
+                      if (regexText.test(value) || regexXML.test(value)) {
+                        return Promise.resolve();
+                      }
+        
+                      return Promise.reject(
+                        "Solo se permiten letras y un máximo de 40 caracteres."
+                      );
+                    },
+                  },
                 ]}
               >
                 <Input />
@@ -69,6 +86,24 @@ const ContactPage: React.FC = () => {
                     required: true,
                     message: "Por favor ingresa tu apellido paterno",
                   },
+                  {
+                    validator: (_, value) => {
+                      const regexText = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
+                      const regexXML = /^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/;
+        
+                      if (!value) {
+                        return Promise.reject("Este campo es obligatorio");
+                      }
+        
+                      if (regexText.test(value) || regexXML.test(value)) {
+                        return Promise.resolve();
+                      }
+        
+                      return Promise.reject(
+                        "Solo se permiten letras y un máximo de 40 caracteres."
+                      );
+                    },
+                  },
                 ]}
               >
                 <Input />
@@ -80,6 +115,24 @@ const ContactPage: React.FC = () => {
                   {
                     required: true,
                     message: "Por favor ingresa tu apellido materno",
+                  },
+                  {
+                    validator: (_, value) => {
+                      const regexText = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
+                      const regexXML = /^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/;
+        
+                      if (!value) {
+                        return Promise.reject("Este campo es obligatorio");
+                      }
+        
+                      if (regexText.test(value) || regexXML.test(value)) {
+                        return Promise.resolve();
+                      }
+        
+                      return Promise.reject(
+                        "Solo se permiten letras y un máximo de 40 caracteres."
+                      );
+                    },
                   },
                 ]}
               >
@@ -100,6 +153,24 @@ const ContactPage: React.FC = () => {
                 name="asunto"
                 rules={[
                   { required: true, message: "Por favor ingresa el asunto" },
+                  {
+                    validator: (_, value) => {
+                      const regexText = /^[A-Za-z\s.,;:!?¿"']{1,150}$/;
+                      const regexXML = /^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/;
+        
+                      if (!value) {
+                        return Promise.reject("Este campo es obligatorio");
+                      }
+        
+                      if (regexText.test(value) || regexXML.test(value)) {
+                        return Promise.resolve();
+                      }
+        
+                      return Promise.reject(
+                        `El texto debe tener entre 1 y 150 caracteres Símbolos permitidos: .,;:!?¿"`
+                      );
+                    },
+                  },
                 ]}
               >
                 <Input />
@@ -111,6 +182,24 @@ const ContactPage: React.FC = () => {
                   {
                     required: true,
                     message: "Por favor ingresa la descripción",
+                  },
+                  {
+                    validator: (_, value) => {
+                      const regexText = /^[A-Za-z\s.,;:!?¿"']{1,500}$/;
+                      const regexXML = /^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/;
+        
+                      if (!value) {
+                        return Promise.reject("Este campo es obligatorio");
+                      }
+        
+                      if (regexText.test(value) || regexXML.test(value)) {
+                        return Promise.resolve();
+                      }
+        
+                      return Promise.reject(
+                        `El texto debe tener entre 1 y 500 caracteres Símbolos permitidos: .,;:!?¿"`
+                      );
+                    },
                   },
                 ]}
               >
@@ -139,73 +228,7 @@ const ContactPage: React.FC = () => {
             </Form>
           </div>
         </div>
-      </Content>
-
-      {/* Pie de página */}
-      <Footer style={{ backgroundColor: "#6E9A65", padding: "40px 200px" }}>
-        <Row justify="center" gutter={[32, 32]}>
-          {/* Sección Inicio */}
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Inicio
-            </Title>
-            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
-              <li>Bienvenida</li>
-              <li>Propósito</li>
-              <li>Objetivos</li>
-              <li>Misión</li>
-              <li>Visión</li>
-            </ul>
-          </Col>
-
-          {/* Sección Nosotros */}
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Nosotros
-            </Title>
-            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
-              <li>Equipo</li>
-              <li>Organigrama</li>
-              <li>Valores</li>
-              <li>Filosofía</li>
-              <li>Políticas</li>
-            </ul>
-          </Col>
-
-          {/* Sección Migibi */}
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Migibi
-            </Title>
-            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
-              <li>Plan</li>
-              <li>HOY</li>
-            </ul>
-          </Col>
-
-          {/* Sección Contáctanos */}
-          <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Contáctanos
-            </Title>
-            <Text style={{ color: "#fff" }}>correo.ejemplo@gmail.com</Text>
-            <div style={{ marginTop: "10px", fontSize: "20px" }}>
-              <MailOutlined style={{ color: "#fff", marginRight: "10px" }} />
-              <InstagramOutlined style={{ color: "#fff", marginRight: "10px" }} />
-              <WhatsAppOutlined style={{ color: "#fff", marginRight: "10px" }} />
-              <FacebookOutlined style={{ color: "#fff" }} />
-            </div>
-          </Col>
-        </Row>
-
-        {/* Sección de términos y condiciones */}
-        <Row justify="center" style={{ marginTop: "30px" }}>
-          <Text style={{ color: "#fff", textAlign: "center" }}>
-            Términos y condiciones | Aviso de privacidad
-          </Text>
-        </Row>
-      </Footer>
-    </Layout>
+    </div>
   );
 };
 

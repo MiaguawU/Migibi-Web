@@ -50,7 +50,7 @@ export default function Inicio() {
                 }
             }}
         >
-      <div style= {{ width: '80vw', alignContent: 'center', marginLeft: '10vw', marginRight: '10vw'}}>
+      <div style= {{ width: '80vw', alignContent: 'center', marginLeft: '10vw', marginRight: '10vw', marginTop: '10px'}}>
         <Flex align='center' justify= 'space-evenly'>
             
             <div >
