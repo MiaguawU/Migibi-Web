@@ -26,7 +26,7 @@ const mainItems: ItemType[] = [
   { label: <Link to="/conocenos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Conócenos</Link>, key: 'conocenos' },
   { label: <Link to="/contactanos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Contáctanos</Link>, key: 'contactanos' },
   { label: <Link to="/hoy" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Hoy</Link>, key: 'hoy' },
-  { label: <Link to="/plan1" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Plan</Link>, key: 'plan' },
+  { label: <Link to="/plan" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Recetas</Link>, key: 'recetas' },
   { label: <Link to="/refri" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Refri</Link>, key: 'refri' },
 ];
@@ -94,9 +94,8 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/conocenos" element={<Conocenos />} />
             <Route path="/contactanos" element={<Contactanos />} />
-            <Route path="/hoy" element={<Hoy />} />
-            <Route path="/plan1" element={<Plan1 />} />
-            <Route path="/plan2" element={<Plan2 />} />
+            <Route path="/hoy" element={<Plan2 />} />
+            <Route path="/plan" element={<Plan1 />} />
             <Route path="/recetas" element={<Recetas />} />
             <Route path="/refri" element={<Refri />} />
             <Route path="/edReceta" element={<EDreceta />} />
