@@ -36,6 +36,10 @@ const profileItem: ItemType[] = [
   { label: <Link to="/perfil"><img src={btPerfil} alt="Perfil" className="img-perfil" /></Link>, key: 'perfil' },
 ];
 
+const accederItem: ItemType[] = [
+  { label: <Link to="/acceder" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Acceder</Link>, key: 'acceder' },
+];
+
 
 function App() {
   const [isDrawerVisible, setDrawerVisible] = useState(false);
@@ -48,6 +52,8 @@ function App() {
   const handleResize = () => {
     setIsMobile(window.innerWidth < 768);
   };
+
+  const [Accedio, setAccedio] = useState(true);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -71,21 +77,30 @@ function App() {
                   onClose={closeDrawer}
                   open={isDrawerVisible}
                 >
-                  <Menu mode="vertical" items={[...mainItems, ...profileItem]} />
+                  <Menu mode="vertical" items={Accedio ? [...mainItems, ...profileItem] : [...mainItems.slice(0, 3), ...accederItem] } />
                 </Drawer>
               </div>
             ) : (
                 <div className="custom-menu">
                   <Menu
                     mode="horizontal"
-                    items={mainItems}
+                    items={Accedio ? mainItems : mainItems.slice(0, 3)}
                     className="menu-links"
                   />
-                  <Menu
-                    mode="horizontal"
-                    items={profileItem}
-                    className="profile-link"
-                  />
+                  {Accedio ? ( // Mostrar el perfil solo si está habilitado
+                    <Menu
+                      mode="horizontal"
+                      items={profileItem}
+                      className="profile-link"
+                    />
+                  ) : (
+                    <Menu
+                      mode="horizontal"
+                      items={accederItem}
+                      className="profile-link"
+                    />
+                  )
+                }
                 </div>
             )}
         </header>
@@ -103,6 +118,8 @@ function App() {
             <Route path="/edReceta" element={<EDreceta />} />
             <Route path="/acceder" element={<Acceder />} />
             <Route path="/verR" element={<VerR />} />
+            <Route path="/terminosycondiciones" element={<VerR />} />
+            <Route path="/avisodeprivacidad" element={<VerR />} />
           </Routes>
         </main>
       </div>
