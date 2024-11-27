@@ -1,0 +1,70 @@
+.notificacion-con-imagen {
+  position: fixed;
+  top: 20px; /* Posiciona la notificación en la parte superior */
+  right: 20px; /* Alinea la notificación a la derecha */
+  width: 350px;
+  height: 150px;
+  background-image: url('../Img/Guardado.png'); /* Ruta a tu imagen */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+
+.notificacion-con-imagen2 {
+  position: fixed;
+  top: 20px; /* Posiciona la notificación en la parte superior */
+  right: 20px; /* Alinea la notificación a la derecha */
+  width: 350px;
+  height: 150px;
+  background-image: url('../Img/Error.png'); /* Ruta a tu imagen */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+.notificacion-con-imagen3 {
+  position: fixed;
+  top: 20px; /* Posiciona la notificación en la parte superior */
+  right: 20px; /* Alinea la notificación a la derecha */
+  width: 350px;
+  height: 150px;
+  background-image: url('../Img/Error2.png'); /* Ruta a tu imagen */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+
+.notificacion-con-imagen4 {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  height: 150px;
+  background-image: url('../Img/CambiarPlan.jpeg'); /* Ruta de tu imagen */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+}
+

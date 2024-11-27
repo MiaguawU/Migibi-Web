@@ -1,0 +1,209 @@
+/* Estilos generales para la pantalla Recetas */
+
+.recetas-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5%;  /* Cambié 20px a porcentaje */
+  padding: 5%;  /* Cambié 20px a porcentaje */
+  bottom: 4dvw;
+  position: relative;
+}
+
+.recetas-container .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;  /* Cambié 800px a 100% */
+  gap: 5%;  /* Cambié 20px a porcentaje */
+}
+
+.recetas-container .search-bar {
+  flex: 1;
+}
+
+.recetas-container .cont {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5%;  /* Cambié 20px a porcentaje */
+  width: 100%;
+}
+
+.recetas-container .card {
+  display: flex;
+  flex-direction: column;
+  background-color: #CAE2B5;
+  border: 1px solid #3E7E1E;
+  border-radius: 10px;
+  padding: 2%;  /* Cambié 10px a porcentaje */
+  width: 100%;  /* Cambié 300px a un valor relativo, ajustable según la pantalla */
+  height: 80%;
+  min-width: 10px;
+  max-width: 300px;
+  max-height: 380px;
+  top: 1dvw;
+  position: relative;
+}
+
+.recetas-container .img-rec {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.recetas-container .fila1,
+.recetas-container .fila2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2%;  /* Cambié 10px a porcentaje */
+}
+
+.recetas-container .edit {
+  width: 20px;  /* Cambié 20px a porcentaje */
+  height: 20px;  /* Cambié 20px a porcentaje */
+}
+
+.recetas-container h3 {
+  font-size: 38px;
+}
+
+.recetas-container .btA {
+  background-color: #CAE2B5;
+  border-color: #3E7E1E;
+  color: #86A071;
+  border: 1px solid #3E7E1E;
+  border-radius: 10px;
+  position: relative;
+  padding: 1% 5%;  /* Cambié 5px 20px a porcentaje */
+}
+
+.recetas-container .btA:hover {
+  border-color: #3E7E1E !important;
+  color: #86A071  !important;
+  border: 1px solid #3E7E1E  !important;
+  background-color: #CAE2B5!important;
+}
+
+.recetas-container .btE {
+  background-color: transparent;
+  border: none !important;
+  left: 0.2dvw;
+  bottom: 0.9dvw;
+}
+
+.recetas-container .btC {
+  background-color: transparent;
+  border: none !important;
+  left: 0.2dvw;
+  bottom: 3.7dvw;
+}
+
+.recetas-container .btD {
+  bottom: 0.9dvw;
+  position: relative;
+  left: 0.2dvw;
+}
+
+.recetas-container .btE:hover {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.recetas-container .btC:hover {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.recetas-container .img {
+  max-width: 20px;
+  max-height: 20px;
+  bottom: 3.8dvw;
+  position: relative;
+}
+
+.recetas-container .img2 {
+  max-width: 20px;
+  max-height: 20px;
+  bottom: 3.8dvw;
+  position: relative;
+}
+
+.recetas-container p {
+  font-size: 28px;
+}
+
+.recetas-container .porciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1%;
+}
+
+.recetas-container .txA {
+  position: relative;
+  bottom: 2.6dvw;
+  right: 0.7dvw;
+}
+
+@media (max-width: 300px), (max-height: 380px) {
+  .recetas-container .header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .recetas-container .card {
+    max-width: 90%;
+  }
+
+  .recetas-container h3 {
+    font-size: 24px;
+  }
+
+  .recetas-container p {
+    font-size: 16px;
+  }
+}
+
+/* Estilos solo para el componente Recetas */
+.recetas-container .buscar .ant-input {
+  background-color: #CAE2B5;  /* Fondo verde claro */
+  border: .5px solid #388e3c;  /* Borde verde oscuro */
+  color: #2c6b2f;  /* Texto verde oscuro */
+  font-size: 16px;  /* Ajusta el tamaño de la fuente */
+  padding: 8px 15px;  /* Espaciado dentro del input */
+  transition: all 0.3s ease;  /* Transición suave para el borde y fondo */
+}
+
+/* Estilo cuando el input está enfocado */
+.recetas-container .buscar .ant-input:focus {
+  background-color: #CAE2B5;  /* Fondo verde más suave */
+  border-color: #66bb6a;  /* Borde verde más claro cuando está enfocado */
+  box-shadow: 0 0 5px rgba(0, 150, 50, 0.6);  /* Efecto de sombra al enfocar */
+}
+
+/* Estilo para el botón de búsqueda dentro del input */
+.recetas-container .buscar .ant-input-search-button {
+  background-color: #388e3c;  /* Botón verde oscuro */
+  color: white;  /* Texto blanco */
+  border: none;  /* Quitar bordes del botón */
+  transition: background-color 0.3s ease;
+}
+
+/* Hover sobre el botón de búsqueda */
+.recetas-container .buscar .ant-input-search-button:hover {
+  background-color: #66bb6a;  /* Botón verde más claro */
+}
+
+/* Estilo del Select */
+.recetas-container .ant-select-selector {
+  border: 1px solid #388e3c !important;  /* Borde verde para el select */
+  background-color: #CAE2B5 !important;  /* Fondo verde claro */
+  color: #2c6b2f;  /* Texto verde oscuro */
+}
+
+.recetas-container .ant-select-selector:hover, .recetas-container .ant-select-selector:focus {
+  border-color: #66bb6a !important;  /* Borde verde claro al enfocar */
+}
