@@ -1,6 +1,8 @@
 import React from "react";
-import { Button } from "antd";
+import { Button, Carousel } from "antd";
 import { useNavigate } from "react-router-dom";
+import CarouselExample from "./Carousel";
+import Carousel2 from "../Img/Infografía MIGIBI 1.png";
 
 export default function Inicio() {
   const navigate = useNavigate();
@@ -9,13 +11,14 @@ export default function Inicio() {
     navigate("/acceder");
   };
 
+
   return (
-    <div>
-      <h1>Página Principal</h1>
-      <Button type="primary" onClick={iraAcceder}>
-        Acceder
-      </Button>
-    </div>
+    <>
+      <CarouselExample />
+      <div>
+        <img src={Carousel2} alt="Descripción de la imagen" style={{ maxWidth: "100%", height: "auto" }} />
+      </div>
+    </>
   );
 }
   

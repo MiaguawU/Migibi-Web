@@ -1,4 +1,6 @@
-import { Row, Card, Col } from 'antd';  
+import React, { useState } from "react";
+import { Row, Card, Col , ConfigProvider} from 'antd';  
+import Pagination from "./Componentes/Pagination";
 import imgdesayuno from "../Img/imgdesayuno.png";
 import defRec from "../Img/defRec.png";
 import btEditar from "../Img/btEditar.png";
@@ -11,133 +13,110 @@ import flechaizquierda from "../Img/flechaizquierda.png";
 import flechaderecha from "../Img/flechaderecha.png";
 import calendario from "../Img/calendario.png";
 import btagregar from "../Img/btagregar2.png";
+import RecipeCard from './Componentes/RecetaCard';
+
+const { Meta } = Card;
+const handleEdit = () => {
+  console.log("Editar receta");
+};
+
+const handleDelete = () => {
+  console.log("Eliminar receta");
+};
 
 export default function Inicio() {  
+  const [weekIndex, setWeekIndex] = useState(0);
+
+  const weeks = [
+    "Semana del 1 al 7 de noviembre",
+    "Semana del 8 al 14 de noviembre",
+    "Semana del 15 al 21 de noviembre",
+    "Semana del 22 al 28 de noviembre",
+  ];
+
+  const handlePrevious = () => {
+    if (weekIndex > 0) setWeekIndex(weekIndex - 1);
+  };
+
+  const handleNext = () => {
+    if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
+  };
+
+  
+  interface CardData {
+    title: string;
+    portions: string;
+    calories: string;
+    time: string;
+    image: string;
+  }
+  
+  const { Meta } = Card;
+  const cardsData: CardData[] = [
+    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
+    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
+    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
+    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
+    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
+  ];
+ 
   return (  
     <>  
+    <ConfigProvider
+    theme={{
+        token: {
+            // Seed Token
+            colorPrimary: '#00b96b',
+            borderRadius: 10,
+            
+
+            // Alias Token
+            colorBgContainer: '#CAE2B5',
+        },
+        components: {
+            Select: {
+                optionActiveBg: '#CAE2B5',
+                algorithm: true
+            }
+        }
+    }}
+    >
       <div style={{ marginLeft: '15px', marginRight: '15px',}}>
         <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex',}}>
           <div style={{height: '100%', width: '80%', display: 'flex',}}>
             <img src={imgdesayuno} style={{height: '100px',}}/><img src={relojarena} style={{height: '66px',}}/>  
           </div>
           <div style={{height: '100%', width: '20%', display: 'flex',}}>
-          <img src={cuadros} style={{height: '58px',}}/>
+            <img src={cuadros} style={{height: '58px',}}/>
           </div>
         </div>
         <div style={{backgroundColor: '#D3E2B4', height: 'auto', borderRadius: '10px',}}>
-          <div style={{margin: '10px', marginTop: '5px', alignItems: 'center',}}>
-            <img src={flechaizquierda} style={{height: '40px',}}/><a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071',}}>Jueves 10 de nobiembre 2024</a> <img src={calendario} style={{height: '30px',}}/><img src={btCompartir} style={{height: '30.5px',}}/><img src={flechaderecha} style={{height: '40px', alignItems: 'left',}}/>      
-          </div>
+          <Pagination
+            currentWeek={weeks[weekIndex]}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+          />
         </div>
         <br /><br />
-        <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}><a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071',}}>Desayuno</a>
-          <div style={{margin: '40px', marginBottom: '20px',}}>
-          <Row gutter={40}>  
-              <Col xs={24} sm={16} md={8} lg={6}>  
-                <Card style={{ backgroundColor: '#CAE2B5', border: '1px solid #ccc', padding: '8px', }}>  
-                  <div style={{ height: 'Auto', width: 'Auto', display: 'flex', justifyContent: 'center', alignSelf: 'center', borderColor: 'Black',}}>  
-                    <img src={defRec} style={{width: '160px',}}/>  <br />
-                  </div>  
-                  <Row>  
-                    <Col xs={18} sm={18} md={18} lg={18}>  
-                      <div> 
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>Plato 5 / 10 porciones  </a> <img src={btEditar} style={{height: '12.8px',}}/>
-                      </div>  
-                      <div>  
-                        <img src={imgCal} style={{height: '13px',}}/>  
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>  Energía: 0.5 cal  </a>
-                        <img src={btCompartir}style={{height: '16px',}}/>  
-                      </div>  
-                    </Col>  
-                    <Col xs={6} sm={6} md={6} lg={6}>  
-                      <div>  
-                        <img src={btEliminar} style={{height: '15px', marginTop: '10px',}}/>  
-                      </div>  
-                    </Col>  
-                  </Row>  
-                </Card>  
-              </Col>  
-              <Col xs={24} sm={16} md={8} lg={6}>  
-                <Card style={{ backgroundColor: '#CAE2B5', border: '1px solid #ccc', padding: '8px', }}>  
-                  <div style={{ height: 'Auto', width: 'Auto', display: 'flex', justifyContent: 'center', alignSelf: 'center', borderColor: 'Black',}}>  
-                    <img src={defRec} style={{width: '160px',}}/>  <br />
-                  </div>  
-                  <Row>  
-                    <Col xs={18} sm={18} md={18} lg={18}>  
-                      <div> 
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>Plato 5 / 10 porciones  </a> <img src={btEditar} style={{height: '12.8px',}}/>
-                      </div>  
-                      <div>  
-                        <img src={imgCal} style={{height: '13px',}}/>  
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>  Energía: 0.5 cal  </a>
-                        <img src={btCompartir}style={{height: '16px',}}/>  
-                      </div>  
-                    </Col>  
-                    <Col xs={6} sm={6} md={6} lg={6}>  
-                      <div>  
-                        <img src={btEliminar} style={{height: '15px', marginTop: '10px',}}/>  
-                      </div>  
-                    </Col>  
-                  </Row>  
-                </Card>  
-              </Col>
-              <Col xs={24} sm={16} md={8} lg={6}>  
-                <Card style={{ backgroundColor: '#CAE2B5', border: '1px solid #ccc', padding: '8px', }}>  
-                  <div style={{ height: 'Auto', width: 'Auto', display: 'flex', justifyContent: 'center', alignSelf: 'center', borderColor: 'Black',}}>  
-                    <img src={defRec} style={{width: '160px',}}/>  <br />
-                  </div>  
-                  <Row>  
-                    <Col xs={18} sm={18} md={18} lg={18}>  
-                      <div> 
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>Plato 5 / 10 porciones  </a> <img src={btEditar} style={{height: '12.8px',}}/>
-                      </div>  
-                      <div>  
-                        <img src={imgCal} style={{height: '13px',}}/>  
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>  Energía: 0.5 cal  </a>
-                        <img src={btCompartir}style={{height: '16px',}}/>  
-                      </div>  
-                    </Col>  
-                    <Col xs={6} sm={6} md={6} lg={6}>  
-                      <div>  
-                        <img src={btEliminar} style={{height: '15px', marginTop: '10px',}}/>  
-                      </div>  
-                    </Col>  
-                  </Row>  
-                </Card>  
-              </Col>
-              <Col xs={24} sm={16} md={8} lg={6}>  
-                <Card style={{ backgroundColor: '#CAE2B5', border: '1px solid #ccc', padding: '8px', }}>  
-                  <div style={{ height: 'Auto', width: 'Auto', display: 'flex', justifyContent: 'center', alignSelf: 'center', borderColor: 'Black',}}>  
-                    <img src={defRec} style={{width: '160px',}}/>  <br />
-                  </div>  
-                  <Row>  
-                    <Col xs={18} sm={18} md={18} lg={18}>  
-                      <div> 
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>Plato 5 / 10 porciones  </a> <img src={btEditar} style={{height: '12.8px',}}/>
-                      </div>  
-                      <div>  
-                        <img src={imgCal} style={{height: '13px',}}/>  
-                        <a style={{fontFamily: 'Jomhuria', fontSize: '26px', color: '#86A071',}}>  Energía: 0.5 cal  </a>
-                        <img src={btCompartir}style={{height: '16px',}}/>  
-                      </div>  
-                    </Col>  
-                    <Col xs={6} sm={6} md={6} lg={6}>  
-                      <div>  
-                        <img src={btEliminar} style={{height: '15px', marginTop: '10px',}}/>  
-                      </div>  
-                    </Col>  
-                  </Row>  
-                </Card>  
-              </Col>      
-            </Row><br/><br/>  
-            <Col xs={24} sm={16} md={8} lg={6}>
-              <div style={{display: 'flex',}}>
-                <img src={btagregar} style={{height: '52px',}}/>
-              </div><br/><br/>
-            </Col> 
-          </div>
-        </div><br/><br/><br/>
+
+        <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px', marginBottom: '20px'}}><a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071',}}>Desayuno</a>
+        <div style={{width: '100%',display:'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap:'16px', padding:'16px'}}>
+                
+                {cardsData.map((card, index) => (
+                  <RecipeCard
+                    title= {card.title}
+                    portions= {card.portions}
+                    calories= {card.calories}
+                    time= {card.time}
+                    image= {card.image}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+        </div>
       </div>
+      </ConfigProvider>
     </>  
   );  
 }

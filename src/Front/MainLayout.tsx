@@ -11,12 +11,25 @@ const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const footerStyle = {
+    container: {
+      backgroundColor: "#6E9A65",
+      padding: "40px 200px",
+      "@media (max-width: 768px)": {
+        padding: "20px 100px", // Cambia el color en pantallas pequeñas
+      },
+      "@media (max-width: 600px)": {
+        padding: "20px 50px", // Cambia el color en pantallas pequeñas
+      },
+    } as React.CSSProperties, // Necesario para TypeScript
+  };
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* Encabezado */}
 
       {/* Contenido */}
-      <Content style={{ minHeight: '100vh'}}>
+      <Content style={{ minHeight: '100vh', width: '100%'}}>
         {children}
       </Content>
 
