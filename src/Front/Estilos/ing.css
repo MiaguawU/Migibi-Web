@@ -1,0 +1,92 @@
+.img{
+    max-width: 40px;
+    max-height: 40px;
+    position: relative;
+    top: 10px;
+
+}
+.jomhuria-regular {
+    font-family: "Jomhuria", serif;
+    font-weight: 300;
+    font-style: normal;
+  }
+.btAg{
+    max-width: 40px;
+    max-height: 40px;
+    border: none;
+    position: relative;
+    background-color: transparent;
+    bottom: 5px;
+    left: 190px;
+}
+
+.card-title {
+    color: #638552;  /* Color que desees para el título */
+    font-size: 30px; 
+    font-family: 'Jomhuria';
+    font-weight: normal;
+  }
+/* Estilos generales para el Card */
+.card-container {
+    width:  305px;
+    background-color: #CEDFAC;
+    height: 300px;
+    border-radius: 8px;
+    color: #638552;
+    border: 1px solid;
+    border-color: #3E7E1E;
+  }
+  
+  .card-body {
+    padding: 16px;
+  }
+  
+  .card-checkbox-container {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    padding: 10%;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+    left: 10px;
+    height: 200px;
+    border: 1px solid;
+    border-color: #3E7E1E;
+  }
+  
+  .card-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .card-checkbox-text {
+    font-family: "Alice, serif";
+    color: #40632F;
+  }
+  
+  
+  /* Estilos para el Drawer */
+  .drawer-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  /* Estilo de la Button link */
+  .card-button-link {
+    color: #3E7E1E;
+    text-decoration: none;
+  }
+  
+  .drawer-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .drawer-checkbox-text {
+    font-family: "Alice, serif";
+    color: #40632F;
+  }
+  
