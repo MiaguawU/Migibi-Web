@@ -1,0 +1,72 @@
+/* Estilo general de la diapositiva */
+.carousel-slide {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente el contenido */
+    align-items: center;    /* Centra verticalmente el contenido */
+    height: 400px;          /* Altura del carrusel */
+    background-color: #C4EFC4; /* Fondo claro */
+  }
+  
+  /* Contenedor de la imagen y el texto */
+  .carousel-content {
+    display: flex;
+    justify-content: space-between; /* Espacio entre imagen y texto */
+    align-items: center;
+    gap: 20px; /* Espacio entre los div */
+    /*max-width: 80%;  Limita el ancho máximo del contenido */
+    width: 100%;
+  }
+  
+  /* Imagen */
+  .carousel-image-container {
+    flex: 1; /* La imagen ocupa una parte proporcional */
+    display: flex;
+    justify-content: center; /* Centra la imagen dentro de su contenedor */
+    align-items: center;
+    overflow: hidden;
+    padding: 20px;
+  }
+  
+  .carousel-image {
+    max-width: 100%; /* Escala la imagen */
+    height: 100%; /* Mantiene la proporción de la imagen */
+    border-radius: 8px; /* Opcional: Bordes redondeados */
+
+  }
+  
+  /* Texto */
+  .carousel-text {
+    flex: 1; /* El texto ocupa una parte proporcional */
+    display: flex;
+    flex-direction: column; /* Apila el título y la descripción */
+    justify-content: center; /* Centra verticalmente el texto */
+    align-items: flex-start; /* Alinea el texto a la izquierda */
+    padding: 20px;
+  }
+  
+  .carousel-text h2 {
+    margin: 0 0 10px; /* Margen entre el título y el párrafo */
+    font-size: 24px;
+  }
+  
+  .carousel-text p {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.5; /* Mejora la legibilidad */
+  }
+  
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .carousel-content {
+      flex-direction: column; /* Apila la imagen y el texto en pantallas pequeñas */
+      text-align: center; /* Centra el texto */
+    }
+  
+    .carousel-text {
+      align-items: center; /* Centra el texto horizontalmente */
+    }
+    .carousel-slide {
+        height: fit-content;
+      }
+  }
+  
