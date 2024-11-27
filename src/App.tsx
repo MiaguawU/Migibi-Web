@@ -1,25 +1,112 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState , useEffect} from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Menu, Button, Drawer } from 'antd';
+import type { MenuProps } from 'antd';
+import 'antd/dist/reset.css';
+import './Front/Estilos/Nav.css';
+import btInicio from './Img/btInicio.png';
+import btPerfil from './Img/btPerfil.png';
+import Inicio from './Front/Inicio';
+import Perfil from './Front/Perfil';
+import Conocenos from './Front/Conocenos';
+import Contactanos from './Front/contactanos';
+import Hoy from './Front/Hoy';
+import Plan1 from './Front/Plan1';
+import Plan2 from './Front/Plan2';
+import Recetas from './Front/Recetas';
+import Refri from './Front/Refri';
+import EDreceta from './Front/EDreceta';
+import Acceder from './Front/Acceder';
+import VerR from './Front/VerReceta';
+import MainLayout from './Front/MainLayout';
+
+type ItemType = Required<MenuProps>['items'][number];
+
+const mainItems: ItemType[] = [
+  { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
+  { label: <Link to="/conocenos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Conócenos</Link>, key: 'conocenos' },
+  { label: <Link to="/hoy" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Hoy</Link>, key: 'hoy' },
+  { label: <Link to="/plan" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Plan</Link>, key: 'plan' },
+  { label: <Link to="/recetas" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Recetas</Link>, key: 'recetas' },
+  { label: <Link to="/refri" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Refri</Link>, key: 'refri' },
+];
+
+const profileItem: ItemType[] = [
+  { label: <Link to="/perfil"><img src={btPerfil} alt="Perfil" className="img-perfil" /></Link>, key: 'perfil' },
+];
+
 
 function App() {
+  const [isDrawerVisible, setDrawerVisible] = useState(false);
+
+  const showDrawer = () => setDrawerVisible(true);
+  const closeDrawer = () => setDrawerVisible(false);
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+    <MainLayout>
+      <div>
+
+        <header>
+            {isMobile ? (
+                <div className="mobile-menu">
+                <Button className="btA" onClick={showDrawer}>Menú</Button>
+                <Drawer
+                  title="Opciones"
+                  placement="right"
+                  onClose={closeDrawer}
+                  open={isDrawerVisible}
+                >
+                  <Menu mode="vertical" items={[...mainItems, ...profileItem]} />
+                </Drawer>
+              </div>
+            ) : (
+                <div className="custom-menu">
+                  <Menu
+                    mode="horizontal"
+                    items={mainItems}
+                    className="menu-links"
+                  />
+                  <Menu
+                    mode="horizontal"
+                    items={profileItem}
+                    className="profile-link"
+                  />
+                </div>
+            )}
+        </header>
+
+        <main>
+          <Routes>
+            <Route path="/" element={<Inicio />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/conocenos" element={<Conocenos />} />
+            <Route path="/contactanos" element={<Contactanos />} />
+            <Route path="/hoy" element={<Plan2 />} />
+            <Route path="/plan" element={<Plan1 />} />
+            <Route path="/recetas" element={<Recetas />} />
+            <Route path="/refri" element={<Refri />} />
+            <Route path="/edReceta" element={<EDreceta />} />
+            <Route path="/acceder" element={<Acceder />} />
+            <Route path="/verR" element={<VerR />} />
+          </Routes>
+        </main>
+      </div>
+    </MainLayout>
+    </Router>
   );
 }
 
