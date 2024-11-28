@@ -25,7 +25,6 @@ type ItemType = Required<MenuProps>['items'][number];
 const mainItems: ItemType[] = [
   { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
   { label: <Link to="/conocenos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Conócenos</Link>, key: 'conocenos' },
-  { label: <Link to="/contactanos" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Contáctanos</Link>, key: 'contactanos' },
   { label: <Link to="/hoy" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Hoy</Link>, key: 'hoy' },
   { label: <Link to="/plan" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Recetas</Link>, key: 'recetas' },
