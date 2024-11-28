@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { Row, Card, Col , ConfigProvider} from 'antd';  
+import {Card, ConfigProvider} from 'antd';  
 import Pagination from "./Componentes/Pagination";
+import RecipeCard from './Componentes/RecetaCard';
 import imgdesayuno from "../Img/imgdesayuno.png";
+
+import relojarena from "../Img/relojarena.png";
+import cuadros from "../Img/cuadros.png";
+{/*
 import defRec from "../Img/defRec.png";
 import btEditar from "../Img/btEditar.png";
 import btCompartir from "../Img/btCompartir.png";
 import imgCal from "../Img/imgCal.png";
 import btEliminar from "../Img/btEliminar.png";
-import relojarena from "../Img/relojarena.png";
-import cuadros from "../Img/cuadros.png";
 import flechaizquierda from "../Img/flechaizquierda.png";
 import flechaderecha from "../Img/flechaderecha.png";
 import calendario from "../Img/calendario.png";
-import btagregar from "../Img/btagregar2.png";
-import RecipeCard from './Componentes/RecetaCard';
+import btagregar from "../Img/btagregar2.png";*/}
 
 const { Meta } = Card;
 const handleEdit = () => {
