@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // Tamaño máximo del archivo: 5 MB
+    fileSize: 5 * 1024 * 1024, 
   },
   fileFilter: (req, file, cb) => {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
@@ -35,7 +35,6 @@ const upload = multer({
 });
 
 
-// Obtener todos los usuarios
 router.get('/', (req, res) => {
   db.query('SELECT * FROM usuario', (err, result) => {
     if (err) {
@@ -45,7 +44,6 @@ router.get('/', (req, res) => {
   });
 });
 
-// Actualizar usuario
 router.put('/:id', upload.single('foto_perfil'), (req, res) => {
   const { id } = req.params;
   const { Nombre_Usuario, Contrasena, Email, Cohabitantes } = req.body;
@@ -66,12 +64,11 @@ router.put('/:id', upload.single('foto_perfil'), (req, res) => {
   });
 });
 
-// Ruta de registro
 
 router.post("/", (req, res) => {
   const { username, password } = req.body;
-  console.log("Headers:", req.headers); // Para depuración
-  console.log("Body recibido:", req.body); // Verifica los datos del cuerpo
+  console.log("Headers:", req.headers); 
+  console.log("Body recibido:", req.body); 
 
   
 
@@ -79,7 +76,6 @@ router.post("/", (req, res) => {
     return res.status(400).send("Faltan datos requeridos: username y password");
   }
 
-  // Ruta fija para la imagen predeterminada
   const foto_perfil = `imagenes/defaultPerfil.png`;
 
   const query = `
@@ -98,7 +94,6 @@ router.post("/", (req, res) => {
 });
 
 
-// Eliminar usuario
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
   const query = 'DELETE FROM usuario WHERE Id_Usuario = ?';
