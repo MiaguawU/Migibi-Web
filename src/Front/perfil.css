@@ -1,0 +1,141 @@
+/* Contenedor principal */
+.profile-container {
+    position: relative; /* Necesario para posicionar el botón dentro del contenedor */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+    background-color: #f5f5f5;
+  }
+  
+  /* Botón de cerrar sesión */
+  .logout-button-container {
+    position: absolute; /* Posiciona el botón en la esquina superior derecha */
+    top: 10px;
+    right: 10px;
+  }
+  
+  .logout-button {
+    background-color: #FFD39E; /* Rojo suave */
+    border: none;
+    color: #6D7868;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .logout-button:hover {
+    background-color: #FFC27A; /* Rojo más oscuro al pasar el mouse */
+  }
+  
+  /* Sección del avatar */
+  .avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .avatar {
+    position: relative;
+  }
+  
+  .avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #d4edda;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .edit-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+  }
+  
+  /* Sección de información del usuario */
+  .info-section {
+    display: flex;
+    flex-direction: column;
+    background: #F0F0F0;
+    border-color: #28a745;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: solid #28a745 1px;
+    font-family: "Jomhuria", serif;
+    font-size: x-large;
+  }
+  .user-title {
+    margin-bottom: 20px;
+    color: #8BA577;
+  }
+  
+  .info-cards {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .info-card {
+    background-color: #C3DCA2;
+    border-radius: 8px;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    min-width: 150px;
+    border: solid #3E7E1E 1px;
+    color: #8BA577
+    
+  }
+  
+  .view-button {
+    background-color: #EEEEED;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .highlight {
+    font-weight: bold;
+    color: #28a745;
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .profile-container {
+      flex-direction: column;
+    }
+  
+    .info-cards {
+      flex-direction: column;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .info-card {
+      min-width: 120px;
+    }
+  }
+  
