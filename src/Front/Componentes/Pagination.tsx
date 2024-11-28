@@ -29,7 +29,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentWeek, onPrevious, onNext
       />
 
       {/* Texto con Ícono de Calendario */}
-        <span style={{fontFamily: 'Jomhuria', fontSize: '32px', color: "#6B8762",}}>{currentWeek}</span>
+        <span style={{fontFamily: 'Jomhuria, serif', fontSize: '32px', color: "#6B8762",}}>{currentWeek}</span>
         <CalendarOutlined style={{ fontSize: "30px" , color: "#6B8762"}} />
         <ShareAltOutlined style={{ fontSize: "30px", cursor: "pointer", color: "#6B8762" }} />
       </div>
