@@ -40,7 +40,7 @@ router.post("/", (req, res) => {
     if (user.password !== password) {
       return res.status(401).send('Contraseña incorrecta');
     }
-
+    
     res.json({ message: 'Inicio de sesión exitoso', user: { username: user.username } });
   });
 });

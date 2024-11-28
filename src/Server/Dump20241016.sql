@@ -20,22 +20,24 @@ USE `migibi`;
 --
 -- Table structure for table `cat_alimento`
 --
-
 DROP TABLE IF EXISTS `cat_alimento`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+
+/*!40101 SET @saved_cs_client = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `cat_alimento` (
   `Id_Alimento` int NOT NULL AUTO_INCREMENT,
   `Id_Tipo_Alimento` int NOT NULL,
   `Alimento` varchar(250) NOT NULL,
-  `Activo` tinyint(1) NOT NULL DEFAULT (1),
+  `Activo` tinyint(1) NOT NULL DEFAULT 1,
   `Id_Usuario_Alta` int NOT NULL,
   `Fecha_Alta` datetime NOT NULL,
   `Id_Usuario_Modif` int DEFAULT NULL,
   `Fecha_Modif` datetime DEFAULT NULL,
   `Id_Usuario_Baja` int DEFAULT NULL,
   `Fecha_Baja` datetime DEFAULT NULL,
-  `Es_Perecedero` tinyint(1) NOT NULL DEFAULT (true),
+  `Es_Perecedero` tinyint(1) NOT NULL DEFAULT 1,
+  `Imagen_alimento` varchar(255) NOT NULL DEFAULT 'img',
   PRIMARY KEY (`Id_Alimento`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -46,17 +48,68 @@ CREATE TABLE `cat_alimento` (
   CONSTRAINT `cat_alimento_ibfk_3` FOREIGN KEY (`Id_Usuario_Baja`) REFERENCES `usuario` (`Id_Usuario`),
   CONSTRAINT `cat_alimento_ibfk_4` FOREIGN KEY (`Id_Tipo_Alimento`) REFERENCES `cat_tipo_alimento` (`Id_Tipo_Alimento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `cat_alimento`
 --
-
 LOCK TABLES `cat_alimento` WRITE;
 /*!40000 ALTER TABLE `cat_alimento` DISABLE KEYS */;
-INSERT INTO `cat_alimento` VALUES (1,5,'Huevos',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(2,7,'Frijoles bayos',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(3,1,'Calabacita',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(4,9,'Sal con ajo en polvo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(5,9,'Sal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(6,9,'Pimienta negra molida',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(7,6,'Harina de trigo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(8,5,'Huevos batidos',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(9,6,'Pan molido',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(10,1,'Jitomate',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(11,1,'Cebolla asada',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(12,9,'Diente de ajo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(13,9,'Concentrado de tomate con pollo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(14,9,'Cilantro',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(15,3,'Filete de pescado',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(16,10,'Aceite vegetal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(17,3,'Pechuga de pollo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(18,1,'Espinaca',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(19,1,'Champiñones',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(20,10,'Mantequilla',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(21,5,'Caldo de pollo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(22,4,'Crema de leche',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(24,9,'Pimienta',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(25,4,'Media crema',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(26,5,'Mayonesa',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(27,1,'Cebolla morada',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(28,2,'Pepino',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(29,3,'Atun',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(31,9,'Chile cerrano',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(32,6,'Paquete de galletas saladas',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(33,8,'Agua',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(34,9,'Ajo en polvo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(35,10,'Aceite de maiz',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(36,3,'Carne de res molida',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(37,4,'Leche evaporada',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(38,6,'Paquete de pasta de espaguetti',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(39,9,'Sal con cebolla en polvo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(40,1,'Cebolla',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(41,9,'Apio',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(42,9,'Salsa de tomate',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(43,9,'Hojas de Laurel',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(44,6,'Pasta para lasaña',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(45,4,'Queso mozzarella',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(47,4,'Queso parmesano',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(48,6,'Pasta de fideo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(49,1,'Brocoli',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(50,6,'Pasta hojaldre',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(51,1,'Alcachofa',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(52,4,'Queso Chihuahua',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(53,9,'Ajonjoli',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(54,9,'Pimiento morron',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(55,4,'Leche condensada',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(56,2,'Jugo de limon',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(57,6,'Galletas Marias',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(58,2,'Limon',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(59,9,'Rama de menta',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(60,2,'Pure de tomate',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(61,2,'Ralladura de limon',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(62,10,'Mazapan',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(63,11,'Grenetina',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(64,2,'Fresas',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(65,7,'Arroz',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(66,9,'Canela',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(67,8,'Hielo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(68,9,'Canela en polvo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,0),(69,2,'Jugo de piña',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(70,4,'Crema de coco',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(71,3,'Jamón',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(72,4,'Queso panela',1,1,'2024-04-28 02:34:31',NULL,NULL,NULL,NULL,1),(73,3,'Chorizo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(74,1,'Papas',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(75,7,'Garbanzos',1,4,'2024-06-03 10:23:50',NULL,NULL,NULL,NULL,0),(76,11,'Arándanos',1,4,'2024-06-03 14:14:00',NULL,NULL,NULL,NULL,0),(78,6,'Cereal Corn Pops',1,4,'2024-06-03 19:29:04',NULL,NULL,NULL,NULL,1),(80,2,'Plátano',1,4,'2024-06-04 10:45:41',NULL,NULL,NULL,NULL,1),(81,9,'Mostaza',1,4,'2024-06-04 17:42:27',NULL,NULL,NULL,NULL,1),(82,1,'Aguacate',1,4,'2024-06-04 19:03:13',NULL,NULL,NULL,NULL,1),(83,3,'Salmón ahumado',1,4,'2024-06-04 19:05:28',NULL,NULL,NULL,NULL,1),(84,1,'Pimiento dulce',1,4,'2024-06-04 19:06:41',NULL,NULL,NULL,NULL,1),(85,9,'Eneldo fresco',1,4,'2024-06-04 19:09:02',NULL,NULL,NULL,NULL,1),(86,3,'Carne molida',1,4,'2024-06-05 11:03:37',NULL,NULL,NULL,NULL,1),(87,1,'Zanahoria',1,4,'2024-06-05 11:10:02',NULL,NULL,NULL,NULL,1),(88,1,'Guisantes',1,4,'2024-06-05 11:10:35',NULL,NULL,NULL,NULL,1),(89,3,'Jamón ibérico',1,4,'2024-06-05 11:12:26',NULL,NULL,NULL,NULL,0),(90,9,'Pimentón dulce',1,4,'2024-06-05 11:16:00',NULL,NULL,NULL,NULL,0),(91,9,'Hoja de Laurel',1,4,'2024-06-05 11:17:52',NULL,NULL,NULL,NULL,0),(92,1,'Aceite de oliva',1,4,'2024-06-05 11:18:55',NULL,NULL,NULL,NULL,0),(93,9,'Orégano',1,4,'2024-06-05 11:24:26',NULL,NULL,NULL,NULL,0),(94,1,'Nopal',1,4,'2024-06-05 11:26:19',NULL,NULL,NULL,NULL,1),(95,4,'Queso manchego',1,4,'2024-06-05 11:27:10',NULL,NULL,NULL,NULL,1),(96,4,'Queso Oaxaca',1,4,'2024-06-05 16:05:12',NULL,NULL,NULL,NULL,1),(97,1,'Papa frita',1,4,'2024-06-05 16:25:21',NULL,NULL,NULL,NULL,1),(98,1,'Papas fritas',1,4,'2024-06-05 16:29:34',NULL,NULL,NULL,NULL,1);
-/*!40000 ALTER TABLE `cat_alimento` ENABLE KEYS */;
+INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Es_Perecedero, Imagen_alimento) VALUES
+(1, 5, 'Huevos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(2, 7, 'Frijoles bayos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(3, 1, 'Calabacita', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(4, 9, 'Sal con ajo en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(5, 9, 'Sal', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(6, 9, 'Pimienta negra molida', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(7, 6, 'Harina de trigo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(8, 5, 'Huevos batidos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(9, 6, 'Pan molido', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(10, 1, 'Jitomate', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(11, 1, 'Cebolla asada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(12, 9, 'Diente de ajo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(13, 9, 'Concentrado de tomate con pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(14, 9, 'Cilantro', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(15, 3, 'Filete de pescado', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(16, 10, 'Aceite vegetal', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(17, 3, 'Pechuga de pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(18, 1, 'Espinaca', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(19, 1, 'Champiñones', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(20, 10, 'Mantequilla', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(21, 5, 'Caldo de pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(22, 4, 'Crema de leche', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(24, 9, 'Pimienta', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(25, 4, 'Media crema', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(26, 5, 'Mayonesa', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(27, 1, 'Cebolla morada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(28, 2, 'Pepino', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(29, 3, 'Atun', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(31, 9, 'Chile cerrano', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(32, 6, 'Paquete de galletas saladas', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(33, 8, 'Agua', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(34, 9, 'Ajo en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(35, 10, 'Aceite de maiz', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(36, 3, 'Carne de res molida', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(37, 4, 'Leche evaporada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(38, 6, 'Paquete de pasta de espaguetti', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(39, 9, 'Sal con cebolla en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
+(40, 1, 'Cebolla', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(41, 5, 'Manteca de cerdo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(42, 10, 'Jugo de naranja', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(43, 3, 'Res', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(44, 3, 'Pechuga de pollo empanizada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(45, 1, 'Zanahoria', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(46, 7, 'Pechuga de pavo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(47, 6, 'Masa de maiz', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(48, 2, 'Tomates', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(49, 3, 'Pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(50, 4, 'Crema', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(98, 1, 'Papas fritas', 1, 4, '2024-06-05 16:29:34', NULL, NULL, NULL, NULL, 1, 'img');
+
 UNLOCK TABLES;
+
+
 
 --
 -- Table structure for table `cat_tipo_alimento`
@@ -316,6 +369,7 @@ CREATE TABLE `receta` (
   `Id_Usuario_Baja` int DEFAULT NULL,
   `Fecha_Baja` datetime DEFAULT NULL,
   `Id_Tipo_Consumo` int NOT NULL,
+  `Imagen_receta` varchar(255) NOT NULL DEFAULT 'img',
   PRIMARY KEY (`Id_Receta`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -334,7 +388,26 @@ CREATE TABLE `receta` (
 
 LOCK TABLES `receta` WRITE;
 /*!40000 ALTER TABLE `receta` DISABLE KEYS */;
-INSERT INTO `receta` VALUES (1,'Cazuela de Huevo con Calabacitas y Frijoles',1,1,'2024-04-28 01:30:24',4,'2024-06-04 18:46:11',NULL,NULL,1),(2,'Pescado empanizado',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,2),(3,'Pechuga con espinacas al champiñón',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,2),(4,'Ensalada de atún',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,2),(5,'Espagueti con albóndigas',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,2),(6,'Lasaña ',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,3),(7,'Sopa de fideo con brócoli',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,2),(8,'Empanadas de alcachofa',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,2),(9,'Carlota de limón',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,4),(10,'Gelatina de mazapan',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,4),(11,'Agua de horchata',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,5),(12,'Piña colada',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,5),(13,'Huevos con jamón y Frijoles',1,1,'2024-04-28 01:30:24',4,'2024-06-11 17:16:17',NULL,NULL,1),(14,'Calabacitas con queso panela y Frijoles',1,1,'2024-04-28 01:30:24',NULL,NULL,NULL,NULL,1),(15,'Huevos con chorizo y Frijoles',1,1,'2024-04-28 01:30:24',4,'2024-06-11 17:19:10',NULL,NULL,1),(16,'Papas con chorizo y Frijoles',1,1,'2024-04-28 01:30:24',4,'2024-06-11 17:20:09',NULL,NULL,1),(17,'Papas con queso y Frijoles',0,1,'2024-04-28 01:30:24',4,'2024-06-11 17:21:24',4,'2024-06-11 17:22:01',1);
+
+INSERT INTO `receta` (`Nombre`, `Activo`, `Id_Usuario_Alta`, `Fecha_Alta`, `Id_Tipo_Consumo`, `Imagen_receta`) VALUES
+('Cazuela de Huevo con Calabacitas y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
+('Pescado empanizado', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
+('Pechuga con espinacas al champiñón', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
+('Ensalada de atún', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
+('Espagueti con albóndigas', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
+('Lasaña', 1, 1, '2024-04-28 01:30:24', 3, 'img'),
+('Sopa de fideo con brócoli', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
+('Empanadas de alcachofa', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
+('Carlota de limón', 1, 1, '2024-04-28 01:30:24', 4, 'img'),
+('Gelatina de mazapan', 1, 1, '2024-04-28 01:30:24', 4, 'img'),
+('Agua de horchata', 1, 1, '2024-04-28 01:30:24', 5, 'img'),
+('Piña colada', 1, 1, '2024-04-28 01:30:24', 5, 'img'),
+('Huevos con jamón y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
+('Calabacitas con queso panela y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
+('Huevos con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
+('Papas con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
+('Papas con queso y Frijoles', 0, 1, '2024-04-28 01:30:24', 1, 'img');
+
 /*!40000 ALTER TABLE `receta` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -26,7 +26,7 @@ const AuthForm: React.FC = () => {
         username: email,
         password: password,
       };
-      await axios.post('http://localhost:5000/usuarios', data, {
+      await axios.post( `${PUERTO}/usuarios`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -44,7 +44,7 @@ const AuthForm: React.FC = () => {
       formData.append("username", email); // Campo username
       formData.append("password", password); // Campo password
   
-      await axios.post("http://localhost:5000/usuarios", formData, {
+      await axios.post(`${PUERTO}/usuarios`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -68,7 +68,7 @@ const AuthForm: React.FC = () => {
       formData.append('username', email); // Usamos 'username' en lugar de 'email'
       formData.append('password', password); // Agregamos la contraseña
   
-      await axios.post('http://localhost:5000/usuarioGmail', formData, {
+      await axios.post(`${PUERTO}/usuarioGmail`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data', // Asegúrate de que el tipo de contenido es multipart/form-data
         },
