@@ -32,6 +32,15 @@ passport.use(
               foto_perfil: fotoPerfil,
               Es_Gmail: 1,
             };
+
+            res.json({
+              id: user.Id_Usuario,
+              username: user.Nombre_Usuario,
+              foto_perfil: user.foto_perfil,
+              Cohabitantes: user.Cohabitantes,
+              Email: user.Email,
+              message: "Sesión iniciada con éxito",
+            });
             return done(null, newUser);
           });
         }
