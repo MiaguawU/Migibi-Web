@@ -5,6 +5,7 @@ const passport = require("./base/auth"); // Autenticación con Google
 const usuarioRouter = require("./base/usuario");
 const usuarioGmailRouter = require("./base/usuarioGmail");
 const loginRouter = require("./base/login");
+const logoutRouter = require("./base/Logout");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
@@ -46,6 +47,7 @@ app.use(passport.session());
 app.use("/usuarios", upload, usuarioRouter);
 app.use("/usuarioGmail", usuarioGmailRouter);
 app.use("/login", loginRouter);
+app.use("/logout", logoutRouter);
 
 // Ruta de inicio de sesión con Google
 app.get(
@@ -54,39 +56,38 @@ app.get(
 );
 
 // Callback después de la autenticación con Google
+const BASE_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login-failed",
+    failureRedirect: `${BASE_URL}/acceder`,
     session: true,
   }),
   (req, res) => {
-    // Redirigir después de iniciar sesión exitosamente
-    res.redirect("/login-success");
+    if (req.user) {
+      // Envía la información del usuario junto con una indicación de redirección
+      res.json({
+        id: req.user.Id_Usuario,
+        username: req.user.Nombre_Usuario,
+        foto_perfil: req.user.foto_perfil,
+        Email: req.user.Email,
+        message: "Sesión iniciada con éxito mediante Google",
+        redirectTo: `${BASE_URL}/perfil`,
+      });
+    } else {
+      res.status(401).json({ message: "Autenticación fallida" });
+    }
   }
 );
 
-// Ruta de cierre de sesión
-app.get("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).send("Error al cerrar sesión");
-    }
-    res.redirect("/");
-  });
-});
 
-// Rutas para manejar el éxito o el fallo de login
-app.get("/login-success", (req, res) => {
-  res.send("Inicio de sesión exitoso");
-});
 
-app.get("/login-failed", (req, res) => {
-  res.status(401).send("Inicio de sesión fallido");
-});
+
 
 // Inicio del servidor
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () =>
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
 );
+
