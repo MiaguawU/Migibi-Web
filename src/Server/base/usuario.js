@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
 const router = express.Router();
-
+const validator = require('validator'); 
 
 
 const uploadDir = path.join(__dirname, '../imagenes');
@@ -35,19 +35,46 @@ const upload = multer({
 });
 
 
-router.get('/', (req, res) => {
-  db.query('SELECT * FROM usuario', (err, result) => {
-    if (err) {
-      return res.status(500).send('Error al obtener usuarios');
+const sanitizeInput = (req, res, next) => {
+  Object.keys(req.body).forEach(key => {
+    if (typeof req.body[key] === 'string') {
+      req.body[key] = validator.escape(req.body[key]); // Escapa caracteres especiales
+      req.body[key] = validator.stripLow(req.body[key], { keep_newlines: false }); // Elimina caracteres ASCII de control
     }
-    res.json(result);
   });
+  next();
+};
+
+// Endpoint para obtener usuario
+router.get("/", (req, res) => {
+  const { id_us } = req.query;
+
+  if (!id_us || !validator.isNumeric(id_us)) {
+    return res.status(400).send("El ID del usuario es requerido y debe ser numérico");
+  }
+
+  db.query(
+    "SELECT * FROM usuario WHERE Id_Usuario = ?",
+    [id_us],
+    (err, result) => {
+      if (err) {
+        console.error("Error al obtener usuario:", err);
+        return res.status(500).send("Error al obtener usuario");
+      }
+      res.json(result);
+    }
+  );
 });
 
-router.put('/:id', upload.single('foto_perfil'), (req, res) => {
+// Endpoint para actualizar usuario
+router.put('/:id', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
   const { id } = req.params;
   const { Nombre_Usuario, Contrasena, Email, Cohabitantes } = req.body;
   const foto_perfil = req.file ? `imagenes/${req.file.filename}` : null;
+
+  if (!validator.isNumeric(id)) {
+    return res.status(400).send("El ID debe ser numérico");
+  }
 
   const query = `
     UPDATE usuario 
@@ -64,13 +91,9 @@ router.put('/:id', upload.single('foto_perfil'), (req, res) => {
   });
 });
 
-
-router.post("/", (req, res) => {
+// Endpoint para agregar usuario
+router.post("/", sanitizeInput, (req, res) => {
   const { username, password } = req.body;
-  console.log("Headers:", req.headers); 
-  console.log("Body recibido:", req.body); 
-
-  
 
   if (!username || !password) {
     return res.status(400).send("Faltan datos requeridos: username y password");
@@ -93,9 +116,14 @@ router.post("/", (req, res) => {
   });
 });
 
-
+// Endpoint para eliminar usuario
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
+
+  if (!validator.isNumeric(id)) {
+    return res.status(400).send("El ID debe ser numérico");
+  }
+
   const query = 'DELETE FROM usuario WHERE Id_Usuario = ?';
 
   db.query(query, [id], (err) => {
@@ -105,5 +133,6 @@ router.delete('/:id', (req, res) => {
     res.send('Usuario eliminado con éxito');
   });
 });
+
 
 module.exports = router;

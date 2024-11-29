@@ -636,7 +636,7 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `Id_Usuario` int NOT NULL AUTO_INCREMENT,
-  `Nombre_Usuario` varchar(250) NOT NULL,
+  `Nombre_Usuario` varchar(250) NOT NULL UNIQUE,
   `Contrasena` varchar(250) NOT NULL ,
   `foto_perfil` VARCHAR(255),
   `Cohabitantes` int NOT NULL DEFAULT (1),

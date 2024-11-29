@@ -19,6 +19,7 @@ import EDreceta from './Front/EDreceta';
 import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
+import Prueba from './Front/Prueba';
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -119,6 +120,7 @@ function App() {
             <Route path="/verR" element={<VerR />} />
             <Route path="/terminosycondiciones" element={<VerR />} />
             <Route path="/avisodeprivacidad" element={<VerR />} />
+            <Route path="/prueba" element={<Prueba />} />
           </Routes>
         </main>
       </div>
