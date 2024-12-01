@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
 const router = express.Router();
-const validator = require('validator'); 
+const validator = require('validator');
+const xss = require('xss');  
 
 
 const uploadDir = path.join(__dirname, '../imagenes');
@@ -13,7 +14,6 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-  
   destination: uploadDir,
   filename: (req, file, cb) => {
     console.log("Archivo recibido:", file);
@@ -34,12 +34,18 @@ const upload = multer({
   },
 });
 
-
+// Función para sanitizar las entradas y evitar inyecciones de HTML/JS
 const sanitizeInput = (req, res, next) => {
   Object.keys(req.body).forEach(key => {
     if (typeof req.body[key] === 'string') {
-      req.body[key] = validator.escape(req.body[key]); // Escapa caracteres especiales
-      req.body[key] = validator.stripLow(req.body[key], { keep_newlines: false }); // Elimina caracteres ASCII de control
+      // Escapa caracteres especiales para evitar inyecciones de HTML
+      req.body[key] = validator.escape(req.body[key]);
+      
+      // Elimina caracteres ASCII no imprimibles
+      req.body[key] = validator.stripLow(req.body[key], { keep_newlines: false });
+      
+      // Sanitiza cualquier posible código HTML/JavaScript
+      req.body[key] = xss(req.body[key]);
     }
   });
   next();
@@ -62,6 +68,7 @@ router.get("/", (req, res) => {
         return res.status(500).send("Error al obtener usuario");
       }
       res.json(result);
+      console.log(result);
     }
   );
 });
@@ -94,12 +101,13 @@ router.put('/:id', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
 // Endpoint para agregar usuario
 router.post("/", sanitizeInput, (req, res) => {
   const { username, password } = req.body;
+  console.log(req.body);
 
   if (!username || !password) {
     return res.status(400).send("Faltan datos requeridos: username y password");
   }
 
-  const foto_perfil = `imagenes/defaultPerfil.png`;
+  const foto_perfil = `../imagenes/defaultPerfil.png`;
 
   const query = `
     INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil) 
@@ -133,6 +141,5 @@ router.delete('/:id', (req, res) => {
     res.send('Usuario eliminado con éxito');
   });
 });
-
 
 module.exports = router;

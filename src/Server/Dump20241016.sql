@@ -1,5 +1,5 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `migibi`;
+USE `migibi`;  
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: migibi
@@ -57,7 +57,7 @@ CREATE TABLE `cat_alimento` (
 LOCK TABLES `cat_alimento` WRITE;
 /*!40000 ALTER TABLE `cat_alimento` DISABLE KEYS */;
 INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Es_Perecedero, Imagen_alimento) VALUES
-(1, 5, 'Huevos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
+(1, 5, 'Huevos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '../imagenes/defRec.png'),
 (2, 7, 'Frijoles bayos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
 (3, 1, 'Calabacita', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, 'img'),
 (4, 9, 'Sal con ajo en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, 'img'),
@@ -369,6 +369,8 @@ CREATE TABLE `receta` (
   `Id_Usuario_Baja` int DEFAULT NULL,
   `Fecha_Baja` datetime DEFAULT NULL,
   `Id_Tipo_Consumo` int NOT NULL,
+  `Tiempo` time NOT NULL,
+  `Calorias` double NOT NULL,
   `Imagen_receta` varchar(255) NOT NULL DEFAULT 'img',
   PRIMARY KEY (`Id_Receta`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
@@ -389,24 +391,24 @@ CREATE TABLE `receta` (
 LOCK TABLES `receta` WRITE;
 /*!40000 ALTER TABLE `receta` DISABLE KEYS */;
 
-INSERT INTO `receta` (`Nombre`, `Activo`, `Id_Usuario_Alta`, `Fecha_Alta`, `Id_Tipo_Consumo`, `Imagen_receta`) VALUES
-('Cazuela de Huevo con Calabacitas y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
-('Pescado empanizado', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
-('Pechuga con espinacas al champiñón', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
-('Ensalada de atún', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
-('Espagueti con albóndigas', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
-('Lasaña', 1, 1, '2024-04-28 01:30:24', 3, 'img'),
-('Sopa de fideo con brócoli', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
-('Empanadas de alcachofa', 1, 1, '2024-04-28 01:30:24', 2, 'img'),
-('Carlota de limón', 1, 1, '2024-04-28 01:30:24', 4, 'img'),
-('Gelatina de mazapan', 1, 1, '2024-04-28 01:30:24', 4, 'img'),
-('Agua de horchata', 1, 1, '2024-04-28 01:30:24', 5, 'img'),
-('Piña colada', 1, 1, '2024-04-28 01:30:24', 5, 'img'),
-('Huevos con jamón y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
-('Calabacitas con queso panela y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
-('Huevos con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
-('Papas con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img'),
-('Papas con queso y Frijoles', 0, 1, '2024-04-28 01:30:24', 1, 'img');
+INSERT INTO `receta` (`Nombre`, `Activo`, `Id_Usuario_Alta`, `Fecha_Alta`, `Id_Tipo_Consumo`, `Imagen_receta`, `Tiempo`, `Calorias`) VALUES
+('Cazuela de Huevo con Calabacitas y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img/cazuela_huevo_calabacitas.jpg', '00:25:00', 250),
+('Pescado empanizado', 1, 1, '2024-04-28 01:30:24', 2, 'img/pescado_empanizado.jpg', '00:30:00', 300),
+('Pechuga con espinacas al champiñón', 1, 1, '2024-04-28 01:30:24', 2, 'img/pechuga_espinacas_champinon.jpg', '00:35:00', 350),
+('Ensalada de atún', 1, 1, '2024-04-28 01:30:24', 2, 'img/ensalada_atun.jpg', '00:15:00', 180),
+('Espagueti con albóndigas', 1, 1, '2024-04-28 01:30:24', 2, 'img/espagueti_albondigas.jpg', '00:45:00', 450),
+('Lasaña', 1, 1, '2024-04-28 01:30:24', 3, 'img/lasana.jpg', '01:00:00', 600),
+('Sopa de fideo con brócoli', 1, 1, '2024-04-28 01:30:24', 2, 'img/sopa_fideo_brocoli.jpg', '00:30:00', 200),
+('Empanadas de alcachofa', 1, 1, '2024-04-28 01:30:24', 2, 'img/empanadas_alcachofa.jpg', '00:50:00', 250),
+('Carlota de limón', 1, 1, '2024-04-28 01:30:24', 4, 'img/carlota_limon.jpg', '00:40:00', 350),
+('Gelatina de mazapan', 1, 1, '2024-04-28 01:30:24', 4, 'img/gelatina_mazapan.jpg', '00:10:00', 120),
+('Agua de horchata', 1, 1, '2024-04-28 01:30:24', 5, 'img/agua_horchata.jpg', '00:05:00', 150),
+('Piña colada', 1, 1, '2024-04-28 01:30:24', 5, 'img/pina_colada.jpg', '00:05:00', 200),
+('Huevos con jamón y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img/huevos_jamon_frijoles.jpg', '00:20:00', 300),
+('Calabacitas con queso panela y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img/calabacitas_queso_frijoles.jpg', '00:25:00', 220),
+('Huevos con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img/huevos_chorizo_frijoles.jpg', '00:30:00', 350),
+('Papas con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, 'img/papas_chorizo_frijoles.jpg', '00:35:00', 400),
+('Papas con queso y Frijoles', 0, 1, '2024-04-28 01:30:24', 1, 'img/papas_queso_frijoles.jpg', '00:40:00', 450);
 
 /*!40000 ALTER TABLE `receta` ENABLE KEYS */;
 UNLOCK TABLES;

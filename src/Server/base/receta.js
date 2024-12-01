@@ -35,54 +35,32 @@ router.post("/", (req, res, next) => {
 
 // Obtener receta(s) (GET)
 router.get("/", (req, res) => {
-  const { activo, id_tipo_consumo } = req.query;
 
-  // Construir la consulta SQL
-  let query = `SELECT * FROM receta WHERE 1`;
+  let query = `SELECT 
+              Nombre, 
+              Tiempo, 
+              Calorias, 
+              Imagen_receta
+            FROM receta`;
 
-  const params = [];
-  if (activo !== undefined) {
-    query += ` AND Activo = ?`;
-    params.push(activo);
-  }
-  if (id_tipo_consumo) {
-    query += ` AND Id_Tipo_Consumo = ?`;
-    params.push(id_tipo_consumo);
-  }
-
+ //nombre
+ //tiempo
+ //calorias
+ //imagen
+  
   // Ejecutar la consulta
-  db.query(query, params, (err, result) => {
+  db.query(query, (err, result) => {
+   
     if (err) {
       console.error("Error al obtener recetas:", err);
       return res.status(500).send("Error al obtener recetas");
     }
-
-    // Devolver las recetas encontradas
+    console.log("si salio :3");
+    console.log(result);
     res.json(result);
   });
 });
 
-// Obtener receta por ID (GET)
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-
-  // Consulta para obtener una receta por su ID
-  const query = `SELECT * FROM receta WHERE Id_Receta = ?`;
-  db.query(query, [id], (err, result) => {
-    if (err) {
-      console.error("Error al obtener receta:", err);
-      return res.status(500).send("Error al obtener receta");
-    }
-
-    // Si no se encuentra la receta
-    if (result.length === 0) {
-      return res.status(404).send("Receta no encontrada");
-    }
-
-    // Devolver la receta encontrada
-    res.json(result[0]);
-  });
-});
 
 // Actualizar una receta (PUT)
 router.put("/:id", (req, res) => {
