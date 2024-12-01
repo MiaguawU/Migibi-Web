@@ -6,6 +6,8 @@ import imgdesayuno from "../Img/imgdesayuno.png";
 
 import relojarena from "../Img/relojarena.png";
 import cuadros from "../Img/cuadros.png";
+import caducar from "../Img/biCa.png";
+import agregar from "../Img/btagregar2.png";
 {/*
 import defRec from "../Img/defRec.png";
 import btEditar from "../Img/btEditar.png";
@@ -86,10 +88,16 @@ export default function Inicio() {
       <div style={{ marginLeft: '15px', marginRight: '15px',}}>
         <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex',}}>
           <div style={{height: '100%', width: '80%', display: 'flex',}}>
-            <img src={imgdesayuno} style={{height: '100px',}}/><img src={relojarena} style={{height: '66px',}}/>  
+            <div style={{display: 'flex', flexDirection: "column"}}>
+              <img src={caducar} style={{height: '100px',}}/>
+              <span style={{fontFamily: 'Jomhuria, serif'}}>Caducar</span>
+            </div>
+            <div>
+              <img src={relojarena} style={{height: '66px',}}/>
+            </div>
           </div>
           <div style={{height: '100%', width: '20%', display: 'flex',}}>
-            <img src={cuadros} style={{height: '58px',}}/>
+            <img src={agregar} style={{height: '58px',}}/>
           </div>
         </div>
         <div style={{backgroundColor: '#D3E2B4', height: 'auto', borderRadius: '10px',}}>
