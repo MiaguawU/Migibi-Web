@@ -16,8 +16,24 @@
     position: absolute; /* Posiciona el botón en la esquina superior derecha */
     top: 10px;
     right: 10px;
+    gap: 10px;
+    display: flex;
   }
   
+  .save-button {
+    background-color: #C3DCA2; /* Rojo suave */
+    border: none;
+    color: #6D7868;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .save-button:hover {
+    background-color: #acc788; /* Rojo más oscuro al pasar el mouse */
+  }
+
   .logout-button {
     background-color: #FFD39E; /* Rojo suave */
     border: none;
