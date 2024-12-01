@@ -4,35 +4,32 @@ import "./perfil.css";
 import NumericInput from "./Componentes/NumberInput";
 import PUERTO from "../config";
 import axios from "axios";
+import btPerfil from '../Img/btPerfil.png'; // Imagen predeterminada si no hay una foto
 
 const UserProfile: React.FC = () => {
   const [formData, setFormData] = useState({
     Nombre_Usuario: '',
-    foto_perfil: '',
+    foto_perfil: '', // Se espera que esto sea la URL de la foto
     Cohabitantes: '',
     Email: '',
   });
 
- 
-  
   const logout = async () => {
     try {
       const token = localStorage.getItem("authToken");
       await axios.post(`${PUERTO}/logout`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
-      localStorage.removeItem("authToken"); // Limpiar token local
-      localStorage.removeItem("currentUser"); // Limpiar usuario actual
+
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("currentUser");
       message.success("Sesión cerrada correctamente.");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       message.error("No se pudo cerrar la sesión.");
     }
   };
-  
 
-  // Función para obtener datos del perfil
   const datosPerfil = async () => {
     try {
       const currentUser = localStorage.getItem("currentUser");
@@ -40,25 +37,25 @@ const UserProfile: React.FC = () => {
         message.warning("No hay un usuario logueado actualmente.");
         return;
       }
-  
+
       const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
       const user = usuarios[currentUser];
-  
+
       if (!user) {
         message.warning("Usuario no encontrado en los datos locales.");
         return;
       }
-  
+
       const response = await axios.get(`${PUERTO}/usuarios`, {
         params: { id_us: currentUser },
         headers: { "Content-Type": "application/json" },
       });
-  
+
       if (response.data.length > 0) {
         const userData = response.data[0];
         setFormData({
           Nombre_Usuario: userData.Nombre_Usuario || 'No info',
-          foto_perfil: userData.foto_perfil || 'No info',
+          foto_perfil: userData.foto_perfil || '', // Si no hay foto, lo dejamos vacío
           Cohabitantes: userData.Cohabitantes || 'No info',
           Email: userData.Email || 'No info',
         });
@@ -71,19 +68,40 @@ const UserProfile: React.FC = () => {
       message.error("No se pudo conectar con el servidor.");
     }
   };
-  
 
   useEffect(() => {
     datosPerfil();
   }, []);
 
-  // Función para manejar cambios en los inputs
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
+
+  // Generar la URL completa de la foto de perfil si existe, o dejarla vacía
+  const fotoPerfilUrl = formData.foto_perfil ? `${PUERTO}/${formData.foto_perfil}` : '';
+
+  const img = [
+    {
+      title: 'Imagen',
+      dataIndex: 'foto_perfil',
+      key: 'foto_perfil',
+      render: (text: string) =>
+        text ? (
+          <div>
+            <img
+              src={`http://localhost:5000${formData.foto_perfil}`}
+              alt="Perfil"
+              style={{ width: 50, height: 50 }}
+            />
+          </div>
+        ) : (
+          'N/A'
+        ),
+    },
+  ];
 
   return (
     <ConfigProvider
@@ -96,18 +114,16 @@ const UserProfile: React.FC = () => {
       }}
     >
       <div className="profile-container">
-        {/* Botón de Cerrar Sesión */}
         <div className="logout-button-container">
           <button className="logout-button" onClick={logout}>Cerrar sesión</button>
         </div>
 
-        {/* Sección de Avatar */}
         <div className="avatar-section">
           <div className="avatar">
             <div
               className="avatar-circle"
               style={{
-                backgroundImage: `url(${formData.foto_perfil || "../Img/btPerfil.png"})`, // Usamos la imagen del servidor o una predeterminada
+                backgroundImage: `url(${formData?.foto_perfil || btPerfil})`, // Usar la imagen del servidor o la predeterminada
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 borderRadius: "50%",
@@ -115,18 +131,17 @@ const UserProfile: React.FC = () => {
                 height: "100px",
               }}
             ></div>
-
+            <br />
+            <br />
             <button className="edit-button">✎</button>
           </div>
         </div>
 
-        {/* Sección de Información del Usuario */}
         <div className="info-section">
-          {/* Input para el nombre del usuario */}
           <Input
             variant="borderless"
-            value={formData.Nombre_Usuario || ''} // Evita que sea undefined
-  onChange={(e) => setFormData({ ...formData, Nombre_Usuario: e.target.value })}
+            value={formData.Nombre_Usuario || ''}
+            onChange={(e) => setFormData({ ...formData, Nombre_Usuario: e.target.value })}
             className="user-title"
           />
 
@@ -152,11 +167,10 @@ const UserProfile: React.FC = () => {
                   },
                 }}
               >
-                {/* Input para la cantidad de cohabitantes */}
                 <span>Cantidad de personas que viven conmigo:</span>
                 <NumericInput
                   style={{ width: 50, textAlign: "center" }}
-                  value={formData.Cohabitantes || ''} // Evita que sea undefined
+                  value={formData.Cohabitantes || ''}
                   onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
                 />
               </ConfigProvider>
@@ -164,6 +178,8 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
       </div>
+
+      
     </ConfigProvider>
   );
 };
