@@ -30,6 +30,7 @@ const UserProfile: React.FC = () => {
     <div className="profile-container">
       {/* Botón de Cerrar Sesión */}
       <div className="logout-button-container">
+        <button className="save-button">Guardar cambios</button>
         <button className="logout-button">Cerrar sesión</button>
       </div>
 
@@ -54,14 +55,7 @@ const UserProfile: React.FC = () => {
       <div className="info-section">
         <Input variant="borderless" defaultValue = "Usuario" className="user-title"/>
         
-        <div className="info-cards">
-          <div className="info-card">
-            <span>Tipos de alimentos que no puedo comer:</span>
-            <button className="view-button">Ver</button>
-          </div>
-          <div className="info-card">
-            
-            <ConfigProvider
+        <ConfigProvider
               theme={{
                 token: {
                   fontFamily: "Jomhuria, Serif",
@@ -77,11 +71,35 @@ const UserProfile: React.FC = () => {
                 },
               }}
             >
+        <div className="info-cards">
+          <div className="info-card">
+            <span>Tipos de alimentos que no puedo comer:</span>
+            <button className="view-button">Ver</button>
+          </div>
+          <div className="info-card">
             <span>Cantidad de personas que viven conmigo:</span>
             <NumericInput style={{ width: 50 , textAlign: "center"}} value={value} onChange={setValue} />
-            </ConfigProvider>
           </div>
         </div>
+          <div style={{
+            backgroundColor: "#C3DCA2",
+            borderRadius: "8px",
+            padding: "10px 15px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            textAlign: "center",
+            gap: "10px",
+            minWidth: "150px",
+            border: "solid #3E7E1E 1px",
+            color: "#8BA577",
+            marginTop: "10px"
+          }}>
+            <span>Contraseña:</span>
+            <Input type="password"/>
+
+          </div>
+          </ConfigProvider>
       </div>
     </div>
     

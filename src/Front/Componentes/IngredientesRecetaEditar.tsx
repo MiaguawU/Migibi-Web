@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider } from "antd";
-import btAg from '../../Img/btagregar.png';
+import btAg from '../../Img/btAgregar.png';
 import '../Estilos/ing.css'; // Importa el archivo CSS
 
 interface Item {

@@ -2,7 +2,6 @@ import React, { useState , useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Menu, Button, Drawer } from 'antd';
 import type { MenuProps } from 'antd';
-import 'antd/dist/reset.css';
 import './Front/Estilos/Nav.css';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
@@ -19,6 +18,10 @@ import EDreceta from './Front/EDreceta';
 import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
+import Modal from './Front/Modal';
+
+{/*
+import 'antd/dist/reset.css';*/}
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -29,6 +32,7 @@ const mainItems: ItemType[] = [
   { label: <Link to="/plan" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Recetas</Link>, key: 'recetas' },
   { label: <Link to="/refri" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Refri</Link>, key: 'refri' },
+  { label: <Link to="/modal" style={{fontFamily: 'Jomhuria' , fontSize: 30}}>Modal</Link>, key: 'modal' },
 ];
 
 const profileItem: ItemType[] = [
@@ -83,7 +87,7 @@ function App() {
                 <div className="custom-menu">
                   <Menu
                     mode="horizontal"
-                    items={Accedio ? mainItems : mainItems.slice(0, 3)}
+                    items={Accedio ? mainItems : mainItems.slice(0, 2)}
                     className="menu-links"
                   />
                   {Accedio ? ( // Mostrar el perfil solo si está habilitado
@@ -117,6 +121,8 @@ function App() {
             <Route path="/edReceta" element={<EDreceta />} />
             <Route path="/acceder" element={<Acceder />} />
             <Route path="/verR" element={<VerR />} />
+            <Route path="/modal" element={<Modal />} />
+
             <Route path="/terminosycondiciones" element={<VerR />} />
             <Route path="/avisodeprivacidad" element={<VerR />} />
           </Routes>
