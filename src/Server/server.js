@@ -1,14 +1,18 @@
 const express = require("express");
 const session = require("express-session");
 const multer = require("multer");
-const passport = require("./base/auth"); // Autenticación con Google
+const passport = require("./base/auth"); 
 const usuarioRouter = require("./base/usuario");
 const usuarioGmailRouter = require("./base/usuarioGmail");
 const loginRouter = require("./base/login");
 const logoutRouter = require("./base/Logout");
+const recetaGeneral = require("./base/receta");
+const alimento = require("./base/Alimento");
+const caducar = require("./base/Caducar");
+
 const dotenv = require("dotenv");
 const cors = require("cors");
-
+const path = require('path');
 dotenv.config();
 
 // Configuración de multer
@@ -18,12 +22,13 @@ const upload = multer({
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "imagenes/");
+    cb(null, path.join(__dirname, 'imagenes'));  // Especifica correctamente la ruta
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
+
 
 // Inicializamos el servidor
 const app = express();
@@ -43,38 +48,40 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Rutas existentes
+
+// Rutas de usuarios
 app.use("/usuarios", upload, usuarioRouter);
 app.use("/usuarioGmail", usuarioGmailRouter);
 app.use("/login", loginRouter);
 app.use("/logout", logoutRouter);
 
-// Ruta de inicio de sesión con Google
+// Ruta de autenticación con Google
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-// Callback después de la autenticación con Google
 const BASE_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
+// Ruta de callback después de la autenticación con Google
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: `${BASE_URL}/acceder`,
-    session: true,
+    session: false,
   }),
   (req, res) => {
     if (req.user) {
-      // Envía la información del usuario junto con una indicación de redirección
-      res.json({
+      const user = {
         id: req.user.Id_Usuario,
         username: req.user.Nombre_Usuario,
         foto_perfil: req.user.foto_perfil,
+        Cohabitantes: req.user.Cohabitantes,
         Email: req.user.Email,
-        message: "Sesión iniciada con éxito mediante Google",
-        redirectTo: `${BASE_URL}/perfil`,
-      });
+      };
+
+      // Redirigir al frontend y almacenar los datos del usuario en localStorage
+      res.json(user); // Responder con los datos del usuario en formato JSON
     } else {
       res.status(401).json({ message: "Autenticación fallida" });
     }
@@ -84,10 +91,15 @@ app.get(
 
 
 
+//modificar recetas
+app.use("/recetaGeneral", recetaGeneral);
 
-// Inicio del servidor
+//modificar alimentos
+app.use("/alimento", alimento);
+app.use("/caducar", caducar);
+const filePath = path.join(__dirname, 'images', 'defaultPerfil.png');
+
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () =>
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
 );
-

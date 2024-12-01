@@ -39,8 +39,7 @@ router.post("/", (req, res, next) => {
       return res.status(500).send('Error al procesar la imagen');
     }
 
-    // Desestructuración de los datos del body
-    const { nombre, id_tipo_consumo, id_usuario_alta, fecha_alta } = req.body;
+    const { nombre, id_tipo_consumo, tiempo, calorias , id_usuario_alta, fecha_alta } = req.body;
 
     console.log("Headers:", req.headers);
     console.log("Body recibido:", req.body);
@@ -51,14 +50,14 @@ router.post("/", (req, res, next) => {
     }
 
     // Establecer la imagen predeterminada si no se sube una imagen
-    const imagen = req.file ? `../imagenes/${req.file.filename}` : `imagenes/defRec.png`;
+    const imagen = req.file ? `../imagenes/${req.file.filename}` : `../imagenes/defRec.png`;
 
     // Consulta 1: Inserción en la tabla `receta`
     const query1 = `
-      INSERT INTO receta (Nombre, Id_Tipo_Consumo, Imagen_receta, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO receta (Nombre, Id_Tipo_Consumo, Tiempo, Calorias, Imagen_receta, Id_Usuario_Alta, Fecha_Alta) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values1 = [nombre, id_tipo_consumo, imagen, id_usuario_alta, fecha_alta];
+    const values1 = [nombre, id_tipo_consumo, tiempo, calorias, imagen, id_usuario_alta, fecha_alta];
 
     // Ejecutar la inserción en la tabla `receta`
     db.query(query1, values1, (err1, result1) => {

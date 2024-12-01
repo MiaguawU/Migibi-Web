@@ -48,7 +48,7 @@ router.post("/", (req, res, next) => {
       return res.status(400).send("Faltan datos requeridos");
     }
 
-    const imagen = req.file ? `../imagenes/${req.file.filename}` : `imagenes/defIng.png`;
+    const imagen = req.file ? `../imagenes/${req.file.filename}` : `../imagenes/defIng.png`;
 
     const query1 = `
       INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
@@ -83,27 +83,50 @@ router.post("/", (req, res, next) => {
   });
 });
 
-// Ver un alimento por su ID
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
+router.get("/", (req, res) => {
+  const query1 = `
+    SELECT 
+      ca.Alimento AS Nombre,
+      sd.Total AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      ca.Imagen_alimento AS Imagen,
+      sd.Fecha_Caducidad
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    WHERE ca.Es_Perecedero = 1
+    ORDER BY sd.Fecha_Caducidad ASC;`;
 
-  const query1 = 'SELECT * FROM cat_alimento WHERE Id_Alimento = ?';
-  const query2 = 'SELECT * FROM stock_detalle WHERE Id_Alimento = ?';
+  const query2 = `
+    SELECT 
+      ca.Alimento AS Nombre,
+      sd.Total AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      ca.Imagen_alimento AS Imagen
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    WHERE ca.Es_Perecedero = 0
+    ORDER BY ca.Alimento ASC;`;
 
-  db.query(query1, [id], (err, result1) => {
-    if (err || result1.length === 0) {
-      return res.status(404).send("Alimento no encontrado");
+  db.query(query1, (err, result1) => {
+    if (err) {
+      console.error("Error en query1:", err);
+      return res.status(500).json({ error: "Error al obtener alimentos perecederos" });
     }
 
-    db.query(query2, [id], (err2, result2) => {
+    db.query(query2, (err2, result2) => {
       if (err2) {
-        return res.status(500).send("Error al consultar stock");
+        console.error("Error en query2:", err2);
+        return res.status(500).json({ error: "Error al obtener alimentos no perecederos" });
       }
 
-      res.json({ alimento: result1[0], stock: result2 });
+      res.json({ Perecedero: result1, NoPerecedero: result2 });
     });
   });
 });
+
+
 
 // Actualizar un alimento
 router.put("/:id", upload.single('image'), (req, res) => {
