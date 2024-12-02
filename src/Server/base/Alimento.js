@@ -87,7 +87,7 @@ router.get("/", (req, res) => {
   const query1 = `
   SELECT 
   ca.Alimento AS Nombre,
-  sd.Total AS Cantidad,
+  sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
   sd.Fecha_Caducidad,
@@ -102,7 +102,7 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
   const query2 = `
     SELECT 
   ca.Alimento AS Nombre,
-  sd.Total AS Cantidad,
+  sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
   cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
@@ -126,6 +126,7 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
       }
 
       res.json({ Perecedero: result1, NoPerecedero: result2 });
+      console.log(result1);
     });
   });
 });
