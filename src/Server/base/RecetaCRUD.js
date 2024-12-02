@@ -50,7 +50,7 @@ router.post("/", (req, res, next) => {
     }
 
     // Establecer la imagen predeterminada si no se sube una imagen
-    const imagen = req.file ? `../imagenes/${req.file.filename}` : `../imagenes/defRec.png`;
+    const imagen = req.file ? `../imagenes/${req.file.filename}` : `/imagenes/defRec.png`;
 
     // Consulta 1: Inserción en la tabla `receta`
     const query1 = `
