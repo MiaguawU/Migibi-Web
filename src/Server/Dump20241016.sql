@@ -1,5 +1,5 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `migibi`;  
+USE `migibi`; 
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: migibi
@@ -640,7 +640,7 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `Id_Usuario` int NOT NULL AUTO_INCREMENT,
-  `Nombre_Usuario` varchar(250) NOT NULL UNIQUE,
+  `Nombre_Usuario` varchar(250) NOT NULL ,
   `Contrasena` varchar(250) NOT NULL ,
   `foto_perfil` VARCHAR(255),
   `Cohabitantes` int NOT NULL DEFAULT (1),

@@ -6,16 +6,29 @@ import PUERTO from '../../config';
 
 const { Title } = Typography;
 
-const AuthForm: React.FC = () => {
+const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) => {
   const [formMode, setFormMode] = useState<"register" | "login">("register");
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [mostrarNotificacionEmail, setMostrarNotificacionEmail] = useState(false);
 
-  
+  const handleAgregarEmail = () => {
+    if (email.trim() === '') {
+      alert('Por favor, ingresa un email.');
+      return;
+    }
+
+    setMostrarNotificacionEmail(true);
+    setTimeout(() => {
+      setMostrarNotificacionEmail(false);
+    }, 3000);
+
+    setEmail('');
+  };
+
   const handleModeChange = (e: any) => {
     setFormMode(e.target.value);
   };
-
 
   const handleGoogleLogin = async (): Promise<void> => {
     // Redirigir al flujo de Google OAuth
@@ -36,7 +49,11 @@ const AuthForm: React.FC = () => {
 
       localStorage.setItem("usuarios", JSON.stringify(usuarios));
       localStorage.setItem("currentUser", id);
+
       message.success(`Sesión iniciada como ${username}`);
+      
+      // Llamamos a onLogin para notificar al componente principal
+      onLogin({ id, username, email, foto_perfil, cohabitantes });
     }
   };
 
@@ -57,6 +74,9 @@ const AuthForm: React.FC = () => {
       localStorage.setItem("currentUser", id);
 
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
+
+      // Llamamos a onLogin para notificar al componente principal
+      onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
     } catch (error: unknown) {
       console.error('Error al iniciar sesión:', error);
 
