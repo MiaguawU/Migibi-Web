@@ -22,33 +22,52 @@ const AuthForm: React.FC = () => {
 
   const sesionNormal = async () => {
     try {
-      const data = {
-        username: email,
-        password: password,
-      };
-      await axios.post('http://localhost:5000/usuarios', data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const data = { username: email, password };
+  
+      const response = await axios.post(`${PUERTO}/login`, data, {
+        headers: { 'Content-Type': 'application/json' },
       });
-      message.success('Bienvenid@');
-    } catch (error) {
-      message.error('Error al iniciar sesión');
+  
+      const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
+  
+      // Guardar los datos completos en localStorage
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+      usuarios[id] = { username, foto_perfil, Cohabitantes, Email };
+  
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      localStorage.setItem("currentUser", id.toString()); // Registrar el usuario actual
+  
+      message.success(`Bienvenido, ${username}. ${serverMessage}`);
+    } catch (error: unknown) {
+      console.error('Error al iniciar sesión:', error);
+  
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.data) {
+          message.error(error.response.data);
+        } else {
+          message.error('Error al iniciar sesión. Por favor, intente nuevamente.');
+        }
+      } else {
+        message.error('Ocurrió un error inesperado.');
+      }
     }
   };
+  
+  
+  
   
 
   const registro = async () => {
     try {
       const formData = new FormData();
-      formData.append("username", email); // Campo username
-      formData.append("password", password); // Campo password
-  
-      await axios.post("http://localhost:5000/usuarios", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await axios.post(`${PUERTO}/usuarios`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
+      localStorage.setItem('user', JSON.stringify(response.data));
   
       message.success("Registro exitoso");
     } catch (error) {
@@ -65,14 +84,15 @@ const AuthForm: React.FC = () => {
   const registroGmail = async () => {
     try {
       const formData = new FormData();
-      formData.append('username', email); // Usamos 'username' en lugar de 'email'
-      formData.append('password', password); // Agregamos la contraseña
-  
-      await axios.post('http://localhost:5000/usuarioGmail', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Asegúrate de que el tipo de contenido es multipart/form-data
-        },
+      formData.append('username', email);
+      formData.append('password', password);
+
+      const response = await axios.post(`${PUERTO}/usuarioGmail`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
+
+      // Guardar sesión en localStorage
+      localStorage.setItem('user', JSON.stringify(response.data));
   
       message.success('Registro exitoso');
     } catch (error) {
