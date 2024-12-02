@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
-import axios from 'axios';
 
 const { Option } = Select;
 
@@ -27,49 +26,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
 
   const [products, setProducts] = useState([]); // Lista de productos
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  
-// Obtener productos desde la API
-const fetchProducts = async () => {
-  try {
-    const { data } = await axios.get('http://localhost:5000/api/products');
-    setProducts(data);
-  } catch (error) {
-    message.error('Error al cargar productos');
-  }
-};
-
-// Eliminar producto
-const deleteProduct = async (id: number) => {
-  try {
-    await axios.delete(`http://localhost:5000/api/products/${id}`);
-    message.success('Producto eliminado');
-    fetchProducts();
-  } catch (error) {
-    message.error('Error al eliminar producto');
-  }
-};
-
-// Manejar envío del formulario desde el modal
-const handleSubmit = async (values: any) => {
-  const formData = new FormData();
-  formData.append('name', values.name);
-  formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); // Formatea la fecha
-  formData.append('quantity', values.quantity);
-  formData.append('unit', values.unit);
-
-  try {
-    await axios.post('http://localhost:5000/api/products', formData);
-    message.success('Producto agregado');
-    fetchProducts(); // Actualiza la lista de productos
-    setIsModalOpen(false); // Cierra el modal
-  } catch (error) {
-    message.error('Error al agregar producto');
-  }
-};
   
   const handleFinish = (values: any) => {
     onSubmit(values); // Llama a la función que maneja los datos

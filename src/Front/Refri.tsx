@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
 import PorCaducar from './Componentes/PorCaducar';
+import ProductModal from './Componentes/IngredienteRefriModal'; // Importa el modal separado
 import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
 import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
@@ -23,6 +24,7 @@ export default function Inicio() {
   const [alimentosNoPerecederos, setAlimentosNoPerecederos] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
 
   // Obtener datos de alimentos
   const datosAlimento = async () => {
@@ -89,8 +91,26 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos]
-  .filter((alimento) => {
+  // Manejar envío del formulario desde el modal
+
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); // Formatea la fecha
+    formData.append('quantity', values.quantity);
+    formData.append('unit', values.unit);
+// Agregar un nuevo ingrediente
+    try {
+      await axios.post('http://localhost:5000/api/products', formData);
+      message.success('Producto agregado');
+      datosAlimento(); // Actualiza la lista de productos
+      setIsModalOpen(false); // Cierra el modal
+    } catch (error) {
+      message.error('Error al agregar producto');
+    }
+  };
+
+  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
     const nombre = alimento.ingrediente.toLowerCase();
     const tipo = alimento.Tipo.toLowerCase();
     const cantidad = alimento.cantidad.toString();
@@ -133,7 +153,7 @@ export default function Inicio() {
             style={{ width: '60%' }}
           />
           <CameraOutlined style={{ fontSize: 30, color: '#3E7E1E' }} />
-          <Button style={{ color: '#3E7E1E', backgroundColor: '#CAE2B5' }}>Agregar</Button>
+          <Button style={{ color: '#3E7E1E', backgroundColor: '#CAE2B5' }} onClick={() => setIsModalOpen(true)}>Agregar</Button>
         </div>
       </div>
 
@@ -182,6 +202,12 @@ export default function Inicio() {
                 </span>
               </Card>
             ))}
+            {/* Modal externo para agregar producto */}
+            <ProductModal
+              visible={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSubmit={handleSubmit}
+            />
           </div>
         </>
       )}
