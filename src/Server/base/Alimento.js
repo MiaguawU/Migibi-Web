@@ -48,7 +48,7 @@ router.post("/", (req, res, next) => {
       return res.status(400).send("Faltan datos requeridos");
     }
 
-    const imagen = req.file ? `../imagenes/${req.file.filename}` : `../imagenes/defIng.png`;
+    const imagen = req.file ? `../imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
 
     const query1 = `
       INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
@@ -85,29 +85,33 @@ router.post("/", (req, res, next) => {
 
 router.get("/", (req, res) => {
   const query1 = `
-    SELECT 
-      ca.Alimento AS Nombre,
-      sd.Total AS Cantidad,
-      cum.Abreviatura AS Unidad,
-      ca.Imagen_alimento AS Imagen,
-      sd.Fecha_Caducidad
-    FROM stock_detalle sd
-    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
-    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
-    WHERE ca.Es_Perecedero = 1
-    ORDER BY sd.Fecha_Caducidad ASC;`;
+  SELECT 
+  ca.Alimento AS Nombre,
+  sd.Total AS Cantidad,
+  cum.Abreviatura AS Unidad,
+  ca.Imagen_alimento AS Imagen,
+  sd.Fecha_Caducidad,
+  cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
+FROM stock_detalle sd
+LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento -- Agregado JOIN para obtener el tipo de alimento
+WHERE ca.Es_Perecedero = 1
+ORDER BY sd.Fecha_Caducidad ASC;`;
 
   const query2 = `
     SELECT 
-      ca.Alimento AS Nombre,
-      sd.Total AS Cantidad,
-      cum.Abreviatura AS Unidad,
-      ca.Imagen_alimento AS Imagen
-    FROM stock_detalle sd
-    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
-    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
-    WHERE ca.Es_Perecedero = 0
-    ORDER BY ca.Alimento ASC;`;
+  ca.Alimento AS Nombre,
+  sd.Total AS Cantidad,
+  cum.Abreviatura AS Unidad,
+  ca.Imagen_alimento AS Imagen,
+  cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
+FROM stock_detalle sd
+LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento -- Agregado JOIN para obtener el tipo de alimento
+WHERE ca.Es_Perecedero = 0
+ORDER BY sd.Fecha_Caducidad ASC;`;
 
   db.query(query1, (err, result1) => {
     if (err) {

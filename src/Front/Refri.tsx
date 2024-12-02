@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
-
 import PorCaducar from './Componentes/PorCaducar';
-import { AutoComplete, Input, Flex, Button, ConfigProvider, Row, Col, Card, Space, Tooltip, message, Spin } from 'antd';
+import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
 import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -14,33 +13,27 @@ interface CardData {
   abreviatura: string;
   image: string;
   fecha: string;
-  diasRestantes: number | string;
+  diasRestantes: string | number;
+  caducidadPasada: boolean | null;
+  Tipo: string;
 }
 
 export default function Inicio() {
-  const options = [
-    { value: 'Burns Bay Road' },
-    { value: 'Downing Street' },
-    { value: 'Wall Street' },
-  ];
-
   const [alimentosPerecederos, setAlimentosPerecederos] = useState<CardData[]>([]);
   const [alimentosNoPerecederos, setAlimentosNoPerecederos] = useState<CardData[]>([]);
-  const [loading, setLoading] = useState(true); // Para mostrar el indicador de carga
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
+  // Obtener datos de alimentos
   const datosAlimento = async () => {
     try {
       const response = await axios.get(`${PUERTO}/alimento`);
-  
-      // Validar si las claves esperadas están presentes
       const { Perecedero, NoPerecedero } = response.data;
+
       if (Array.isArray(Perecedero) && Array.isArray(NoPerecedero)) {
-        // Mapear alimentos perecederos
         const perecederos = Perecedero.map((alimento) => {
-          const fechaCaducidad = alimento.Fecha_Caducidad
-            ? new Date(alimento.Fecha_Caducidad)
-            : null;
-    
+          const fechaCaducidad = alimento.Fecha_Caducidad ? new Date(alimento.Fecha_Caducidad) : null;
+          const caducidadPasada = fechaCaducidad && fechaCaducidad < new Date();
           const diasRestantes = fechaCaducidad
             ? Math.max(
                 0,
@@ -49,28 +42,31 @@ export default function Inicio() {
                 )
               )
             : 'No definida';
-    
+          const fecha = fechaCaducidad ? fechaCaducidad.toLocaleDateString() : 'Fecha no disponible';
+
           return {
             ingrediente: alimento.Nombre || ' ',
             cantidad: alimento.Cantidad || 1,
             abreviatura: alimento.Unidad || ' ',
-            image: alimento.Imagen || ' ',
-            fecha: diasRestantes === 'No definida' ? 'Fecha no disponible' : `${diasRestantes} días`,
-            diasRestantes, // Guardar los días restantes para comparar después
+            image: alimento.Imagen ? `${PUERTO}${alimento.Imagen}` : '/imagenes/defIng.png',
+            fecha: caducidadPasada ? fecha : `${diasRestantes} días`,
+            diasRestantes,
+            caducidadPasada,
+            Tipo: alimento.Tipo_Alimento,
           };
         });
-    
-        // Mapear alimentos no perecederos
+
         const noPerecederos = NoPerecedero.map((alimento) => ({
           ingrediente: alimento.Nombre || ' ',
           cantidad: alimento.Cantidad || 0,
           abreviatura: alimento.Unidad || ' ',
-          image: alimento.Imagen || ' ',
-          fecha: '🧀', // Default para no perecederos
+          image: alimento.Imagen ? `${PUERTO}${alimento.Imagen}` : '/imagenes/defIng.png',
+          fecha: '🧀',
           diasRestantes: 'No aplica',
+          caducidadPasada: false,
+          Tipo: alimento.Tipo_Alimento,
         }));
-    
-        // Actualizar estados
+
         setAlimentosPerecederos(perecederos);
         setAlimentosNoPerecederos(noPerecederos);
         message.success("Alimentos obtenidos exitosamente");
@@ -81,68 +77,72 @@ export default function Inicio() {
       console.error("Error al obtener alimentos", error);
       message.error("No se pudo conectar con el servidor.");
     } finally {
-      setLoading(false); // Al finalizar la carga, se puede mostrar el contenido
+      setLoading(false);
     }
   };
 
-  // Ejecutar la función al montar el componente
   useEffect(() => {
-    // Esperamos que ambas solicitudes se completen antes de renderizar
-    Promise.all([datosAlimento()])
-      .then(() => {
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error en las peticiones", error);
-        setLoading(false);
-      });
-  }, []);  // Aquí solo necesitamos un `useEffect`
+    datosAlimento();
+  }, []);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value.toLowerCase());
+  };
+
+  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
+    const nombre = alimento.ingrediente.toLowerCase();
+    const tipo = alimento.Tipo.toLowerCase();
+    const cantidad = alimento.cantidad.toString();
+    return (
+      nombre.includes(searchTerm) ||
+      tipo.includes(searchTerm) ||
+      cantidad.includes(searchTerm)
+    );
+  });
 
   return (
-    <>
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: '#00b96b',
-            borderRadius: 10,
-            colorBgContainer: '#CAE2B5',
-          },
-          components: {
-            Select: {
+    <ConfigProvider
+      theme={{
+        token: {
+          // Seed Token
+          colorPrimary: '#00b96b',
+          borderRadius: 10,
+          
+
+          // Alias Token
+          colorBgContainer: '#CAE2B5',
+      },
+      components: {
+          Select: {
               optionActiveBg: '#CAE2B5',
-              algorithm: true,
-            }
+              algorithm: true
           }
-        }}
-      >
-        <div style={{ width: '80vw', alignContent: 'center', marginLeft: '10vw', marginRight: '10vw', marginTop: '10px' }}>
-          <Flex align='center' justify='space-evenly'>
-            <div>
-              <AutoComplete
-                style={{ width: "50vw" }}
-                options={options}
-                filterOption={(inputValue, option) =>
-                  option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                }
-              >
-                <Input.Search size="large" placeholder="Buscar un ingrediente" />
-              </AutoComplete>
-            </div>
-            <div>
-              <CameraOutlined style={{ fontSize: 30, color: '#3E7E1E', backgroundColor: '#EEF6DD' }} />
-            </div>
-            <div>
-              <Button style={{ color: "#3E7E1E", backgroundColor: "#CAE2B5" }}>Agregar</Button>
-            </div>
-          </Flex>
+      }
+
+      }}
+    >
+      <div style={{ width: '80vw', margin: '10px auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Input.Search
+            size="large"
+            placeholder="Buscar ingrediente"
+            onSearch={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: '60%' }}
+          />
+          <CameraOutlined style={{ fontSize: 30, color: '#3E7E1E' }} />
+          <Button style={{ color: '#3E7E1E', backgroundColor: '#CAE2B5' }}>Agregar</Button>
         </div>
-        
-        {loading ? (
-          <Spin size="large" style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }} />
-        ) : (
+      </div>
+
+      {loading ? (
+        <Spin size="large" style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }} />
+      ) : (
+        <>
+          
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
-            <PorCaducar />
-            {[...alimentosPerecederos, ...alimentosNoPerecederos].map((card, index) => (
+          <PorCaducar />
+            {filteredAlimentos.map((card, index) => (
               <Card
                 key={index}
                 hoverable
@@ -152,58 +152,37 @@ export default function Inicio() {
                   overflow: 'hidden',
                 }}
               >
-                <div
-                  style={{
-                    border: '1px solid #3E7E1E',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <img alt={card.ingrediente} src="../Img/biCa.png" style={{ width: '100%', height: 'auto' }} />
+                <span style={{fontSize: 30, color: '#86A071', fontFamily: 'Jomhuria, sans-serif'}}>
+
+                <img alt={card.image} src={card.image} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }} />
+                
+                <Meta
+                  title={<span style={{ fontSize: '30px', color: '#86A071', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
+                  description={`${card.cantidad} ${card.abreviatura}`}
+                  style={{ marginTop: '10px' }}
+                />
+                <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#86A071' }}>
+                  {card.fecha}
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: '10px',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 30,
-                      color: '#86A071',
-                      fontFamily: 'Jomhuria, sans-serif',
-                    }}
-                  >
-                    {`${card.ingrediente}`}
-                    <br />
-                    {`${card.cantidad} ${card.abreviatura}`}
-                    <br />
-                    {card.diasRestantes === 'No definida' ? 'Fecha no disponible' : card.fecha}
-                  </span>
-                  <Space size="small">
-                    <Tooltip title="Editar">
-                      <EditOutlined style={{ color: '#6F895A', fontSize: 20 }} />
+                <Space size="small" style={{ marginTop: '10px' }}>
+                  <Tooltip title="Editar">
+                    <EditOutlined style={{ color: '#6F895A', fontSize: 20 }} />
+                  </Tooltip>
+                  {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
+                    <Tooltip title="Advertencia">
+                      <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
                     </Tooltip>
-                    {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
-                      <Tooltip title="Advertencia">
-                        <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
-                      </Tooltip>
-                    )}
-                    <Tooltip title="Eliminar">
-                      <DeleteOutlined style={{ color: '#6F895A', fontSize: 20 }} />
-                    </Tooltip>
-                  </Space>
-                </div>
+                  )}
+                  <Tooltip title="Eliminar">
+                    <DeleteOutlined style={{ color: '#6F895A', fontSize: 20 }} />
+                  </Tooltip>
+                </Space>
+                </span>
               </Card>
             ))}
           </div>
-        )}
-        
-      </ConfigProvider>
-    </>
+        </>
+      )}
+    </ConfigProvider>
   );
 }

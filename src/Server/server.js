@@ -9,6 +9,8 @@ const logoutRouter = require("./base/Logout");
 const recetaGeneral = require("./base/receta");
 const alimento = require("./base/Alimento");
 const caducar = require("./base/Caducar");
+const call = require("./base/ManejodeAuth");
+const routerSave = require("./base/SaveGmail");
 
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -36,6 +38,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
+
 // Configuración de sesiones
 app.use(
   session({
@@ -54,6 +58,8 @@ app.use("/usuarios", upload, usuarioRouter);
 app.use("/usuarioGmail", usuarioGmailRouter);
 app.use("/login", loginRouter);
 app.use("/logout", logoutRouter);
+app.use("/manejo",call)
+app.use("/save", routerSave);
 
 // Ruta de autenticación con Google
 app.get(
@@ -66,28 +72,37 @@ const BASE_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 // Ruta de callback después de la autenticación con Google
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: `${BASE_URL}/acceder`,
-    session: false,
-  }),
+  passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    if (req.user) {
+    try {
+      // Datos del usuario autenticado
       const user = {
         id: req.user.Id_Usuario,
         username: req.user.Nombre_Usuario,
+        email: req.user.Email,
         foto_perfil: req.user.foto_perfil,
-        Cohabitantes: req.user.Cohabitantes,
-        Email: req.user.Email,
+        Cohabitantes: req.user.Cohabitantes || null,
       };
 
-      // Redirigir al frontend y almacenar los datos del usuario en localStorage
-      res.json(user); // Responder con los datos del usuario en formato JSON
-    } else {
-      res.status(401).json({ message: "Autenticación fallida" });
+      // Serializar los datos del usuario como query string
+      const queryParams = new URLSearchParams({
+        id: user.id.toString(),
+        username: user.username,
+        email: user.email,
+        foto_perfil: user.foto_perfil,
+        Cohabitantes: user.Cohabitantes ? user.Cohabitantes.toString() : "",
+        message: "Sesión iniciada con éxito",
+      });
+
+      // Redirigir al frontend con los datos
+      const frontendURL = process.env.FRONTEND_URL || "http://localhost:3000";
+      res.redirect(`${frontendURL}/dashboard?${queryParams}`);
+    } catch (error) {
+      console.error("Error durante el callback de Google:", error);
+      res.redirect(`${BASE_URL}/error?message=Error durante la autenticación`);
     }
   }
 );
-
 
 
 
@@ -97,6 +112,8 @@ app.use("/recetaGeneral", recetaGeneral);
 //modificar alimentos
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);
+
+
 const filePath = path.join(__dirname, 'images', 'defaultPerfil.png');
 
 const PORT = process.env.SERVER_PORT || 5000;
