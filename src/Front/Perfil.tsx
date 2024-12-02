@@ -4,15 +4,17 @@ import "./perfil.css";
 import NumericInput from "./Componentes/NumberInput";
 import PUERTO from "../config";
 import axios from "axios";
-import btPerfil from '../Img/btPerfil.png'; // Imagen predeterminada si no hay una foto
+import btPerfil from "../Img/btPerfil.png"; // Imagen predeterminada si no hay una foto
 
 const UserProfile: React.FC = () => {
   const [formData, setFormData] = useState({
     Nombre_Usuario: '',
-    foto_perfil: '', // Se espera que esto sea la URL de la foto
+    foto_perfil: '',
     Cohabitantes: '',
     Email: '',
   });
+
+  const [loading, setLoading] = useState(true);
 
   const logout = async () => {
     try {
@@ -31,6 +33,7 @@ const UserProfile: React.FC = () => {
   };
 
   const datosPerfil = async () => {
+    setLoading(true);
     try {
       const currentUser = localStorage.getItem("currentUser");
       if (!currentUser) {
@@ -54,18 +57,21 @@ const UserProfile: React.FC = () => {
       if (response.data.length > 0) {
         const userData = response.data[0];
         setFormData({
-          Nombre_Usuario: userData.Nombre_Usuario || 'No info',
-          foto_perfil: userData.foto_perfil || '', // Si no hay foto, lo dejamos vacío
-          Cohabitantes: userData.Cohabitantes || 'No info',
-          Email: userData.Email || 'No info',
+          Nombre_Usuario: userData.Nombre_Usuario || "No info",
+          foto_perfil: userData.foto_perfil?.startsWith("http")
+            ? userData.foto_perfil 
+            : `${PUERTO}/${userData.foto_perfil}`, 
+          Cohabitantes: userData.Cohabitantes || "No info",
+          Email: userData.Email || "No info",
         });
-        message.success("Usuario conectado correctamente.");
       } else {
         message.warning("No se encontró información del usuario.");
       }
     } catch (error) {
       console.error("Error al obtener usuario:", error);
       message.error("No se pudo conectar con el servidor.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,35 +79,17 @@ const UserProfile: React.FC = () => {
     datosPerfil();
   }, []);
 
-  const handleInputChange = (field: string, value: string | number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = btPerfil; // Usar imagen predeterminada si falla la carga
   };
 
-  // Generar la URL completa de la foto de perfil si existe, o dejarla vacía
-  const fotoPerfilUrl = formData.foto_perfil ? `${PUERTO}/${formData.foto_perfil}` : '';
-
-  const img = [
-    {
-      title: 'Imagen',
-      dataIndex: 'foto_perfil',
-      key: 'foto_perfil',
-      render: (text: string) =>
-        text ? (
-          <div>
-            <img
-              src={`http://localhost:5000${formData.foto_perfil}`}
-              alt="Perfil"
-              style={{ width: 50, height: 50 }}
-            />
-          </div>
-        ) : (
-          'N/A'
-        ),
-    },
-  ];
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <p>Cargando información del perfil...</p>
+      </div>
+    );
+  }
 
   return (
     <ConfigProvider
@@ -115,24 +103,24 @@ const UserProfile: React.FC = () => {
     >
       <div className="profile-container">
         <div className="logout-button-container">
-          <button className="logout-button" onClick={logout}>Cerrar sesión</button>
+          <button className="logout-button" onClick={logout}>
+            Cerrar sesión
+          </button>
         </div>
 
         <div className="avatar-section">
           <div className="avatar">
-            <div
-              className="avatar-circle"
+            <img
+              src={formData.foto_perfil || btPerfil}
+              alt="Perfil"
+              onError={handleImageError} // Manejar errores de carga de la imagen
               style={{
-                backgroundImage: `url(${formData?.foto_perfil || btPerfil})`, // Usar la imagen del servidor o la predeterminada
-                backgroundSize: "cover",
-                backgroundPosition: "center",
                 borderRadius: "50%",
                 width: "100px",
                 height: "100px",
+                objectFit: "cover",
               }}
-            ></div>
-            <br />
-            <br />
+            />
             <button className="edit-button">✎</button>
           </div>
         </div>
@@ -140,8 +128,10 @@ const UserProfile: React.FC = () => {
         <div className="info-section">
           <Input
             variant="borderless"
-            value={formData.Nombre_Usuario || ''}
-            onChange={(e) => setFormData({ ...formData, Nombre_Usuario: e.target.value })}
+            value={formData.Nombre_Usuario || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, Nombre_Usuario: e.target.value })
+            }
             className="user-title"
           />
 
@@ -159,27 +149,21 @@ const UserProfile: React.FC = () => {
                     colorText: "#8BA577",
                     colorPrimaryActive: "#3E7E1E",
                   },
-                  components: {
-                    Input: {
-                      activeBorderColor: "#3E7E1E",
-                      hoverBorderColor: "#52A528",
-                    },
-                  },
                 }}
               >
                 <span>Cantidad de personas que viven conmigo:</span>
                 <NumericInput
                   style={{ width: 50, textAlign: "center" }}
-                  value={formData.Cohabitantes || ''}
-                  onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
+                  value={formData.Cohabitantes || ""}
+                  onChange={(value) =>
+                    setFormData({ ...formData, Cohabitantes: value })
+                  }
                 />
               </ConfigProvider>
             </div>
           </div>
         </div>
       </div>
-
-      
     </ConfigProvider>
   );
 };
