@@ -1,69 +1,41 @@
-import { Link, useNavigate } from 'react-router-dom';  
+import { Link, useNavigate } from 'react-router-dom';
 import './Estilos/Recetas.css';
-import { Input, Button, Select, Space, Tooltip, Card, ConfigProvider, message } from 'antd'; // Ant Design
-import btEditar from '../Img/btEditar.png';
-import def from '../Img/defRec.png';
-import btEl from '../Img/btEliminar.png';
-import cal from '../Img/imgCal.png';
-import tiempo from '../Img/imgTiempo.png';
-import btCom from '../Img/btCompartir.png';
+import { Input, Button, ConfigProvider, message } from 'antd';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
-
-import type { SelectProps } from 'antd';
-import React, { useState, useEffect } from 'react';
 import RecipeCard from './Componentes/RecetaCard';
 
-interface ItemProps {
-  label: string;
-  value: string;
-}
-
-const { Meta } = Card;
-
 const { Search } = Input;
-const options: ItemProps[] = [];
 
-for (let i = 10; i < 36; i++) {
-  const value = i.toString(36) + i;
-  options.push({
-    label: `Long Label: ${value}`,
-    value,
-  });
+interface CardData {
+  title: string;
+  portions: string;
+  calories: string; // Puede ser string o número
+  time: string; // Puede ser string o número
+  image: string;
 }
-
-const sharedProps: SelectProps = {
-  mode: 'multiple',
-  style: { width: '100%' },
-  options,
-  placeholder: 'Select Item...',
-  maxTagCount: 'responsive',
-};
 
 export default function Recetas() {
-
-  interface CardData {
-    title: string;
-    portions: string;
-    calories: string;
-    time: string;
-    image: string;
-  }
-
   const [recipes, setRecipes] = useState<CardData[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredRecipes, setFilteredRecipes] = useState<CardData[]>([]);
 
+  // Obtener datos de recetas
   const datosReceta = async () => {
     try {
       const response = await axios.get(`${PUERTO}/recetaGeneral`);
       if (response.data) {
         const recData = response.data.map((receta: any) => ({
           title: receta.Nombre || ' ',
-          portions: '20',  
-          calories: receta.Calorias || ' ',
-          time: receta.Tiempo || ' ',
-          image: receta.Imagen_receta || 'img', 
+          portions: receta.Porciones || ' ',
+          calories: String(receta.Calorias || '0'), // Convertir a cadena
+          time: String(receta.Tiempo || '0'), // Convertir a cadena
+          image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
         }));
+        
         setRecipes(recData);
+        setFilteredRecipes(recData); // Inicializar con todas las recetas
         message.success("Recetas obtenidas exitosamente");
       }
     } catch (error) {
@@ -76,22 +48,25 @@ export default function Recetas() {
     datosReceta();
   }, []);
 
-  const navigate = useNavigate();
-  const onSearch = (value: string) => {
-    console.log("Buscando:", value);
-  };
-
-  const [value, setValue] = useState(['a10', 'c12', 'h17', 'j19', 'k20']);
-
-  const selectProps: SelectProps = {
-    value,
-    onChange: setValue,
-  };
-
-  const IReditar = () => {
-    navigate('/edReceta');
-  };
+  // Manejar búsqueda
+  const handleSearch = (value: string) => {
+    setSearchTerm(value.toLowerCase());
+    const filtered = recipes.filter((recipe) => {
+      const title = recipe.title.toLowerCase();
+      const calories = String(recipe.calories).toLowerCase(); // Convertir a cadena
+      const time = String(recipe.time).toLowerCase(); // Convertir a cadena
   
+      return (
+        title.includes(value.toLowerCase()) ||
+        calories.includes(value.toLowerCase()) ||
+        time.includes(value.toLowerCase())
+      );
+    });
+    setFilteredRecipes(filtered);
+  };
+
+  const navigate = useNavigate();
+
   const IRver = () => {
     navigate('/verR');
   };
@@ -112,26 +87,34 @@ export default function Recetas() {
           borderRadius: 10,
           colorBgContainer: '#CAE2B5',
         },
-        components: {
-          Select: {
-            optionActiveBg: '#CAE2B5',
-            algorithm: true
-          }
-        }
       }}
     >
       <div className="recetas-container">
+        {/* Encabezado con búsqueda */}
         <div className="header">
-          <Space direction="vertical" style={{ width: '100%' }} className='buscar'>
-            <Select {...sharedProps} {...selectProps} />
-          </Space>
+          <Search
+            placeholder="Buscar por nombre, calorías o tiempo"
+            allowClear
+            onSearch={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: '80%' }}
+          />
           <Button className="btA" onClick={IRver}>Agregar</Button>
         </div>
-        
-        <div style={{ width: '100vw', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
-          {recipes.map((card, index) => (
+
+        {/* Listado de recetas */}
+        <div
+          style={{
+            width: '100vw',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+            gap: '16px',
+            padding: '16px',
+          }}
+        >
+          {filteredRecipes.map((card, index) => (
             <RecipeCard
-              key={index}  
+              key={index}
               title={card.title}
               portions={card.portions}
               calories={card.calories}
