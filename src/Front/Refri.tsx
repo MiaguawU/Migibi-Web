@@ -89,16 +89,18 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
+  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos]
+  .filter((alimento) => {
     const nombre = alimento.ingrediente.toLowerCase();
     const tipo = alimento.Tipo.toLowerCase();
     const cantidad = alimento.cantidad.toString();
     return (
-      nombre.includes(searchTerm) ||
-      tipo.includes(searchTerm) ||
-      cantidad.includes(searchTerm)
-    );
-  });
+      (nombre.includes(searchTerm) ||
+        tipo.includes(searchTerm) ||
+        cantidad.includes(searchTerm)) &&
+      alimento.cantidad > 0 // Asegurarse de que la cantidad sea mayor que 0
+    );
+  });
 
   return (
     <ConfigProvider

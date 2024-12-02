@@ -76,22 +76,48 @@ router.get("/", (req, res) => {
 // Endpoint para actualizar usuario
 router.put('/:id', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
   const { id } = req.params;
-  const { Nombre_Usuario, Contrasena, Email, Cohabitantes } = req.body;
+  const { Nombre_Usuario, Cohabitantes, Email } = req.body;
+
+  // Verificar si se recibe una nueva foto de perfil
   const foto_perfil = req.file ? `imagenes/${req.file.filename}` : null;
 
+  // Validación de ID
   if (!validator.isNumeric(id)) {
     return res.status(400).send("El ID debe ser numérico");
   }
 
-  const query = `
-    UPDATE usuario 
-    SET Nombre_Usuario = ?, Contrasena = ?, Email = ?, Cohabitantes = ?, foto_perfil = ? 
-    WHERE Id_Usuario = ?
-  `;
-  const values = [Nombre_Usuario, Contrasena, Email, Cohabitantes, foto_perfil, id];
+  // Preparar la consulta dinámica
+  let query = `UPDATE usuario SET `;
+  const values = [];
 
+  // Añadir los campos a actualizar
+  if (Nombre_Usuario) {
+    query += `Nombre_Usuario = ?, `;
+    values.push(Nombre_Usuario);
+  }
+  if (Cohabitantes) {
+    query += `Cohabitantes = ?, `;
+    values.push(Cohabitantes);
+  }
+  if (Email) {
+    query += `Email = ?, `;
+    values.push(Email);
+  }
+  if (foto_perfil) {
+    query += `foto_perfil = ?, `;
+    values.push(foto_perfil);
+  }
+
+  // Eliminar la coma final
+  query = query.slice(0, -2);
+
+  // Añadir la condición WHERE al final de la consulta
+  query += ` WHERE Id_Usuario = ?`;
+  values.push(id);
+
+  // Ejecutar la consulta
   db.query(query, values, (err) => {
-    if (err) {
+    if (err) { 
       return res.status(500).send('Error al actualizar usuario');
     }
     res.send('Usuario actualizado con éxito');

@@ -66,16 +66,11 @@ router.get("/", (req, res) => {
   const { activo } = req.query;
 
   // Construir la consulta SQL
-  let query = `SELECT * FROM cat_unidad_medida WHERE 1`;
+  let query = `SELECT * FROM cat_unidad_medida`;
 
-  const params = [];
-  if (activo !== undefined) {
-    query += ` AND Activo = ?`;
-    params.push(activo);
-  }
 
   // Ejecutar la consulta
-  db.query(query, params, (err, result) => {
+  db.query(query, (err, result) => {
     if (err) {
       console.error("Error al obtener unidades de medida:", err);
       return res.status(500).send("Error al obtener unidades de medida");

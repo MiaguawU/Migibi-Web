@@ -83,13 +83,36 @@ const UserProfile: React.FC = () => {
     e.currentTarget.src = btPerfil; // Usar imagen predeterminada si falla la carga
   };
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <p>Cargando información del perfil...</p>
-      </div>
-    );
-  }
+  const handleSaveChanges = async () => {
+    try {
+      const currentUser = localStorage.getItem("currentUser"); // Obtener el ID desde localStorage
+      if (!currentUser) {
+        message.error("No hay un usuario logueado.");
+        return;
+      }
+  
+      // El id debe ser el ID del usuario que está logueado (tomado de localStorage)
+      const userId = currentUser; // Asegúrate que esto es el id del usuario
+  
+      // Aquí se manda el id junto con los datos del formulario
+      const response = await axios.put(`${PUERTO}/usuarios/${userId}`, formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (response.status === 200) {
+        message.success("Cambios guardados correctamente.");
+        // Actualizar el estado local o hacer cualquier acción adicional si es necesario
+      } else {
+        message.error("No se pudieron guardar los cambios.");
+      }
+    } catch (error) {
+      console.error("Error al guardar los cambios:", error);
+      message.error("Hubo un error al guardar los cambios.");
+    }
+  };
+  
 
   return (
     <ConfigProvider
@@ -101,14 +124,16 @@ const UserProfile: React.FC = () => {
         },
       }}
     >
-    <div className="profile-container">
-      {/* Botón de Cerrar Sesión */}
-      <div className="logout-button-container">
-        <button className="save-button">Guardar cambios</button>
-        <button className="logout-button" onClick={logout}>
+      <div className="profile-container">
+        {/* Botón de Cerrar Sesión */}
+        <div className="logout-button-container">
+          <button className="save-button" onClick={handleSaveChanges}>
+            Guardar cambios
+          </button>
+          <button className="logout-button" onClick={logout}>
             Cerrar sesión
           </button>
-      </div>
+        </div>
 
         <div className="avatar-section">
           <div className="avatar">
@@ -127,50 +152,51 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
 
-      <div className="info-section">
-        <Input
-          variant="borderless"
-          value={formData.Nombre_Usuario || ""}
-          onChange={(e) =>
+        <div className="info-section">
+          <Input
+            variant="borderless"
+            value={formData.Nombre_Usuario || ""}
+            onChange={(e) =>
               setFormData({ ...formData, Nombre_Usuario: e.target.value })
             }
-          className="user-title"
-        />
+            className="user-title"
+          />
 
-        <div className="info-cards">
-          <div className="info-card">
-            <span>Tipos de alimentos que no puedo comer:</span>
-            <button className="view-button">Ver</button>
-          </div>
-          <div className="info-card">
-            <ConfigProvider
-              theme={{
-                token: {
-                  fontFamily: "Jomhuria, Serif",
-                  fontSize: 25,
-                  colorText: "#8BA577",
-                  colorPrimaryActive: "#3E7E1E",
-                },
-                components: {
-                  Input: {
-                    activeBorderColor: "#3E7E1E",
-                    hoverBorderColor: "#52A528",
+          <div className="info-cards">
+            <div className="info-card">
+              <span>Tipos de alimentos que no puedo comer:</span>
+              <button className="view-button">Ver</button>
+            </div>
+            <div className="info-card">
+              <ConfigProvider
+                theme={{
+                  token: {
+                    fontFamily: "Jomhuria, Serif",
+                    fontSize: 25,
+                    colorText: "#8BA577",
+                    colorPrimaryActive: "#3E7E1E",
                   },
-                },
-              }}
-            >
-              <span>Cantidad de personas que viven conmigo:</span>
-              <NumericInput
-                style={{ width: 50, textAlign: "center" }}
-                value={formData.Cohabitantes || ''}
-                onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
-              />
-            </ConfigProvider>
+                  components: {
+                    Input: {
+                      activeBorderColor: "#3E7E1E",
+                      hoverBorderColor: "#52A528",
+                    },
+                  },
+                }}
+              >
+                <span>Cantidad de personas que viven conmigo:</span>
+                <NumericInput
+                  style={{ width: 50, textAlign: "center" }}
+                  value={formData.Cohabitantes || ""}
+                  onChange={(value) =>
+                    setFormData({ ...formData, Cohabitantes: value })
+                  }
+                />
+              </ConfigProvider>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-      
     </ConfigProvider>
   );
 };
