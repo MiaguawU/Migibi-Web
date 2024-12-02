@@ -33,40 +33,40 @@ const upload = multer({
   },
 });
 
-// Crear una nueva unidad de medida (POST)
+// Crear un nuevo tipo de alimento (POST)
 router.post("/", (req, res, next) => {
-  const { unidad_medida, abreviatura, id_usuario_alta, fecha_alta } = req.body;
+  const { tipo_alimento, id_usuario_alta, fecha_alta } = req.body;
 
   // Validar que los campos requeridos estén presentes
-  if (!unidad_medida || !abreviatura || !id_usuario_alta || !fecha_alta) {
+  if (!tipo_alimento || !id_usuario_alta || !fecha_alta) {
     return res.status(400).send("Faltan datos requeridos");
   }
 
-  // Consulta para insertar una nueva unidad de medida
+  // Consulta para insertar un nuevo tipo de alimento
   const query1 = `
-    INSERT INTO cat_unidad_medida (Unidad_Medida, Abreviatura, Id_Usuario_Alta, Fecha_Alta) 
-    VALUES (?, ?, ?, ?)
+    INSERT INTO cat_tipo_alimento (Tipo_Alimento, Id_Usuario_Alta, Fecha_Alta) 
+    VALUES (?, ?, ?)
   `;
-  const values1 = [unidad_medida, abreviatura, id_usuario_alta, fecha_alta];
+  const values1 = [tipo_alimento, id_usuario_alta, fecha_alta];
 
   // Ejecutar la consulta
   db.query(query1, values1, (err1, result1) => {
     if (err1) {
-      console.error("Error al insertar unidad de medida:", err1);
-      return res.status(500).send("Error al agregar unidad de medida");
+      console.error("Error al insertar tipo de alimento:", err1);
+      return res.status(500).send("Error al agregar tipo de alimento");
     }
 
-    // Responder con el ID de la nueva unidad de medida
-    res.json({ id: result1.insertId, message: "Unidad de medida agregada con éxito" });
+    // Responder con el ID del nuevo tipo de alimento
+    res.json({ id: result1.insertId, message: "Tipo de alimento agregado con éxito" });
   });
 });
 
-// Obtener unidades de medida (GET)
+// Obtener tipos de alimento (GET)
 router.get("/", (req, res) => {
   const { activo } = req.query;
 
   // Construir la consulta SQL
-  let query = `SELECT * FROM cat_unidad_medida WHERE 1`;
+  let query = `SELECT * FROM cat_tipo_alimento WHERE 1`;
 
   const params = [];
   if (activo !== undefined) {
@@ -77,46 +77,46 @@ router.get("/", (req, res) => {
   // Ejecutar la consulta
   db.query(query, params, (err, result) => {
     if (err) {
-      console.error("Error al obtener unidades de medida:", err);
-      return res.status(500).send("Error al obtener unidades de medida");
+      console.error("Error al obtener tipos de alimento:", err);
+      return res.status(500).send("Error al obtener tipos de alimento");
     }
 
-    // Devolver las unidades de medida encontradas
+    // Devolver los tipos de alimento encontrados
     res.json(result);
   });
 });
 
-// Actualizar una unidad de medida (PUT)
+// Actualizar un tipo de alimento (PUT)
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { unidad_medida, abreviatura, id_usuario_modif, fecha_modif, activo } = req.body;
+  const { tipo_alimento, id_usuario_modif, fecha_modif, activo } = req.body;
 
   // Validar que los campos requeridos estén presentes
-  if (!unidad_medida || !abreviatura || !id_usuario_modif || !fecha_modif || activo === undefined) {
+  if (!tipo_alimento || !id_usuario_modif || !fecha_modif || activo === undefined) {
     return res.status(400).send("Faltan datos requeridos");
   }
 
-  // Consulta para actualizar la unidad de medida
+  // Consulta para actualizar el tipo de alimento
   const query1 = `
-    UPDATE cat_unidad_medida 
-    SET Unidad_Medida = ?, Abreviatura = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = ?
-    WHERE Id_Unidad_Medida = ?
+    UPDATE cat_tipo_alimento 
+    SET Tipo_Alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = ?
+    WHERE Id_Tipo_Alimento = ?
   `;
-  const values1 = [unidad_medida, abreviatura, id_usuario_modif, fecha_modif, activo, id];
+  const values1 = [tipo_alimento, id_usuario_modif, fecha_modif, activo, id];
 
   // Ejecutar la consulta
   db.query(query1, values1, (err1, result1) => {
     if (err1) {
-      console.error("Error al actualizar unidad de medida:", err1);
-      return res.status(500).send("Error al actualizar unidad de medida");
+      console.error("Error al actualizar tipo de alimento:", err1);
+      return res.status(500).send("Error al actualizar tipo de alimento");
     }
 
     // Responder con un mensaje de éxito
-    res.json({ message: "Unidad de medida actualizada con éxito" });
+    res.json({ message: "Tipo de alimento actualizado con éxito" });
   });
 });
 
-// Eliminar una unidad de medida (marcarla como inactiva) (DELETE)
+// Eliminar un tipo de alimento (marcarlo como inactivo) (DELETE)
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   const { id_usuario_baja, fecha_baja } = req.body;
@@ -126,23 +126,23 @@ router.delete("/:id", (req, res) => {
     return res.status(400).send("Faltan datos requeridos para la baja");
   }
 
-  // Consulta para marcar la unidad de medida como inactiva (baja lógica)
+  // Consulta para marcar el tipo de alimento como inactivo (baja lógica)
   const query1 = `
-    UPDATE cat_unidad_medida 
+    UPDATE cat_tipo_alimento 
     SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? 
-    WHERE Id_Unidad_Medida = ?
+    WHERE Id_Tipo_Alimento = ?
   `;
   const values1 = [id_usuario_baja, fecha_baja, id];
 
   // Ejecutar la consulta
   db.query(query1, values1, (err1, result1) => {
     if (err1) {
-      console.error("Error al eliminar unidad de medida:", err1);
-      return res.status(500).send("Error al eliminar unidad de medida");
+      console.error("Error al eliminar tipo de alimento:", err1);
+      return res.status(500).send("Error al eliminar tipo de alimento");
     }
 
     // Responder con un mensaje de éxito
-    res.json({ message: "Unidad de medida eliminada con éxito" });
+    res.json({ message: "Tipo de alimento eliminado con éxito" });
   });
 });
 

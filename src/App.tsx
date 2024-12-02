@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Menu, Button, Drawer } from 'antd';
 import type { MenuProps } from 'antd';
 import './Front/Estilos/Nav.css';
+import Modal from './Front/Modal';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
 import Inicio from './Front/Inicio';
@@ -18,10 +19,7 @@ import EDreceta from './Front/EDreceta';
 import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
-import Modal from './Front/Modal';
-
-{/*
-import 'antd/dist/reset.css';*/}
+import Prueba from './Front/Prueba';
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -125,6 +123,7 @@ function App() {
 
             <Route path="/terminosycondiciones" element={<VerR />} />
             <Route path="/avisodeprivacidad" element={<VerR />} />
+            <Route path="/prueba" element={<Prueba />} />
           </Routes>
         </main>
       </div>

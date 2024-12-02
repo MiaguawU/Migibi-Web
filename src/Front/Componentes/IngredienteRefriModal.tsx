@@ -11,9 +11,27 @@ interface FormModalProps {
   onSubmit: (values: any) => void;
 }
 
-const [products, setProducts] = useState([]); // Lista de productos
-const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 6 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 14 },
+  },
+};
 
+const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) => {
+  const [form] = Form.useForm();
+
+  const [products, setProducts] = useState([]); // Lista de productos
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  
 // Obtener productos desde la API
 const fetchProducts = async () => {
   try {
@@ -24,9 +42,16 @@ const fetchProducts = async () => {
   }
 };
 
-useEffect(() => {
-  fetchProducts();
-}, []);
+// Eliminar producto
+const deleteProduct = async (id: number) => {
+  try {
+    await axios.delete(`http://localhost:5000/api/products/${id}`);
+    message.success('Producto eliminado');
+    fetchProducts();
+  } catch (error) {
+    message.error('Error al eliminar producto');
+  }
+};
 
 // Manejar envío del formulario desde el modal
 const handleSubmit = async (values: any) => {
@@ -45,32 +70,7 @@ const handleSubmit = async (values: any) => {
     message.error('Error al agregar producto');
   }
 };
-
-// Eliminar producto
-const deleteProduct = async (id: number) => {
-  try {
-    await axios.delete(`http://localhost:5000/api/products/${id}`);
-    message.success('Producto eliminado');
-    fetchProducts();
-  } catch (error) {
-    message.error('Error al eliminar producto');
-  }
-};
-
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 14 },
-  },
-};
-
-const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) => {
-  const [form] = Form.useForm();
-
+  
   const handleFinish = (values: any) => {
     onSubmit(values); // Llama a la función que maneja los datos
     form.resetFields(); // Resetea el formulario después de enviar
