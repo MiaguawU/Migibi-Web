@@ -95,83 +95,89 @@ export default function EDreceta() {
     return (
       <div className='todo'>
         <Form>
-        <div className='receta'>
-          <div className='f1'>
-            <img src={def}/>
-            <Upload {...props}>
-              <Button className='btUp' icon={<UploadOutlined />}></Button>
-            </Upload>
-            <div className='tiempo'>
-              <p className='txt'>Tiempo:</p>
-              <TimePicker minuteStep={15} secondStep={10} hourStep={1} className='time' placeholder="tiempo"/>
-            </div>
-            <div className='tipo'>
-                <p className='txi'>Tipo:</p>
-                <Select
-              labelInValue
-              defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Jack (100)',
-                },
-                {
-                  value: 'lucy',
-                  label: 'Lucy (101)',
-                },
-              ]}
-              className='sl'
-            />
-            </div>
-            <div className='porciones'>
-              <p className='txp'>Porciones:</p>    
-              <InputNumber className='nP' min={1} max={100000} defaultValue={3} onChange={onChange} />
+          <div className='receta'>
+            <div className='f1'>
+              <div className='imgDiv'>
+                <img src={def}/>
+                <Upload {...props}>
+                  <Button className='btUp' icon={<UploadOutlined />}></Button>
+                </Upload>
               </div>
-          </div>
-          <div className='f2'>
-            
+              <div className = 'ttpcDiv'>
+
+                <div className='tiempo'>
+                  <p className='txt'>Tiempo:</p>
+                  <TimePicker minuteStep={15} secondStep={10} hourStep={1} className='time' placeholder="tiempo"/>
+                </div>
+                <div className='tipo'>
+                  <p className='txi'>Tipo:</p>
+                  <Select
+                    labelInValue
+                    defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
+                    style={{ width: 120 }}
+                    onChange={handleChange}
+                    options={[
+                      {
+                        value: 'jack',
+                        label: 'Jack (100)',
+                      },
+                      {
+                        value: 'lucy',
+                        label: 'Lucy (101)',
+                      },
+                    ]}
+                className='sl'
+                />
+                </div>
+                <div className='porciones'>
+                  <p className='txp'>Porciones:</p>    
+                  <InputNumber className='nP' min={1} max={100000} defaultValue={3} onChange={onChange} />
+                </div>
+                <div className='calorias'>
+                  <p className='txc'>Calorias:</p>
+                  <InputNumber min={1} max={100000} defaultValue={3} onChange={onChange} className='nC' />
+                  <Select
+                    labelInValue
+                    defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
+                    style={{ width: 120 }}
+                    onChange={handleChange}
+                    options={[
+                      {
+                        value: 'jack',
+                        label: 'Jack (100)',
+                      },
+                      {
+                        value: 'lucy',
+                        label: 'Lucy (101)',
+                      },
+                    ]}
+                    className='sl2'
+                  />
+                </div>
+              </div>
+            </div>
+            <div className='f2'>
               <div className='rect'>
-              <p className='nRec' >Receta</p>
-            <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                <div className='nRecCom'>
+                  <p className='nRec' >Receta</p>
+                  <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                </div>
+                <div className='divEnviarReset'>
+                  <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
+                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+                </div>
               </div>
               <div className='ing'>
-              <Ingredientes />
+                <Ingredientes />
               </div>
-              
-          </div>
-          <div className='f3'>
-              <div className='calorias'>
-              <p className='txc'>Calorias:</p>
-              <InputNumber min={1} max={100000} defaultValue={3} onChange={onChange} className='nC' />
-            <Select
-              labelInValue
-              defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Jack (100)',
-                },
-                {
-                  value: 'lucy',
-                  label: 'Lucy (101)',
-                },
-              ]}
-              className='sl2'
-            />
-              </div>
-              
+            </div>
+            <div className='f3'>
               <div className='proceso'>
                 <Proceso/>
               </div>
-          </div>
+            </div>
           
-        </div>
-        <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
-        <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+          </div>
         </Form>
       </div>
     );
