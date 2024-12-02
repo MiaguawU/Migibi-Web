@@ -68,7 +68,7 @@ export default function Recetas() {
   const navigate = useNavigate();
 
   const IRver = () => {
-    navigate('/verR');
+    navigate('/edReceta');
   };
 
   const handleEdit = () => {
