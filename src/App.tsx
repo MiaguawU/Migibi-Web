@@ -8,6 +8,7 @@ import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
 import Inicio from './Front/Inicio';
 import Perfil from './Front/Perfil';
+import Caducar from './Front/Componentes/PorCaducar';
 import Conocenos from './Front/Conocenos';
 import Contactanos from './Front/contactanos';
 import Hoy from './Front/Hoy';
@@ -124,6 +125,7 @@ function App() {
             <Route path="/terminosycondiciones" element={<VerR />} />
             <Route path="/avisodeprivacidad" element={<VerR />} />
             <Route path="/prueba" element={<Prueba />} />
+            <Route path="/cad" element={<Caducar />} />
           </Routes>
         </main>
       </div>
