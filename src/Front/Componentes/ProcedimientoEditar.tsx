@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider } from "antd";
+import InsModal from "./InstruccionModal";
 import btAg from '../../Img/btAgregar.png';
 import '../Estilos/proceso.css'; // Importa el archivo CSS
+
 
 interface Item {
   name: string;
@@ -26,6 +28,16 @@ const PorCaducar: React.FC = () => {
   ]);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+
+  // Manejar envío del formulario desde el modal
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('quantity', values.quantity);
+    formData.append('unit', values.unit);
+    formData.append('type', values.type);
+  };
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -64,7 +76,7 @@ const PorCaducar: React.FC = () => {
                 </Checkbox>
               </div>
             ))}
-            <Button className="btAg"><img className="img" src={btAg} alt="Agregar" /></Button>
+            <Button className="btAg" onClick={() => setIsModalOpen(true)}><img className="img" src={btAg} alt="Agregar" /></Button>
           </div>
         </Card>
 
@@ -88,6 +100,13 @@ const PorCaducar: React.FC = () => {
           ))}
         </Drawer>
       </ConfigProvider>
+
+      {/* Modal externo para agregar producto */}
+      <InsModal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
     </>
   );
 };

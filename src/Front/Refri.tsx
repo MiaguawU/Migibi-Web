@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
 import PorCaducar from './Componentes/PorCaducar';
-import ProductModal from './Componentes/IngredienteRefriModal'; // Importa el modal separado
+import ProductModal from './Componentes/ProductoRefriModal'; // Importa el modal separado
 import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
 import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
@@ -92,14 +92,15 @@ export default function Inicio() {
   };
 
   // Manejar envío del formulario desde el modal
-
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
     formData.append('name', values.name);
     formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); // Formatea la fecha
     formData.append('quantity', values.quantity);
     formData.append('unit', values.unit);
-// Agregar un nuevo ingrediente
+    formData.append('type', values.type);
+    formData.append('imgsrc', values.imgsrc);
+    // Agregar un nuevo ingrediente
     try {
       await axios.post('http://localhost:5000/api/products', formData);
       message.success('Producto agregado');
@@ -151,7 +152,6 @@ export default function Inicio() {
             onChange={(e) => handleSearch(e.target.value)}
             style={{ width: '60%' }}
           />
-          <CameraOutlined style={{ fontSize: 30, color: '#3E7E1E' }} />
           <Button style={{ color: '#3E7E1E', backgroundColor: '#CAE2B5' }} onClick={() => setIsModalOpen(true)}>Agregar</Button>
         </div>
       </div>
