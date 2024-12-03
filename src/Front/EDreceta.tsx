@@ -85,7 +85,6 @@ const onChange: InputNumberProps['onChange'] = (value) => {
 
 export default function EDreceta() {
   const [form] = Form.useForm();
-  const [value, setValue] = useState('');
   const [inputValue, setInputValue] = useState<string>("");
 
   // Función para actualizar el estado
