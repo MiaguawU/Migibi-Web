@@ -111,15 +111,7 @@
     gap: 10px;
 }
 
-.sl{
-    border-color: #3E7E1E !important;
-    border: 1px solid;
-    border-radius: 7px;
-    position: relative;
-    right: 10px;
-    
-}
-.sl2{
+.sl, .sl2{
     border-color: #3E7E1E !important;
     border: 1px solid;
     border-radius: 7px;
@@ -153,6 +145,11 @@ p,h3{
     justify-content: flex-start;
     margin-block-end: 0px;
 }
+
+.user-title {
+    margin-bottom: 20px;
+    color: #8BA577;
+  }
 .tx{
     font-size: 25px;
     padding: 20px;
@@ -162,7 +159,7 @@ p,h3{
     padding: 10px;
     position: relative;
     top: 4px;
-    
+    margin: 0px;
 }
 .txi, .txt, .txp, .txc{
     padding: 20px;
@@ -207,8 +204,40 @@ p,h3{
 
 .ing {
     width: 100%;
+    gap: 10px;
+    display: flex
 }
-@media (max-width:900px) {
+@media (max-width: 655px) {
+    .receta {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .f1 {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .f2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .ing {
+        
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    }
+    .btUp {
+        position: relative;
+        top: 110px;
+        right: 15px;
+        bottom: auto;
+        left: auto;
+    }
+}
+
+@media (min-width:655px) { /*Ipad size*/
     .todo {
         flex-direction: column;
         height: 100%;
@@ -217,12 +246,43 @@ p,h3{
         flex-direction: column;
     }
     .btUp {
-        right: 15px;
+        position: relative;
         top: 100px;
+        right: 15px;
+        bottom: auto;
+        left: auto;
+    }
+    .rect {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: normal;
+        flex-wrap: nowrap;
+    }
+    .nRecCom {
+        width: auto;
+    }
+    .divEnviarReset {
+        width: auto;
+    }
+    .f1 {
+        flex-direction: row;
+        gap: 10px;
+    }
+    .f2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column;
+    }
+    .ing {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
     }
 }
 
-@media (min-width:900px) {
+@media (min-width:900px) { /*Laptop size*/
     .todo {
         flex-direction: row;
         height: 90vh;
@@ -231,7 +291,42 @@ p,h3{
         flex-direction: row;
     }
     .btUp {
+        position: relative;
         bottom: 25px;
         left: 220px;
+        top: auto;
+        right: auto;
+    }
+    .rect {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        align-content: flex-start;
+        flex-wrap: wrap;
+    }
+    .nRecCom {
+        width: 100%;
+    }
+    .divEnviarReset {
+        width: 100%;
+    }
+    .f1 {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        gap: auto;
+    }
+    .f2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column;
+    }
+    .ing {
+        
+    width: 100%;
+    display: flex;
+    flex-direction: row;
     }
 }

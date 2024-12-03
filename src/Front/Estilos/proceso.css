@@ -40,12 +40,12 @@
   .proceso .card-checkbox-container {
     display: flex;
     flex-direction: column;
-    padding: 10%;
     background-color: white;
     border-radius: 20px;
     position: relative;
     border: 1px solid;
     border-color: #3E7E1E;
+    padding: 5%;
   }
   
   .card-checkbox {
