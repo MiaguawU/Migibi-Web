@@ -39,7 +39,17 @@ router.post("/", (req, res, next) => {
       return res.status(500).send('Error al procesar la imagen');
     }
 
-    const { nombre, tipo, id_unidad, es_perecedero, cantidad, fecha_caducidad, Id_Usuario_Alta, Fecha_Alta } = req.body;
+    const { nombre, tipo, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta  } = req.body;
+    console.log(req.body);
+    
+    const hoy = Date.now();
+    let es_perecedero = 1;
+
+    const Fecha_Alta= hoy.toISOString();;
+    
+    if(!fecha_caducidad){
+      es_perecedero = 0;
+    }
 
     console.log("Headers:", req.headers); 
     console.log("Body recibido:", req.body);
@@ -83,10 +93,13 @@ router.post("/", (req, res, next) => {
   });
 });
 
+//obtener alimentos del refri
 router.get("/", (req, res) => {
   const query1 = `
   SELECT 
+  ca.Id_Alimento AS id,
   ca.Alimento AS Nombre,
+  ca.Activo As Activo,
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
@@ -101,7 +114,9 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
 
   const query2 = `
     SELECT 
+    ca.Id_Alimento AS id,
   ca.Alimento AS Nombre,
+  ca.Activo As Activo,
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
@@ -189,29 +204,5 @@ router.put("/:id", upload.single('image'), (req, res) => {
   }
 });
 
-// Eliminar un alimento
-router.delete("/:id", (req, res) => {
-  const { id } = req.params;
-
-  // Eliminar primero los registros en stock_detalle
-  const query2 = 'DELETE FROM stock_detalle WHERE Id_Alimento = ?';
-  db.query(query2, [id], (err2) => {
-    if (err2) {
-      console.error("Error al eliminar stock:", err2);
-      return res.status(500).send("Error al eliminar stock");
-    }
-
-    // Luego eliminar el alimento
-    const query1 = 'DELETE FROM cat_alimento WHERE Id_Alimento = ?';
-    db.query(query1, [id], (err1) => {
-      if (err1) {
-        console.error("Error al eliminar alimento:", err1);
-        return res.status(500).send("Error al eliminar alimento");
-      }
-
-      res.json({ message: "Alimento eliminado con éxito" });
-    });
-  });
-});
 
 module.exports = router;

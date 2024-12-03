@@ -1,25 +1,16 @@
 import React, { useState } from "react";
-import {Card, ConfigProvider} from 'antd';  
-import Pagination from "./Componentes/Pagination";
-import RecipeCard from './Componentes/RecetaCard';
-import imgdesayuno from "../Img/imgdesayuno.png";
+import { Row, Card, Col, ConfigProvider } from 'antd'; 
 
+import RecipeCard from './Componentes/RecetaCard';
+import Pagination from './Componentes/Pagination';
+import imgdesayuno from "../Img/imgdesayuno.png";
 import relojarena from "../Img/relojarena.png";
 import cuadros from "../Img/cuadros.png";
 import caducar from "../Img/biCa.png";
 import agregar from "../Img/btagregar2.png";
-{/*
-import defRec from "../Img/defRec.png";
-import btEditar from "../Img/btEditar.png";
-import btCompartir from "../Img/btCompartir.png";
-import imgCal from "../Img/imgCal.png";
-import btEliminar from "../Img/btEliminar.png";
-import flechaizquierda from "../Img/flechaizquierda.png";
-import flechaderecha from "../Img/flechaderecha.png";
-import calendario from "../Img/calendario.png";
-import btagregar from "../Img/btagregar2.png";*/}
 
 const { Meta } = Card;
+
 const handleEdit = () => {
   console.log("Editar receta");
 };
@@ -28,7 +19,7 @@ const handleDelete = () => {
   console.log("Eliminar receta");
 };
 
-export default function Inicio() {  
+export default function Inicio() {   
   const [weekIndex, setWeekIndex] = useState(0);
 
   const weeks = [
@@ -46,87 +37,110 @@ export default function Inicio() {
     if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
   };
 
-  
   interface CardData {
+    id: number;
     title: string;
     portions: string;
     calories: string;
     time: string;
     image: string;
   }
-  
-  const { Meta } = Card;
-  const cardsData: CardData[] = [
-    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
-    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
-    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
-    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
-    { title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300' },
-  ];
- 
-  return (  
-    <>  
-    <ConfigProvider
-    theme={{
-        token: {
-            // Seed Token
-            colorPrimary: '#00b96b',
-            borderRadius: 10,
-            
 
-            // Alias Token
-            colorBgContainer: '#CAE2B5',
+  const cardsData: CardData[] = [
+    {id: 1, title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300'},
+    // Puedes agregar más datos aquí
+  ];
+
+  interface comidaSemana {
+    comida: string;
+    recetas: CardData[];
+  }
+
+  const comidasData: comidaSemana[] = [
+    {comida: "Desayuno", recetas: cardsData},
+    {comida: "Comida", recetas: cardsData}
+  ];
+
+  const semanaData: { fecha: string; comidas: comidaSemana[] }[] = [
+    {fecha: "Jueves 10 de noviembre 2024", comidas: comidasData},
+    {fecha: "Viernes 11 de noviembre 2024", comidas: comidasData}
+  ];
+
+  return (  
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#00b96b',
+          borderRadius: 10,
+          colorBgContainer: '#CAE2B5',
         },
         components: {
-            Select: {
-                optionActiveBg: '#CAE2B5',
-                algorithm: true
-            }
+          Select: {
+            optionActiveBg: '#CAE2B5',
+            algorithm: true
+          }
         }
-    }}
+      }}
     >
-      <div style={{ marginLeft: '15px', marginRight: '15px',}}>
-        <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex',}}>
-          <div style={{height: '100%', width: '80%', display: 'flex',}}>
-            <div style={{display: 'flex', flexDirection: "column"}}>
-              <img src={caducar} style={{height: '100px',}}/>
-              <span style={{fontFamily: 'Jomhuria, serif'}}>Caducar</span>
-            </div>
-            <div>
-              <img src={relojarena} style={{height: '66px',}}/>
-            </div>
+      <div style={{ paddingLeft: '15px', paddingRight: '15px' }}>
+        <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex'}}>
+          <div style={{height: '100%', display: 'flex'}}>
+            <img src={imgdesayuno} style={{height: '100px'}} />
+            <img src={relojarena} style={{height: '66px'}} />  
           </div>
-          <div style={{height: '100%', width: '20%', display: 'flex',}}>
-            <img src={agregar} style={{height: '58px',}}/>
+          <div style={{height: '100%', display: 'flex', paddingLeft: '0'}}>
+            <img src={cuadros} style={{height: '58px'}} />
           </div>
         </div>
-        <div style={{backgroundColor: '#D3E2B4', height: 'auto', borderRadius: '10px',}}>
+
+        <div style={{backgroundColor: '#D3E2B4', height: 'auto', borderRadius: '10px'}}>
           <Pagination
             currentWeek={weeks[weekIndex]}
             onPrevious={handlePrevious}
             onNext={handleNext}
           />
         </div>
-        <br /><br />
 
-        <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px', marginBottom: '20px'}}><a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071',}}>Desayuno</a>
-        <div style={{width: '100%',display:'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap:'16px', padding:'16px'}}>
-                
-                {cardsData.map((card, index) => (
-                  <RecipeCard
-                    title= {card.title}
-                    portions= {card.portions}
-                    calories= {card.calories}
-                    time= {card.time}
-                    image= {card.image}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                ))}
+        <br />
+
+        {semanaData.map((dia, index) => (
+          <div key={index}>
+            <div style={{backgroundColor: '#D3E2B4', height: '45px', borderRadius: '10px', display: "flex", alignItems: "center", flexWrap: "wrap"}}>
+              <div style={{margin: '10px', marginTop: '5px', alignItems: 'center'}}>
+                <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071'}}>{dia.fecha}</a>      
               </div>
-        </div>
+            </div>
+            <br /><br />
+            {dia.comidas.map((comida, index) => (
+              <div key={index}>
+                <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}>
+                  <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071'}}>{comida.comida}</a>
+                  <div>
+                    <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px'}}>
+                      {comida.recetas.map((card) => (
+                        <RecipeCard
+                          key={card.id}
+                          id={card.id}
+                          title={card.title}
+                          portions={card.portions}
+                          calories={card.calories}
+                          time={card.time}
+                          image={card.image}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <br /><br />
+                </div>
+                <br /><br />
+              </div>
+            ))}
+            <br />
+          </div>
+        ))}
       </div>
-      </ConfigProvider>
-    </>  
-  );  
+    </ConfigProvider>
+  );
 }

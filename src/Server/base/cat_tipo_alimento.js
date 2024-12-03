@@ -63,25 +63,17 @@ router.post("/", (req, res, next) => {
 
 // Obtener tipos de alimento (GET)
 router.get("/", (req, res) => {
-  const { activo } = req.query;
 
   // Construir la consulta SQL
-  let query = `SELECT * FROM cat_tipo_alimento WHERE 1`;
+  let query = `SELECT * FROM cat_tipo_alimento`;
 
-  const params = [];
-  if (activo !== undefined) {
-    query += ` AND Activo = ?`;
-    params.push(activo);
-  }
 
   // Ejecutar la consulta
-  db.query(query, params, (err, result) => {
+  db.query(query, (err, result) => {
     if (err) {
       console.error("Error al obtener tipos de alimento:", err);
       return res.status(500).send("Error al obtener tipos de alimento");
     }
-
-    // Devolver los tipos de alimento encontrados
     res.json(result);
   });
 });
