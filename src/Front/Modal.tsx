@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, message } from 'antd';
 import axios from 'axios';
-import ProductModal from './Componentes/IngredienteRefriModal'; // Importa el modal separado
+import ProductModal from './Componentes/ProductoRefriModal'; // Importa el modal separado
+import InsModal from './Componentes/InstruccionModal';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState([]); // Lista de productos
@@ -21,24 +22,16 @@ const Products: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Manejar envío del formulario desde el modal
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
     formData.append('name', values.name);
     formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); // Formatea la fecha
     formData.append('quantity', values.quantity);
     formData.append('unit', values.unit);
-
-    try {
-      await axios.post('http://localhost:5000/api/products', formData);
-      message.success('Producto agregado');
-      fetchProducts(); // Actualiza la lista de productos
-      setIsModalOpen(false); // Cierra el modal
-    } catch (error) {
-      message.error('Error al agregar producto');
-    }
+    formData.append('type', values.type);
+    formData.append('imgsrc', values.imgsrc);
   };
-
+  
   // Eliminar producto
   const deleteProduct = async (id: number) => {
     try {
@@ -82,7 +75,7 @@ const Products: React.FC = () => {
       />
 
       {/* Modal externo para agregar producto */}
-      <ProductModal
+      <InsModal
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
