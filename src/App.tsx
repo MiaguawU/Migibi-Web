@@ -21,8 +21,9 @@ import Acceder from './Front/Acceder';  // Asegúrate de que esta importación s
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
 import Prueba from './Front/PruebaCam';
-import AuthForm from './Front/Componentes/AuthForm';  // Importa tu componente de autenticación
-
+import AuthForm from './Front/Componentes/AuthForm';  
+import IngRecetaEditar from './Front/Componentes/IngredientesRecetaEditar';
+import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
 type ItemType = Required<MenuProps>['items'][number];
 
 const mainItems: ItemType[] = [
@@ -56,26 +57,31 @@ function App() {
   };
 
   useEffect(() => {
-    // Comprobar en sessionStorage si hay usuarios
-    const usuarios = JSON.parse(sessionStorage.getItem("usuarios") || "[]");
-    if (usuarios.length > 0) {
-      setAccedio(true);  // Si hay usuarios, accedido es verdadero
+    const usuariosSession = JSON.parse(sessionStorage.getItem("usuarios") || "{}");
+    const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
+    const currentUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+  
+    if (currentUser && (usuariosSession[currentUser] || usuariosLocal[currentUser])) {
+      setAccedio(true); // Si hay un usuario activo, marcar como autenticado
     } else {
-      setAccedio(false); // Si no hay usuarios, accedido es falso
+      setAccedio(false);
     }
-
+  
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []); // Solo se ejecuta una vez cuando el componente se monta
+  }, []);
+  
 
   // Lógica para manejar el login
   const onLogin = (userData: any) => {
-    sessionStorage.setItem("usuarios", JSON.stringify(userData));
+    sessionStorage.setItem("usuarios", JSON.stringify({ [userData.id]: userData }));
+    sessionStorage.setItem("currentUser", userData.id);
     setAccedio(true);
-    console.log('Usuario logueado:', userData);
+    console.log("Usuario logueado y datos almacenados en sessionStorage:", userData);
   };
+  
 
   return (
     <Router>
@@ -136,6 +142,8 @@ function App() {
               <Route path="/avisodeprivacidad" element={<VerR />} />
               <Route path="/prueba" element={<Prueba />} />
               <Route path="/cad" element={<Caducar />} />
+              <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} />} />
+              <Route path="/proEditar" element={<ProcRecetaEditar />} />
             </Routes>
           </main>
         </div>

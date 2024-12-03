@@ -35,16 +35,19 @@ if (Object.keys(userData).length > 0) {
       console.log("Datos enviados al servidor:", response.data);
 
       // Guardar los datos en localStorage
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{ }");
       const { id, username, email, foto_perfil, Cohabitantes } = userData;
+      
 
       if (id) {
         usuarios[id] = { username, email, foto_perfil, Cohabitantes };
         localStorage.setItem("usuarios", JSON.stringify(usuarios));
+        sessionStorage.setItem("usuarios", JSON.stringify(usuarios)); // Guardar usuarios en sessionStorage
         localStorage.setItem("currentUser", id);
-        console.log("Datos guardados en localStorage.");
+        sessionStorage.setItem("currentUser", id); // Guardar el usuario actual
+        console.log("Datos guardados en sessionStorage y localStorage.");
       } else {
-        console.warn("ID de usuario no proporcionado, no se guardaron los datos.");
+        console.warn("ID de usuario no proporcionado. No se guardaron los datos.");
       }
     } catch (error) {
       console.error("Error al enviar los datos al servidor:", error);

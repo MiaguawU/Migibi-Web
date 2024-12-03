@@ -9,6 +9,7 @@ import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@
 const { Meta } = Card;
 
 interface CardData {
+  id: number;
   ingrediente: string;
   cantidad: number;
   abreviatura: string;
@@ -17,18 +18,70 @@ interface CardData {
   diasRestantes: string | number;
   caducidadPasada: boolean | null;
   Tipo: string;
+  Activo: number;
 }
 
 export default function Inicio() {
   const [alimentosPerecederos, setAlimentosPerecederos] = useState<CardData[]>([]);
   const [alimentosNoPerecederos, setAlimentosNoPerecederos] = useState<CardData[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+
+  const agregarAlimento = async () =>{
+    setLoading(true);
+    try {
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        return;
+      }
+
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+      const user = usuarios[currentUser];
+
+      if (!user) {
+        message.warning("Usuario no encontrado en los datos locales.");
+        return;
+      }
+      const id_alta = currentUser
+      //mandar id, nombre alimento, cantidad, tipo, fecha, unidad
+      const response = await axios.get(`${PUERTO}/usuarios`, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+    } catch (error) {
+      console.error("Error al obtener usuario:", error);
+      message.error("No se pudo conectar con el servidor.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const eliminarAlimento = async (id: number) => {
+    try {
+      // Asegúrate de que la ruta sea correcta y que tu servidor acepte PUT en /alimentoInactivo
+      const response = await axios.put(`${PUERTO}/alimentoInactivo/${id}`, {
+        id: id,
+      });
+
+      if (response.status === 200) {
+        message.success("Alimento eliminado exitosamente.");
+        datosAlimento(); // Recargar la lista de alimentos después de la eliminación
+      } else {
+        message.error("No se pudo eliminar el alimento.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar alimento:", error);
+      message.error("Ocurrió un error al intentar eliminar el alimento.");
+    }
+  };
 
   // Obtener datos de alimentos
   const datosAlimento = async () => {
     try {
+      // Asegúrate de que esta ruta sea correcta para obtener los datos de los alimentos
       const response = await axios.get(`${PUERTO}/alimento`);
       const { Perecedero, NoPerecedero } = response.data;
 
@@ -47,6 +100,7 @@ export default function Inicio() {
           const fecha = fechaCaducidad ? fechaCaducidad.toLocaleDateString() : 'Fecha no disponible';
 
           return {
+            id: alimento.id || ' ',
             ingrediente: alimento.Nombre || ' ',
             cantidad: alimento.Cantidad || 1,
             abreviatura: alimento.Unidad || ' ',
@@ -55,10 +109,12 @@ export default function Inicio() {
             diasRestantes,
             caducidadPasada,
             Tipo: alimento.Tipo_Alimento,
+            Activo: alimento.Activo,
           };
         });
 
         const noPerecederos = NoPerecedero.map((alimento) => ({
+          id: alimento.id || ' ',
           ingrediente: alimento.Nombre || ' ',
           cantidad: alimento.Cantidad || 0,
           abreviatura: alimento.Unidad || ' ',
@@ -67,6 +123,7 @@ export default function Inicio() {
           diasRestantes: 'No aplica',
           caducidadPasada: false,
           Tipo: alimento.Tipo_Alimento,
+          Activo: alimento.Activo,
         }));
 
         setAlimentosPerecederos(perecederos);
@@ -92,16 +149,16 @@ export default function Inicio() {
   };
 
   // Manejar envío del formulario desde el modal
-
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
     formData.append('name', values.name);
     formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); // Formatea la fecha
     formData.append('quantity', values.quantity);
     formData.append('unit', values.unit);
-// Agregar un nuevo ingrediente
+
     try {
-      await axios.post('http://localhost:5000/api/products', formData);
+      // Reemplazar la URL con la correcta de la API
+      await axios.post(`${PUERTO}/productos`, formData);
       message.success('Producto agregado');
       datosAlimento(); // Actualiza la lista de productos
       setIsModalOpen(false); // Cierra el modal
@@ -118,29 +175,24 @@ export default function Inicio() {
       (nombre.includes(searchTerm) ||
         tipo.includes(searchTerm) ||
         cantidad.includes(searchTerm)) &&
-      alimento.cantidad > 0 // Asegurarse de que la cantidad sea mayor que 0
-    );
-  });
+      alimento.cantidad > 0 && alimento.Activo > 0
+    );
+  });
 
   return (
     <ConfigProvider
       theme={{
         token: {
-          // Seed Token
           colorPrimary: '#00b96b',
           borderRadius: 10,
-          
-
-          // Alias Token
           colorBgContainer: '#CAE2B5',
-      },
-      components: {
+        },
+        components: {
           Select: {
-              optionActiveBg: '#CAE2B5',
-              algorithm: true
-          }
-      }
-
+            optionActiveBg: '#CAE2B5',
+            algorithm: true,
+          },
+        },
       }}
     >
       <div style={{ width: '80vw', margin: '10px auto' }}>
@@ -161,9 +213,8 @@ export default function Inicio() {
         <Spin size="large" style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }} />
       ) : (
         <>
-          
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
-          <PorCaducar />
+            <PorCaducar />
             {filteredAlimentos.map((card, index) => (
               <Card
                 key={index}
@@ -174,10 +225,7 @@ export default function Inicio() {
                   overflow: 'hidden',
                 }}
               >
-                <span style={{fontSize: 30, color: '#86A071', fontFamily: 'Jomhuria, sans-serif'}}>
-
                 <img alt={card.image} src={card.image} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }} />
-                
                 <Meta
                   title={<span style={{ fontSize: '30px', color: '#86A071', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
                   description={`${card.cantidad} ${card.abreviatura}`}
@@ -196,10 +244,9 @@ export default function Inicio() {
                     </Tooltip>
                   )}
                   <Tooltip title="Eliminar">
-                    <DeleteOutlined style={{ color: '#6F895A', fontSize: 20 }} />
+                    <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
                   </Tooltip>
                 </Space>
-                </span>
               </Card>
             ))}
             {/* Modal externo para agregar producto */}
