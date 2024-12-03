@@ -1,9 +1,9 @@
 import { UploadOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Ingredientes from './Componentes/IngredientesRecetaEditar';
 import type { UploadProps } from 'antd';
 import type { InputNumberProps } from 'antd';
-import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber } from "antd";
+import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber, ConfigProvider } from "antd";
 import def from '../Img/defRec.png';
 import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
@@ -86,16 +86,64 @@ const onChange: InputNumberProps['onChange'] = (value) => {
 export default function EDreceta() {
   const [form] = Form.useForm();
   const [value, setValue] = useState('');
+  const [inputValue, setInputValue] = useState<string>("");
+
+  // Función para actualizar el estado
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
 
   const onReset = () => {
     form.resetFields();
   };
   
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isTablet, setIsTablet] = useState<boolean>(false);
+
+  useEffect(() => {
+      
+    const handleResize = () => {
+      const width = window.innerWidth;
+
+      // Configuración de estado para móvil y tablet
+      setIsMobile(width <= 655);
+      setIsTablet(width > 655 && width <= 900);
+    };
+
+    handleResize(); // Ejecuta al cargar
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
     return (
       <div className='todo'>
         <Form>
           <div className='receta'>
+              { (isMobile || isTablet) && (
+              <div className='rect'>
+                <div className='nRecCom'>
+                  <ConfigProvider
+                    theme={{
+                      token: {
+                        fontFamily: "Jomhuria, Serif",
+                        fontSize: 35,
+                        colorText: "#8BA577",
+                      },
+                    }}
+                  >
+                    <Input variant="borderless" className="nRec" placeholder='receta' value={inputValue} onChange={handleInputChange}/>
+                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                  </ConfigProvider>
+                </div>
+                <div className='divEnviarReset'>
+                  <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
+                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+                </div>
+              </div>
+              )}
             <div className='f1'>
               <div className='imgDiv'>
                 <img src={def}/>
@@ -157,24 +205,44 @@ export default function EDreceta() {
               </div>
             </div>
             <div className='f2'>
+              {!isMobile && !isTablet && (
               <div className='rect'>
                 <div className='nRecCom'>
-                  <p className='nRec' >Receta</p>
+                  <ConfigProvider
+                    theme={{
+                      token: {
+                        fontFamily: "Jomhuria, Serif",
+                        fontSize: 35,
+                        colorText: "#8BA577",
+                      },
+                    }}
+                  >
+                  <Input variant="borderless" className="nRec" placeholder='receta' value={inputValue} onChange={handleInputChange}/>
                   <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                  </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
                   <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
                 </div>
               </div>
+              )}
+
               <div className='ing'>
                 <Ingredientes />
+                { (isMobile || isTablet) && (
+                <div className='proceso'>
+                  <Proceso/>
+                </div>
+                )}
               </div>
             </div>
             <div className='f3'>
+              {!isMobile && !isTablet && (
               <div className='proceso'>
                 <Proceso/>
               </div>
+              )}
             </div>
           
           </div>
