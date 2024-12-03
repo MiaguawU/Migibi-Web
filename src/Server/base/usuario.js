@@ -127,7 +127,6 @@ router.put('/:id', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
 // Endpoint para agregar usuario
 router.post("/", sanitizeInput, (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body);
 
   if (!username || !password) {
     return res.status(400).send("Faltan datos requeridos: username y password");

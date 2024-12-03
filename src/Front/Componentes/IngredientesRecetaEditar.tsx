@@ -1,61 +1,67 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
-import btAg from '../../Img/btagregar.png'
-import '../Estilos/ing.css'; // Importa el archivo CSS
+import btAg from "../../Img/btagregar.png"; // Asegúrate de que la ruta sea correcta
+import "../Estilos/ing.css"; // Importa el archivo CSS
 import axios from "axios";
-import PUERTO from "../../config";
+import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
 
 interface IngredientesProps {
   recetaId: number; // ID de la receta
 }
 
 interface Item {
-  id_receta: number;
   id: number; // Representa el Id_Stock_Detalle
   name: string;
   isChecked: boolean;
   cantidad: string;
+  unidad: string;
+  Activo: number;
 }
 
 const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => {
   const [items, setItems] = useState<Item[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]); // Nuevo estado para almacenar los IDs seleccionados
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  const id_receta = recetaId;
+
+  // Función para obtener los ingredientes de la receta
   const datosAlimento = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/ingredientes`);
+      const response = await axios.get(`${PUERTO}/ingredientes/${id_receta}`);
       console.log("Datos recibidos:", response.data);
 
-      const ingredientes = response.data.map((ingrediente: any) => {
-        return {
-          id_receta: ingrediente.id_receta,
-          id: ingrediente.id,
-          name: ingrediente.Nombre || "Alimento desconocido",
-          isChecked: false,
-          cantidad: ingrediente.Cantidad,
-        };
-      });
+      const ingredientes = response.data.map((ingrediente: any) => ({
+        id: ingrediente.id,
+        name: ingrediente.Nombre || "Alimento desconocido",
+        isChecked: false,
+        cantidad: ingrediente.Cantidad,
+        unidad: ingrediente.Unidad,
+        Activo: ingrediente.Activo,
+      }));
+
       setItems(ingredientes);
       message.success("Ingredientes obtenidos exitosamente");
     } catch (error) {
-      console.error("Error al obtener Ingredientes", error);
+      console.error("Error al obtener Ingredientes:", error);
       message.error("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Efecto para cargar los datos al inicio
   useEffect(() => {
     datosAlimento();
   }, []);
 
+  // Alternar el estado del Drawer (Agregar ingredientes)
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  // Actualizar estado del checkbox y manejar el arreglo `selectedIds`
+  // Manejar el cambio en los checkboxes
   const handleCheckboxChange = (index: number) => {
     const updatedItems = [...items];
     updatedItems[index].isChecked = !updatedItems[index].isChecked;
@@ -63,18 +69,14 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
 
     const itemId = updatedItems[index].id;
 
-    setSelectedIds((prevIds) => {
-      if (updatedItems[index].isChecked) {
-        // Agregar el ID al arreglo si está seleccionado
-        return [...prevIds, itemId];
-      } else {
-        // Eliminar el ID del arreglo si se deselecciona
-        return prevIds.filter((id) => id !== itemId);
-      }
-    });
+    setSelectedIds((prevIds) =>
+      updatedItems[index].isChecked
+        ? [...prevIds, itemId] // Agregar si está seleccionado
+        : prevIds.filter((id) => id !== itemId) // Remover si está deseleccionado
+    );
   };
 
-  // Función para enviar los IDs al servidor
+  // Enviar los IDs seleccionados al servidor
   const enviarIdsSeleccionados = async () => {
     if (selectedIds.length === 0) {
       message.warning("No has seleccionado ningún alimento.");
@@ -82,9 +84,9 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
     }
 
     try {
-      const response = await axios.put(`${PUERTO}/caducar`, {
-        ids: selectedIds, // Enviar los IDs seleccionados
-        Cantidad: 0, // Cantidad que deseas actualizar
+      const response = await axios.put(`${PUERTO}/ingED`, {
+        ids: selectedIds,
+        Cantidad: 0,
       });
 
       console.log(response.data.message);
@@ -97,53 +99,78 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
           isChecked: selectedIds.includes(item.id) ? false : item.isChecked,
         }))
       );
-      setSelectedIds([]); // Limpiar la lista de seleccionados
+      setSelectedIds([]);
     } catch (error) {
-      console.error("Error al actualizar alimentos", error);
-      message.error("No se pudo eliminar los Ingredientes.");
+      console.error("Error al actualizar alimentos:", error);
+      message.error("No se pudo eliminar los ingredientes.");
     }
   };
+
+  // Manejar el evento del botón "Agregar"
+  const handleAgregar = () => {
+    console.log("Abrir modal o formulario para agregar nuevo ingrediente.");
+    toggleDrawer();
+  };
+
   return (
     <>
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#638552',
+            colorPrimary: "#638552",
           },
         }}
       >
         <Card
           title={<span className="card-title">Ingredientes</span>}
-          extra={<Button
-            type="primary"
-            onClick={enviarIdsSeleccionados}
-            disabled={selectedIds.length === 0}
-          >
-            Eliminar
-          </Button>
-           }
+          extra={
+            <Button
+              type="primary"
+              onClick={enviarIdsSeleccionados}
+              disabled={selectedIds.length === 0}
+            >
+              Eliminar
+            </Button>
+          }
           className="card-container"
           bodyStyle={{ padding: "16px" }}
-          
         >
-          <div className="card-checkbox-container">
-            {items.slice(0, 5).map((item, index) => (
-              <div key={index} className="card-checkbox">
-                <Checkbox
-                  checked={item.isChecked}
-                  onChange={() => handleCheckboxChange(index)}
-                  className="card-checkbox-text"
-                >
-                  {item.name}
-                </Checkbox>
-              </div>
-            ))}
-            <Button className="btAg"><img className="img" src={btAg} alt="Agregar" /></Button>
-          </div>
+          {loading ? (
+            <p>Cargando ingredientes...</p>
+          ) : (
+            <div className="card-checkbox-container">
+              {items
+                .filter((item) => item.Activo > 0) 
+                .map((item, index) => (
+                  <div key={index} className="card-checkbox">
+                    <Checkbox
+                      checked={item.isChecked}
+                      onChange={() => handleCheckboxChange(index)}
+                      className="card-checkbox-text"
+                    >
+                      {item.name} {item.cantidad} {item.unidad}
+                    </Checkbox>
+                  </div>
+                ))}
+              <Button className="btAg" onClick={handleAgregar}>
+                <img className="img" src={btAg} alt="Agregar" />
+              </Button>
+            </div>
+          )}
         </Card>
       </ConfigProvider>
+  
+      <Drawer
+        title="Agregar Ingrediente"
+        placement="right"
+        onClose={toggleDrawer}
+        open={isDrawerOpen}
+      >
+        <p>Formulario aquí...</p>
+      </Drawer>
     </>
   );
+  
 };
 
 export default IngredientesRecetaEditar;

@@ -46,7 +46,6 @@ export default function Inicio() {
         return;
       }
       const id_alta = currentUser
-      //mandar id, nombre alimento, cantidad, tipo, fecha, unidad
       const response = await axios.get(`${PUERTO}/usuarios`, {
         headers: { "Content-Type": "application/json" },
       });
@@ -61,14 +60,13 @@ export default function Inicio() {
 
   const eliminarAlimento = async (id: number) => {
     try {
-      // Asegúrate de que la ruta sea correcta y que tu servidor acepte PUT en /alimentoInactivo
       const response = await axios.put(`${PUERTO}/alimentoInactivo/${id}`, {
         id: id,
       });
 
       if (response.status === 200) {
         message.success("Alimento eliminado exitosamente.");
-        datosAlimento(); // Recargar la lista de alimentos después de la eliminación
+        datosAlimento(); 
       } else {
         message.error("No se pudo eliminar el alimento.");
       }
@@ -78,10 +76,8 @@ export default function Inicio() {
     }
   };
 
-  // Obtener datos de alimentos
   const datosAlimento = async () => {
     try {
-      // Asegúrate de que esta ruta sea correcta para obtener los datos de los alimentos
       const response = await axios.get(`${PUERTO}/alimento`);
       const { Perecedero, NoPerecedero } = response.data;
 
@@ -148,20 +144,20 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-  // Manejar envío del formulario desde el modal
+
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
     formData.append('name', values.name);
-    formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); // Formatea la fecha
+    formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); 
     formData.append('quantity', values.quantity);
     formData.append('unit', values.unit);
 
     try {
-      // Reemplazar la URL con la correcta de la API
+     
       await axios.post(`${PUERTO}/productos`, formData);
       message.success('Producto agregado');
-      datosAlimento(); // Actualiza la lista de productos
-      setIsModalOpen(false); // Cierra el modal
+      datosAlimento(); 
+      setIsModalOpen(false); 
     } catch (error) {
       message.error('Error al agregar producto');
     }
@@ -204,7 +200,6 @@ export default function Inicio() {
             onChange={(e) => handleSearch(e.target.value)}
             style={{ width: '60%' }}
           />
-          <CameraOutlined style={{ fontSize: 30, color: '#3E7E1E' }} />
           <Button style={{ color: '#3E7E1E', backgroundColor: '#CAE2B5' }} onClick={() => setIsModalOpen(true)}>Agregar</Button>
         </div>
       </div>
