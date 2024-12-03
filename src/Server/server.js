@@ -16,10 +16,12 @@ const IngredienteReal = require ("./base/IngredienteREAL");
 const Ingredientes = require("./base/Ingredientes");
 const recetaCRUD = require("./base/RecetaCRUD");
 const tipo_consumo= require("./base/cat_tipo_consumo");
-
+const morgan = require('morgan');
 const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require('path');
+const Procedimiento = require("./base/Procedimiento")
+
 dotenv.config();
 
 // Configuración de multer
@@ -42,6 +44,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
 
@@ -117,6 +120,8 @@ app.use("/ingED", IngredienteReal);
 app.use("/ingredientes", Ingredientes);
 //tipo_consumo
 app.use("/tipoC", tipo_consumo);
+//Procedimiento (Instrucciones)
+app.use("/proceso", Procedimiento);
 
 //modificar alimentos
 app.use("/alimento", alimento);

@@ -8,9 +8,8 @@ const router = express.Router();
 
 
 // Eliminar un ingrediente de la receta
-router.put("/:id", (req, res) => {
-
-    const { ids } = req.body; // Obtener los IDs desde el cuerpo de la solicitud
+router.put("/", (req, res) => {
+  const { ids } = req.body; // Obtener los IDs desde el cuerpo de la solicitud
 
   // Validar que se hayan enviado los datos necesarios
   if (!ids || !Array.isArray(ids) || ids.length === 0) {
@@ -18,7 +17,7 @@ router.put("/:id", (req, res) => {
   }
 
   // Registrar resultados de las actualizaciones
-  const resultados = { eliminados: [], errores: [] };
+  const resultados = { actualizados: [], errores: [] };
 
   // Función para procesar cada ID
   const procesarId = (id, callback) => {
