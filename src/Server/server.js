@@ -11,6 +11,11 @@ const alimento = require("./base/Alimento");
 const caducar = require("./base/Caducar");
 const call = require("./base/ManejodeAuth");
 const routerSave = require("./base/SaveGmail");
+const routerAlimentoInactivo = require ("./base/AlimentoInactivo");
+const IngredienteReal = require ("./base/IngredienteREAL");
+const Ingredientes = require("./base/Ingredientes");
+const recetaCRUD = require("./base/RecetaCRUD");
+const tipo_consumo= require("./base/cat_tipo_consumo");
 
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -104,15 +109,21 @@ app.get(
   }
 );
 
-
-
 //modificar recetas
 app.use("/recetaGeneral", recetaGeneral);
+app.use("/recetaCRUD" , recetaCRUD)
+//ingredientes
+app.use("/ingED", IngredienteReal);
+app.use("/ingredientes", Ingredientes);
+//tipo_consumo
+app.use("/tipoC", tipo_consumo);
 
 //modificar alimentos
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);
+app.use("/alimentoInactivo", routerAlimentoInactivo);
 
+app.disable('etag'); // En Express.js
 
 const filePath = path.join(__dirname, 'images', 'defaultPerfil.png');
 

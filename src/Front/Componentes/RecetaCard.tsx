@@ -3,6 +3,7 @@ import { Card, Button, Tooltip } from "antd";
 import { EditOutlined, DeleteOutlined, ShareAltOutlined, ClockCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
 
 interface RecipeCardProps {
+  id: number;
   title: string;
   portions: string;
   calories: string;
@@ -12,7 +13,8 @@ interface RecipeCardProps {
   onDelete: () => void;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ title, portions, calories, time, image, onEdit, onDelete }) => {
+
+const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, time, image, onEdit, onDelete }) => {
   return (
     <Card
         hoverable

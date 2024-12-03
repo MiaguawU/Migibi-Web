@@ -18,19 +18,32 @@ const UserProfile: React.FC = () => {
 
   const logout = async () => {
     try {
+      // Obtener el token de autenticación
       const token = localStorage.getItem("authToken");
+      
+      // Realizar la solicitud de cierre de sesión al backend
       await axios.post(`${PUERTO}/logout`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
+      // Eliminar datos relacionados con la sesión en localStorage y sessionStorage
       localStorage.removeItem("authToken");
       localStorage.removeItem("currentUser");
+      sessionStorage.removeItem("usuarios");
+      sessionStorage.removeItem("currentUser");
+  
+      // Notificar al usuario del éxito
       message.success("Sesión cerrada correctamente.");
+      
+      // Opcional: Redirigir al usuario a la página de inicio o login
+      window.location.href = "/acceder";
     } catch (error) {
+      // Manejo de errores
       console.error("Error al cerrar sesión:", error);
-      message.error("No se pudo cerrar la sesión.");
+      message.error("No se pudo cerrar la sesión. Inténtalo de nuevo más tarde.");
     }
   };
+  
 
   const datosPerfil = async () => {
     setLoading(true);
@@ -74,7 +87,7 @@ const UserProfile: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     datosPerfil();
   }, []);

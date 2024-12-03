@@ -52,7 +52,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
       message.success(`Sesión iniciada como ${username}`);
       
-      // Llamamos a onLogin para notificar al componente principal
       onLogin({ id, username, email, foto_perfil, cohabitantes });
     }
   };
@@ -75,7 +74,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
 
-      // Llamamos a onLogin para notificar al componente principal
       onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
     } catch (error: unknown) {
       console.error('Error al iniciar sesión:', error);
