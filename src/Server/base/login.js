@@ -10,8 +10,6 @@ router.use(express.urlencoded({ extended: true }));
 router.post("/", (req, res) => {
   const { username, password } = req.body;
 
-  console.log("Headers:", req.headers); // Para depuración
-  console.log("Body recibido:", req.body); // Verifica los datos del cuerpo
 
   if (!username || !password) {
     console.log("Faltan datos requeridos: username y password");

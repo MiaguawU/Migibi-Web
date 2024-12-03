@@ -16,8 +16,15 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 interface Tipo {
-  id: number;
-  nombre: string;
+  Id_Tipo_Consumo: number;
+  Tipo_Consumo: string;
+}
+
+function getBase64(file: File, callback: (url: string) => void) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => callback(reader.result as string);
+  reader.onerror = (error) => message.error("Error al procesar la imagen.");
 }
 
 export default function EDreceta() {
@@ -43,6 +50,19 @@ export default function EDreceta() {
     Calorias: 0,
   });
 
+  const uploadProps = {
+    showUploadList: false, // No mostrar la lista de archivos
+    beforeUpload: (file: File) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("Solo puedes subir archivos de imagen.");
+        return false;
+      }
+      getBase64(file, (url) => setFormData((prev) => ({ ...prev, Imagen: url })));
+      return false; // Evitar la subida automática
+    },
+  };
+
   // Obtener tipos de consumo
   const obtenerTipos = async () => {
     try {
@@ -52,6 +72,7 @@ export default function EDreceta() {
       if(response){
         setTipos(response.data );
         message.success("Tipos de consumo cargados correctamente.");
+        console.log("Tipos recibidos:", response.data);
       }
       else{
         message.error("No hay datos en los tipos");
@@ -138,15 +159,8 @@ export default function EDreceta() {
 
   // Resetear el formulario
   const onReset = () => {
-    form.resetFields();
-    setFormData({
-      Nombre: '',
-      Imagen: def,
-      Tiempo: dayjs('00:00:00', 'HH:mm:ss'),
-      id_Tipo: '',
-      Porciones: 1,
-      Calorias: 0,
-    });
+    datosReceta();
+    obtenerTipos();
   };
 
   return (
@@ -155,8 +169,13 @@ export default function EDreceta() {
         <div className="receta">
           <div className="f1">
             <div className="imgDiv">
-              <img src={formData.Imagen} alt="Receta" />
-              <Upload>
+              <img src={formData.Imagen} alt="Receta" style={{
+                  maxHeight: '400px',
+                  maxWidth: '300px',
+                  border: '1px solid #3E7E1E',
+                  borderRadius: '10px' 
+                }}/>
+              <Upload {...uploadProps}>
                 <Button className="btUp" icon={<UploadOutlined />}></Button>
               </Upload>
             </div>
@@ -179,8 +198,8 @@ export default function EDreceta() {
                   style={{ width: 200 }}
                 >
                   {Tipos.map((tipo) => (
-                    <Option key={tipo.id} value={tipo.id}>
-                      {tipo.nombre}
+                    <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>
+                      {tipo.Tipo_Consumo}
                     </Option>
                   ))}
                 </Select>
@@ -223,7 +242,7 @@ export default function EDreceta() {
           </div>
           <div className="f3">
             <Ingredientes recetaId={Number(id)} />
-            <Proceso />
+            <Proceso  recetaId={Number(id)} />
           </div>
         </div>
       </Form>

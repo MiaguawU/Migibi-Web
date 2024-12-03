@@ -39,22 +39,25 @@ router.post("/", (req, res) => {
 // Obtener un detalle de receta específico por ID 
 router.get("/:id", (req, res) => {
     const { id } = req.params;
+    console.log(req.params);
     //id_receta
     //id_receta_detalle
     //nombreAlimento
     //cantidad
     const query = `
         SELECT 
-        rd.Id_Receta_Detalle AS id,
-        ca.Alimento AS Nombre,
-        rd.Cantidad AS Cantidad,
-        rd.Id_Receta AS id_receta
-      FROM receta_detalle rd
-      LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
-      WHERE rd.Id_Receta = ?
-      ORDER BY ca.Alimento ASC;`;
+            ca.Alimento AS Nombre,
+            rd.Cantidad AS Cantidad,
+            cu.Abreviatura AS Unidad,  
+            rd.Id_Receta_Detalle AS id,
+            rd.Activo AS Activo
+        FROM receta_detalle rd
+        LEFT JOIN cat_alimento ca ON rd.Id_Alimento = ca.Id_Alimento
+        LEFT JOIN cat_unidad_medida cu ON rd.Id_Unidad_Medida = cu.Id_Unidad_Medida
+        WHERE rd.Id_Receta = 1
+        ORDER BY ca.Alimento ASC;`;
 
-    db.query(query, [id], (err, result) => {
+    db.query(query, (err, result) => {
       if (err) {
         console.error("Error al obtener el detalle de receta:", err);
         return res.status(500).send("Error al obtener el detalle");
@@ -62,7 +65,8 @@ router.get("/:id", (req, res) => {
       if (result.length === 0) {
         return res.status(404).send("Detalle de receta no encontrado");
       }
-      res.json(result[0]);
+      res.json(result);
+      console.log(result);
     });
 });
 

@@ -74,8 +74,6 @@ router.put('/:id', upload.single('foto_perfil'), (req, res) => {
 // Ruta de registro
 router.post("/", upload.single('foto_perfil'), (req, res) => {
   const { username, password } = req.body;
-  console.log("Headers:", req.headers); // Para depuración
-  console.log("Body recibido:", req.body); // Verifica los datos del cuerpo
 
   const email = username;
   const name = "usuario_gmail";
