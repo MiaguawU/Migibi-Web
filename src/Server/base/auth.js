@@ -35,9 +35,10 @@ passport.use(
           });
         } else {
           // Usuario nuevo: insertar datos
+          const con = 'sopaDEpollo22';
           const query =
-            "INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail) VALUES (?, ?, ?, ?)";
-          db.query(query, [nombre, email, fotoPerfil, 1], (err, result) => {
+            "INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena) VALUES (?, ?, ?, ?, ?)";
+          db.query(query, [nombre, email, fotoPerfil, 1, con], (err, result) => {
             if (err) return done(err);
 
             const newUser = {
