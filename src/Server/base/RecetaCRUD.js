@@ -114,10 +114,26 @@ router.post("/", (req, res, next) => {
 router.get("/:id", (req, res) => {
     const { id } = req.params;
   
-    // Consulta para obtener los detalles de la receta
+    //nombre receta
+    //imagen
+    //tiempo
+    //tipo
+    //porciones
+    //calorias
+    
     const query1 = `
-      SELECT * FROM receta WHERE Id_Receta = ?
-    `;
+          SELECT 
+              r.Nombre AS Nombre,
+              r.Calorias AS Calorias,
+              r.Id_Tipo_Consumo AS id_Tipo,
+              r.Imagen_receta AS Imagen,
+              r.Tiempo AS Tiempo
+          FROM 
+              receta r
+          WHERE 
+              r.Id_Receta = ?;`;
+
+        console.log("id recibido");
     
     db.query(query1, [id], (err1, result1) => {
       if (err1) {
@@ -128,28 +144,8 @@ router.get("/:id", (req, res) => {
       if (result1.length === 0) {
         return res.status(404).send("Receta no encontrada");
       }
-  
-      // Obtener los ingredientes asociados a esta receta
-      const query2 = `
-        SELECT rd.*, i.Nombre AS Ingrediente, um.Nombre AS Unidad_Medida
-        FROM receta_detalle rd
-        JOIN ingrediente i ON rd.Id_Ingrediente = i.Id_Ingrediente
-        JOIN unidad_medida um ON rd.Id_Unidad_Medida = um.Id_Unidad_Medida
-        WHERE rd.Id_Receta = ?
-      `;
-      
-      db.query(query2, [id], (err2, result2) => {
-        if (err2) {
-          console.error("Error al obtener detalles de receta:", err2);
-          return res.status(500).send("Error al obtener detalles de receta");
-        }
-  
-        // Responder con los datos de la receta y los detalles
-        res.json({
-          receta: result1[0],
-          ingredientes: result2
-        });
-      });
+      console.log("receta enviada", result1);
+      res.json(result1)
     });
   });
 

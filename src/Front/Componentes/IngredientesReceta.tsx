@@ -23,7 +23,7 @@ const PorCaducar: React.FC = () => {
     { name: "Pollo", isChecked: true },
     { name: "Pasta", isChecked: true },
   ]);
-
+  
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
