@@ -46,7 +46,7 @@ const accederItem: ItemType[] = [
 
 function App() {
   const [isDrawerVisible, setDrawerVisible] = useState(false);
-  const [Accedio, setAccedio] = useState(false);
+  const [Accedio, setAccedio] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const showDrawer = () => setDrawerVisible(true);

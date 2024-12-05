@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
-import btAg from "../../Img/btagregar.png"; // Asegúrate de que la ruta sea correcta
-import "../Estilos/ing.css"; // Importa el archivo CSS
+import IngModal from "./IngredienteModal";
+import btAg from '../../Img/btAgregar.png';
+import '../Estilos/ing.css'; // Importa el archivo CSS
 import axios from "axios";
 import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
 
@@ -27,7 +28,20 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onRes
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+<<<<<<< HEAD
   const [resetTrigger, setResetTrigger] = useState(false); // Nuevo estado para manejar el reset
+=======
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+
+  // Manejar envío del formulario desde el modal
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('quantity', values.quantity);
+    formData.append('unit', values.unit);
+    formData.append('type', values.type);
+  };
+>>>>>>> Nisa1
 
   const id_receta = recetaId;
 
@@ -134,13 +148,13 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onRes
         <Card
           title={<span className="card-title">Ingredientes</span>}
           extra={
-            <Button
+            <><Button
               type="primary"
               onClick={enviarIdsSeleccionados}
               disabled={selectedIds.length === 0}
             >
               Eliminar
-            </Button>
+            </Button><Button type="link" onClick={toggleDrawer} className="card-button-link">Ver más</Button></>
           }
           className="card-container"
           bodyStyle={{ padding: "16px" }}
@@ -148,27 +162,55 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onRes
           {loading ? (
             <p>Cargando ingredientes...</p>
           ) : (
+<<<<<<< HEAD
             <div className="card-checkbox-container">
               {items
                 .filter((item) => item.Activo > 0)
+=======
+          <div className="card-checkbox-container">
+            {items
+                .filter((item) => item.Activo > 0) 
+>>>>>>> Nisa1
                 .map((item, index) => (
-                  <div key={index} className="card-checkbox">
-                    <Checkbox
-                      checked={item.isChecked}
-                      onChange={() => handleCheckboxChange(index)}
-                      className="card-checkbox-text"
-                    >
-                      {item.name} {item.cantidad} {item.unidad}
-                    </Checkbox>
-                  </div>
-                ))}
-              <Button className="btAg" onClick={handleAgregar}>
-                <img className="img" src={btAg} alt="Agregar" />
-              </Button>
-            </div>
+              <div key={index} className="card-checkbox">
+                <Checkbox
+                  checked={item.isChecked}
+                  onChange={() => handleCheckboxChange(index)}
+                  className="card-checkbox-text"
+                >
+                  {item.name} {item.cantidad} {item.unidad}
+                </Checkbox>
+              </div>
+            ))}
+            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
+              <img className="img" src={btAg} alt="Agregar" />
+            </Button>
+          </div>
           )}
         </Card>
+
+        <Drawer
+          title="Ingredientes"
+          placement="right"
+          onClose={toggleDrawer}
+          open={isDrawerOpen}
+          width={300}
+        >
+          <p>Formulario aquí...</p>
+          {items.map((item, index) => (
+            <div key={index} className="drawer-checkbox">
+              <Checkbox
+                checked={item.isChecked}
+                onChange={() => handleCheckboxChange(index)}
+                className="drawer-checkbox-text"
+              >
+                {item.name}
+              </Checkbox>
+            </div>
+          ))}
+        </Drawer>
       </ConfigProvider>
+<<<<<<< HEAD
 
       <Drawer
         title="Agregar Ingrediente"
@@ -178,6 +220,14 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onRes
       >
         <p>Formulario aquí...</p>
       </Drawer>
+=======
+      {/* Modal externo para agregar producto */}
+      <IngModal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
+>>>>>>> Nisa1
     </>
   );
 };
