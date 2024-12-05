@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
 import PorCaducar from './Componentes/PorCaducar';
-import ProductModal from './Componentes/IngredienteRefriModal'; // Importa el modal separado
+import ProductModal from './Componentes/ProductoRefriModal'; // Importa el modal separado
 import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
 import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
@@ -144,14 +144,16 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-
+  // Manejar envío del formulario desde el modal
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
     formData.append('name', values.name);
     formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); 
     formData.append('quantity', values.quantity);
     formData.append('unit', values.unit);
-
+    formData.append('type', values.type);
+    formData.append('imgsrc', values.imgsrc);
+// Agregar un nuevo ingrediente
     try {
      
       await axios.post(`${PUERTO}/productos`, formData);
@@ -220,28 +222,31 @@ export default function Inicio() {
                   overflow: 'hidden',
                 }}
               >
-                <img alt={card.image} src={card.image} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }} />
-                <Meta
-                  title={<span style={{ fontSize: '30px', color: '#86A071', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
-                  description={`${card.cantidad} ${card.abreviatura}`}
-                  style={{ marginTop: '10px' }}
-                />
-                <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#86A071' }}>
-                  {card.fecha}
-                </div>
-                <Space size="small" style={{ marginTop: '10px' }}>
-                  <Tooltip title="Editar">
-                    <EditOutlined style={{ color: '#6F895A', fontSize: 20 }} />
-                  </Tooltip>
-                  {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
-                    <Tooltip title="Advertencia">
-                      <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
+                
+                <span style={{fontSize: 30, color: '#86A071', fontFamily: 'Jomhuria, sans-serif'}}>
+                  <img alt={card.image} src={card.image} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }} />
+                  <Meta
+                    title={<span style={{ fontSize: '30px', color: '#86A071', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
+                    description={`${card.cantidad} ${card.abreviatura}`}
+                    style={{ marginTop: '10px' }}
+                  />
+                  <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#86A071' }}>
+                    {card.fecha}
+                  </div>
+                  <Space size="small" style={{ marginTop: '10px' }}>
+                    <Tooltip title="Editar">
+                      <EditOutlined style={{ color: '#6F895A', fontSize: 20 }} />
                     </Tooltip>
-                  )}
-                  <Tooltip title="Eliminar">
-                    <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
-                  </Tooltip>
-                </Space>
+                    {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
+                      <Tooltip title="Advertencia">
+                        <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
+                      </Tooltip>
+                    )}
+                    <Tooltip title="Eliminar">
+                      <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
+                    </Tooltip>
+                  </Space>
+                </span>
               </Card>
             ))}
             {/* Modal externo para agregar producto */}

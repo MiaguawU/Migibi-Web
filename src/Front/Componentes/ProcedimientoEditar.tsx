@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
-import btAg from "../../Img/btagregar.png"; // Asegúrate de que la ruta sea correcta
-import "../Estilos/ing.css"; // Importa el archivo CSS
+import InsModal from "./InstruccionModal";
+import btAg from '../../Img/btAgregar.png';
+import '../Estilos/proceso.css'; // Importa el archivo CSS
 import axios from "axios";
 import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
 
@@ -24,6 +25,16 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+
+  // Manejar envío del formulario desde el modal
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('quantity', values.quantity);
+    formData.append('unit', values.unit);
+    formData.append('type', values.type);
+  };
 
   const id_receta = recetaId;
 
@@ -123,6 +134,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
         <Card
           title={<span className="card-title">Instrucciones</span>}
           extra={
+            <>
             <Button
               type="primary"
               onClick={enviarIdsSeleccionados}
@@ -130,6 +142,8 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
             >
               Eliminar
             </Button>
+            <Button type="link" onClick={toggleDrawer} className="card-button-link">Ver más</Button>
+            </>
           }
           className="card-container"
           bodyStyle={{ padding: "16px" }}
@@ -137,36 +151,51 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
           {loading ? (
             <p>Cargando ingredientes...</p>
           ) : (
-            <div className="card-checkbox-container">
-              {items.map((item, index) => (
-                <div key={index} className="card-checkbox">
-                  <Checkbox
-                    checked={item.isChecked}
-                    onChange={() => handleCheckboxChange(index)}
-                    className="card-checkbox-text"
-                  >
-                    {item.orden}.{item.name} 
-                  </Checkbox>
-                </div>
-              ))}
-              <Button className="btAg" onClick={handleAgregar}>
-                <img className="img" src={btAg} alt="Agregar" />
-              </Button>
-            </div>
+          <div className="card-checkbox-container">
+            {items.slice(0, 5).map((item, index) => (
+              <div key={index} className="card-checkbox">
+                <Checkbox
+                  checked={item.isChecked}
+                  onChange={() => handleCheckboxChange(index)}
+                  className="card-checkbox-text"
+                >
+                  {item.orden}.{item.name} 
+                </Checkbox>
+              </div>
+            ))}
+            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
+              <img className="img" src={btAg} alt="Agregar" />
+            </Button>
+          </div>
           )}
         </Card>
-      </ConfigProvider>
 
-      {/* Drawer para agregar ingredientes */}
-      <Drawer
-        title="Agregar Ingrediente"
-        placement="right"
-        onClose={toggleDrawer}
-        open={isDrawerOpen}
-      >
-        {/* Contenido del formulario para agregar ingrediente */}
-        <p>Formulario aquí...</p>
-      </Drawer>
+        <Drawer
+          title="Agregar Ingrediente"
+          placement="right"
+          onClose={toggleDrawer}
+          open={isDrawerOpen}
+          width={300}
+        >
+          {items.map((item, index) => (
+            <div key={index} className="drawer-checkbox">
+              <Checkbox
+                checked={item.isChecked}
+                onChange={() => handleCheckboxChange(index)}
+                className="drawer-checkbox-text"
+              >
+                {item.name}
+              </Checkbox>
+            </div>
+          ))}
+        </Drawer>
+      </ConfigProvider>
+      {/* Modal externo para agregar producto */}
+      <InsModal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
     </>
   );
 };

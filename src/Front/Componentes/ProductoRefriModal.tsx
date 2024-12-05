@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message } from 'antd';
-import { CheckOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps } from 'antd';
+import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -21,17 +21,42 @@ const formItemLayout = {
   },
 };
 
+const props: UploadProps = {
+  beforeUpload: (file) => {
+    const isIMG = file.type === 'image/png';
+    if (!isIMG) {
+      message.error(`${file.name} no es un archivo de imagen`);
+    }
+    return isIMG || Upload.LIST_IGNORE;
+  },
+  onChange: (info) => {
+    console.log(info.fileList);
+  },
+};
+
 const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) => {
   const [form] = Form.useForm();
 
-  const [products, setProducts] = useState([]); // Lista de productos
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [searchTerm, setSearchTerm] = useState('');
+  const [alimentosPerecederos, setAlimentosPerecederos] = useState<string[]>([]);
+  const [alimentosNoPerecederos, setAlimentosNoPerecederos] = useState<string[]>([]);
+  
+  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
+    const nombre = alimento;
+    return (
+      nombre.includes(searchTerm) 
+    );
+  });
   
   const handleFinish = (values: any) => {
     onSubmit(values); // Llama a la función que maneja los datos
     form.resetFields(); // Resetea el formulario después de enviar
   };
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value.toLowerCase());
+  };
   return (
     <ConfigProvider
       theme={{
@@ -69,8 +94,10 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
             label="Nombre"
             rules={[{ required: true, message: 'Por favor, introduce el nombre' }]}
           >
-            <Input
-              placeholder="Nombre del producto"
+            <Input.Search
+              placeholder="Buscar ingrediente"
+              onSearch={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
             />
           </Form.Item>
 
@@ -78,7 +105,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
           <Form.Item
             name="expirationDate"
             label="Fecha de caducidad"
-            rules={[{ required: true, message: 'Por favor, selecciona una fecha' }]}
           >
             <DatePicker
               style={{ width: '100%' }}
@@ -120,6 +146,27 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
             </Select>
           </Form.Item>
 
+          {/* Select de tipo */}
+          <Form.Item
+            name="type"
+            label="Tipo"
+            rules={[{ required: true, message: 'Por favor, selecciona el tipo de alimento' }]}
+          >
+            <Select placeholder="Selecciona el tipo de alimento">
+              <Option value="kg">Vegetal</Option>
+              <Option value="g">Fruta</Option>
+              <Option value="l">Camaron</Option>
+              <Option value="pz">Pepe</Option>
+            </Select>
+          </Form.Item>
+
+
+          <Form.Item name="imgsrc" label="Imagen">
+            <Upload accept=".jpg,.png" listType="picture" maxCount={1} {...props}>
+              <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            </Upload>
+          </Form.Item>
+
           {/* Botón de enviar */}
           <Form.Item
             wrapperCol={{
@@ -132,9 +179,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
             </Button>
           </Form.Item>
 
-          <Form.Item>
-            <Upload />
-          </Form.Item>
         </Form>
 
       </Modal>
