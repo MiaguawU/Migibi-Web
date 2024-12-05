@@ -145,9 +145,13 @@ export default function EDreceta() {
   // Manejar envío del formulario
   const handleSubmit = async () => {
     try {
+      await enviarDatosIngredientes();
+      await enviarDatosProcedimiento();
+  
+      // Aquí envías los datos de la receta principal
       const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, formData);
       if (response.status === 200) {
-        message.success("Receta actualizada correctamente.");
+        message.success("Receta y componentes actualizados correctamente.");
       } else {
         message.warning("No se pudo actualizar la receta.");
       }
@@ -159,9 +163,40 @@ export default function EDreceta() {
 
   // Resetear el formulario
   const onReset = () => {
-    datosReceta();
-    obtenerTipos();
+    datosReceta(); // Recargar los datos originales de la receta
+    obtenerTipos(); // Recargar los tipos
+    resetIngredientes(); // Reiniciar ingredientes
+    resetProcedimiento(); // Reiniciar procedimiento
   };
+
+  const enviarDatosIngredientes = async () => {
+    try {
+      // Aquí puedes llamar a la API para enviar los datos actualizados desde Ingredientes.
+      console.log("Enviando datos de ingredientes...");
+    } catch (error) {
+      console.error("Error al enviar datos de ingredientes:", error);
+    }
+  };
+  
+  const enviarDatosProcedimiento = async () => {
+    try {
+      // Aquí puedes llamar a la API para enviar los datos actualizados desde Procedimiento.
+      console.log("Enviando datos de procedimiento...");
+    } catch (error) {
+      console.error("Error al enviar datos de procedimiento:", error);
+    }
+  };
+  
+  const resetIngredientes = () => {
+    // Aquí puedes implementar lógica para reiniciar ingredientes.
+    console.log("Reiniciando datos de ingredientes...");
+  };
+  
+  const resetProcedimiento = () => {
+    // Aquí puedes implementar lógica para reiniciar procedimiento.
+    console.log("Reiniciando datos de procedimiento...");
+  };
+  
 
   return (
     <div className="todo">
@@ -233,7 +268,7 @@ export default function EDreceta() {
           </div>
           <div className="f2">
             <h2>{formData.Nombre}</h2>
-            <Button type="primary" htmlType="submit" className="btEn">
+            <Button type="primary" htmlType="submit" className="btEn" onClick={onReset}>
               Enviar
             </Button>
             <Button htmlType="button" onClick={onReset} className="btEn2">
@@ -241,8 +276,12 @@ export default function EDreceta() {
             </Button>
           </div>
           <div className="f3">
-            <Ingredientes recetaId={Number(id)} />
-            <Proceso  recetaId={Number(id)} />
+            <Ingredientes recetaId={Number(id)} 
+            onSubmit={() => enviarDatosIngredientes()}
+            onReset={() => resetIngredientes()}/>
+            <Proceso  recetaId={Number(id)} 
+             onSubmit={() => enviarDatosProcedimiento()}
+             onReset={() => resetProcedimiento()}/>
           </div>
         </div>
       </Form>

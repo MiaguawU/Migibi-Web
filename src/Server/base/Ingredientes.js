@@ -54,10 +54,10 @@ router.get("/:id", (req, res) => {
         FROM receta_detalle rd
         LEFT JOIN cat_alimento ca ON rd.Id_Alimento = ca.Id_Alimento
         LEFT JOIN cat_unidad_medida cu ON rd.Id_Unidad_Medida = cu.Id_Unidad_Medida
-        WHERE rd.Id_Receta = 1
+        WHERE rd.Id_Receta = ?
         ORDER BY ca.Alimento ASC;`;
 
-    db.query(query, (err, result) => {
+    db.query(query, [id],(err, result) => {
       if (err) {
         console.error("Error al obtener el detalle de receta:", err);
         return res.status(500).send("Error al obtener el detalle");

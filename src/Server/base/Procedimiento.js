@@ -38,17 +38,17 @@ router.post("/", (req, res) => {
 
 // Obtener todas las instrucciones de una receta específica (GET)
 router.get("/:id", (req, res) => {
-    const { id_receta } = req.params;
+    const { id } = req.params;
     
     const query =` SELECT 
     ri.Instruccion AS Nombre,
     ri.Orden AS Orden,
     ri.Id_Receta_Instrucciones AS id
 FROM receta_instrucciones ri
-WHERE ri.Id_Receta = 1
+WHERE ri.Id_Receta = ?
 ORDER BY ri.Orden ASC;`;
 
-    db.query(query, (err, results) => {
+    db.query(query,[ id ] ,(err, results) => {
       if (err) {
         console.error("Error al obtener instrucciones de receta:", err);
         return res.status(500).send("Error al obtener las instrucciones");
