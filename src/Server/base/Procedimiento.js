@@ -37,11 +37,18 @@ router.post("/", (req, res) => {
 });
 
 // Obtener todas las instrucciones de una receta específica (GET)
-router.get("/:id_receta", (req, res) => {
+router.get("/:id", (req, res) => {
     const { id_receta } = req.params;
-    const query = "SELECT * FROM receta_instrucciones WHERE Id_Receta = ?";
+    
+    const query =` SELECT 
+    ri.Instruccion AS Nombre,
+    ri.Orden AS Orden,
+    ri.Id_Receta_Instrucciones AS id
+FROM receta_instrucciones ri
+WHERE ri.Id_Receta = 1
+ORDER BY ri.Orden ASC;`;
 
-    db.query(query, [id_receta], (err, results) => {
+    db.query(query, (err, results) => {
       if (err) {
         console.error("Error al obtener instrucciones de receta:", err);
         return res.status(500).send("Error al obtener las instrucciones");
@@ -50,22 +57,7 @@ router.get("/:id_receta", (req, res) => {
     });
 });
 
-// Obtener una instrucción específica por ID (GET)
-router.get("/:id", (req, res) => {
-    const { id } = req.params;
-    const query = "SELECT * FROM receta_instrucciones WHERE Id_Instruccion = ?";
 
-    db.query(query, [id], (err, result) => {
-      if (err) {
-        console.error("Error al obtener la instrucción:", err);
-        return res.status(500).send("Error al obtener la instrucción");
-      }
-      if (result.length === 0) {
-        return res.status(404).send("Instrucción no encontrada");
-      }
-      res.json(result[0]);
-    });
-});
 
 // Actualizar una instrucción de receta (PUT)
 router.put("/:id", (req, res) => {

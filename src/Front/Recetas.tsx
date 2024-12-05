@@ -9,60 +9,88 @@ import RecipeCard from './Componentes/RecetaCard';
 const { Search } = Input;
 
 interface CardData {
+  id: number;
   title: string;
   portions: string;
-  calories: string; // Puede ser string o número
-  time: string; // Puede ser string o número
+  calories: string; 
+  time: string; 
   image: string;
+  Activo: number;
 }
 
-export default function Recetas() {
+const Recetas: React.FC = (): JSX.Element => {
   const [recipes, setRecipes] = useState<CardData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState<CardData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Obtener datos de recetas
   const datosReceta = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`${PUERTO}/recetaGeneral`);
       if (response.data) {
-        const recData = response.data.map((receta: any) => ({
-          title: receta.Nombre || ' ',
-          portions: receta.Porciones || ' ',
-          calories: String(receta.Calorias || '0'), // Convertir a cadena
-          time: String(receta.Tiempo || '0'), // Convertir a cadena
-          image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
-        }));
-        
+        const recData = response.data
+          .filter((receta: any) => receta.Activo > 0)
+          .map((receta: any) => ({
+            id: receta.Id_Receta || ' ',
+            title: receta.Nombre || ' ',
+            portions: receta.Porciones || ' ',
+            calories: String(receta.Calorias || '0'),
+            time: String(receta.Tiempo || '0'),
+            image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
+            Activo: receta.Activo,
+          }));
+
         setRecipes(recData);
-        setFilteredRecipes(recData); // Inicializar con todas las recetas
+        setLoading(false);
         message.success("Recetas obtenidas exitosamente");
       }
     } catch (error) {
       console.error("Error al obtener recetas", error);
+      setLoading(false);
       message.error("No se pudo conectar con el servidor.");
     }
+  };
+
+  const eliminarReceta = async (id: number) => {
+    try {
+      const response = await axios.put(`${PUERTO}/recetaGeneral/${id}`);
+      if (response.status === 200) {
+        message.success(`Receta eliminada exitosamente.`);
+        datosReceta(); 
+      }
+    } catch (error) {
+      console.error("Error al eliminar receta:", error);
+      message.error("No se pudo eliminar la receta.");
+    }
+  };
+  
+
+  const handleEdit = (id: number) => {
+    // Navigate to the edit page (you can pass the recipe ID or other params if needed)
+    navigate(`/edReceta?id=${id}`);
   };
 
   useEffect(() => {
     datosReceta();
   }, []);
 
-  // Manejar búsqueda
-  const handleSearch = (value: string) => {
-    setSearchTerm(value.toLowerCase());
+  useEffect(() => {
     const filtered = recipes.filter((recipe) => {
       const title = recipe.title.toLowerCase();
-      const calories = String(recipe.calories).toLowerCase(); // Convertir a cadena
-      const time = String(recipe.time).toLowerCase(); // Convertir a cadena
-  
       return (
-        title.includes(value.toLowerCase()) ||
-        calories.includes(value.toLowerCase()) ||
-        time.includes(value.toLowerCase())
+        (title.includes(searchTerm.toLowerCase()) ||
+          recipe.calories.includes(searchTerm.toLowerCase()) ||
+          recipe.time.includes(searchTerm.toLowerCase())) &&
+        recipe.Activo > 0
       );
     });
     setFilteredRecipes(filtered);
+  }, [searchTerm, recipes]);
+
+  // Manejar búsqueda
+  const handleSearch = (value: string) => {
+    setSearchTerm(value.toLowerCase());
   };
 
   const navigate = useNavigate();
@@ -71,14 +99,41 @@ export default function Recetas() {
     navigate('/edReceta');
   };
 
-  const handleEdit = () => {
-    console.log("Editar receta");
-  };
+  // Ensure that loading state is handled properly
+  if (loading) {
+    return (
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#00b96b',
+            borderRadius: 10,
+            colorBgContainer: '#CAE2B5',
+          },
+        }}
+      >
+        <div className="recetas-container">
+          {/* Loading state */}
+          <div className="header">
+            <Search
+              placeholder="Buscar por nombre, calorías o tiempo"
+              allowClear
+              onSearch={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: '80%' }}
+            />
+            <Button className="btA" onClick={IRver}>Agregar</Button>
+          </div>
 
-  const handleDelete = () => {
-    console.log("Eliminar receta");
-  };
+          {/* Loading Spinner or Message */}
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <p>Cargando recetas...</p>
+          </div>
+        </div>
+      </ConfigProvider>
+    );
+  }
 
+  // Return valid JSX for loaded state
   return (
     <ConfigProvider
       theme={{
@@ -114,18 +169,21 @@ export default function Recetas() {
         >
           {filteredRecipes.map((card, index) => (
             <RecipeCard
+              id={card.id}
               key={index}
               title={card.title}
               portions={card.portions}
               calories={card.calories}
               time={card.time}
               image={card.image}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
+              onEdit={() => handleEdit(card.id)}
+              onDelete={() => eliminarReceta(card.id)}
             />
           ))}
         </div>
       </div>
     </ConfigProvider>
   );
-}
+};
+
+export default Recetas;

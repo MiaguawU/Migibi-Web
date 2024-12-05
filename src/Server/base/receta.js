@@ -36,17 +36,19 @@ router.post("/", (req, res, next) => {
 // Obtener receta(s) (GET)
 router.get("/", (req, res) => {
 
-  let query = `SELECT 
+  let query = `SELECT
+              Id_Receta, 
               Nombre, 
               Tiempo, 
               Calorias, 
-              Imagen_receta
+              Imagen_receta,
+              Activo
             FROM receta`;
 
- //nombre
+ //nombre y id
  //tiempo
  //calorias
- //imagen
+ //imagen y activo :3
   
   // Ejecutar la consulta
   db.query(query, (err, result) => {
@@ -62,33 +64,22 @@ router.get("/", (req, res) => {
 });
 
 
-// Actualizar una receta (PUT)
+//eliminar receta
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { nombre, id_usuario_modif, fecha_modif, id_tipo_consumo, imagen_receta, activo } = req.body;
-
-  // Validar que los campos requeridos estén presentes
-  if (!nombre || !id_usuario_modif || !fecha_modif || !id_tipo_consumo || !imagen_receta || activo === undefined) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
 
   // Consulta para actualizar una receta
-  const query = `
-    UPDATE receta 
-    SET Nombre = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Id_Tipo_Consumo = ?, Imagen_receta = ?, Activo = ?
-    WHERE Id_Receta = ?
-  `;
-  const values = [nombre, id_usuario_modif, fecha_modif, id_tipo_consumo, imagen_receta, activo, id];
+  const query = `UPDATE receta SET Activo = 0 WHERE Id_Receta = ?`;
+  console.error("id recibido");
 
   // Ejecutar la consulta
-  db.query(query, values, (err, result) => {
+  db.query(query, [id], (err, result) => {
     if (err) {
       console.error("Error al actualizar receta:", err);
-      return res.status(500).send("Error al actualizar receta");
+      return res.status(500).send("Error al eliminar receta");
     }
-
-    // Responder con un mensaje de éxito
-    res.json({ message: "Receta actualizada con éxito" });
+    console.error("receta eliminada");
+    res.json({ message: "Receta eliminada con éxito" });
   });
 });
 
