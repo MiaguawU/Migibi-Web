@@ -50,6 +50,32 @@ const props: UploadProps = {
   },
 };
 
+  const enviarDatosIngredientes = async () => {
+    try {
+      // Aquí puedes llamar a la API para enviar los datos actualizados desde Ingredientes.
+      console.log("Enviando datos de ingredientes...");
+    } catch (error) {
+      console.error("Error al enviar datos de ingredientes:", error);
+    }
+  };
+  const enviarDatosProcedimiento = async () => {
+    try {
+      // Aquí puedes llamar a la API para enviar los datos actualizados desde Procedimiento.
+      console.log("Enviando datos de procedimiento...");
+    } catch (error) {
+      console.error("Error al enviar datos de procedimiento:", error);
+    }
+  };
+  const resetIngredientes = () => {
+    // Aquí puedes implementar lógica para reiniciar ingredientes.
+    console.log("Reiniciando datos de ingredientes...");
+  };
+  
+  const resetProcedimiento = () => {
+    // Aquí puedes implementar lógica para reiniciar procedimiento.
+    console.log("Reiniciando datos de procedimiento...");
+  };
+
 export default function EDreceta() {
   const [syncedValue1, setSyncedValue1] = useState("Valor inicial 1");
   const [syncedValue2, setSyncedValue2] = useState("Valor inicial 2");
@@ -108,6 +134,13 @@ export default function EDreceta() {
     }
   };
 
+  // Resetear el formulario
+  const onReset = () => {
+    datosReceta(); // Recargar los datos originales de la receta
+    obtenerTipos(); // Recargar los tipos
+    resetIngredientes(); // Reiniciar ingredientes
+    resetProcedimiento(); // Reiniciar procedimiento
+  };
   // Obtener datos de la receta
   const datosReceta = async () => {
     setLoading(true);
@@ -200,10 +233,6 @@ export default function EDreceta() {
     setInputValue(e.target.value);
   };
 
-  const onReset = () => {
-    datosReceta();
-    obtenerTipos();
-  };
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
@@ -363,7 +392,9 @@ export default function EDreceta() {
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} />
+                <Ingredientes recetaId={Number(id)} 
+                onSubmit={() => enviarDatosIngredientes()}
+                onReset={() => resetIngredientes()}/>
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
                   <Proceso  recetaId={Number(id)} />
@@ -374,7 +405,9 @@ export default function EDreceta() {
             <div className='f3'>
               {!isMobile && !isTablet && (
               <div className='proceso'>
-                <Proceso recetaId={Number(id)} />
+                <Proceso recetaId={Number(id)} 
+                onSubmit={() => enviarDatosIngredientes()}
+                onReset={() => resetIngredientes()}/>
               </div>
               )}
             </div>

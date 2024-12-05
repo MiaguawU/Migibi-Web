@@ -8,6 +8,8 @@ import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado
 
 interface IngredientesProps {
   recetaId: number; // ID de la receta
+  onSubmit?: () => void;
+  onReset?: () => void; // Ahora opcional
 }
 
 interface Item {
