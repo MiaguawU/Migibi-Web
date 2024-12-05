@@ -9,8 +9,16 @@ router.get("/", (req, res) => {
   console.log("Llamando a caducar");
 
   const query1 = `
-    SELECT * FROM vw_stock_detalle WHERE Activo = 1 and Es_Perecedero=1 order by Fecha_Caducidad, Alimento ASC limit 10;`;
-  
+    SELECT 
+    sd.Id_Stock_Detalle AS id,
+    ca.Alimento AS Nombre,
+    sd.Cantidad AS Cantidad,
+    sd.Fecha_Caducidad AS Fecha
+  FROM stock_detalle sd
+  LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+  WHERE ca.Es_Perecedero = 1 and sd.Activo = 1
+  ORDER BY sd.Fecha_Caducidad ASC 
+  limit 10;`;
   db.query(query1, (err, result1) => {
     if (err) {
       console.log("Error:", err);  // Loguea el error

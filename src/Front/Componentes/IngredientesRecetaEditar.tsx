@@ -7,7 +7,10 @@ import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado
 
 interface IngredientesProps {
   recetaId: number; // ID de la receta
+  onSubmit?: () => void;
+  onReset?: () => void; // Ahora opcional
 }
+
 
 interface Item {
   id: number; // Representa el Id_Stock_Detalle
@@ -18,11 +21,13 @@ interface Item {
   Activo: number;
 }
 
-const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => {
+
+const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onReset }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(false); // Nuevo estado para manejar el reset
 
   const id_receta = recetaId;
 
@@ -51,10 +56,15 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
     }
   };
 
-  // Efecto para cargar los datos al inicio
+  // Efecto para cargar los datos iniciales o cuando se activa el reset
   useEffect(() => {
     datosAlimento();
-  }, []);
+  }, [resetTrigger]); // Agregar resetTrigger como dependencia
+
+  // Efecto para escuchar el evento onReset
+  useEffect(() => {
+    onReset && setResetTrigger((prev) => !prev);
+  }, [onReset]);
 
   // Alternar el estado del Drawer (Agregar ingredientes)
   const toggleDrawer = () => {
@@ -140,7 +150,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
           ) : (
             <div className="card-checkbox-container">
               {items
-                .filter((item) => item.Activo > 0) 
+                .filter((item) => item.Activo > 0)
                 .map((item, index) => (
                   <div key={index} className="card-checkbox">
                     <Checkbox
@@ -159,7 +169,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
           )}
         </Card>
       </ConfigProvider>
-  
+
       <Drawer
         title="Agregar Ingrediente"
         placement="right"
@@ -170,7 +180,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
       </Drawer>
     </>
   );
-  
 };
 
 export default IngredientesRecetaEditar;
+

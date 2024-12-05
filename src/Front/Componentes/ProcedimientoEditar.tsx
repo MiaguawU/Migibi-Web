@@ -6,8 +6,11 @@ import axios from "axios";
 import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
 
 interface ProcedimientoProps {
-  recetaId: number; // ID de la receta
+  recetaId: number;
+  onSubmit?: () => void;
+  onReset?: () => void;
 }
+
 
 interface Item {
   id: number; // Representa el Id_Stock_Detalle
