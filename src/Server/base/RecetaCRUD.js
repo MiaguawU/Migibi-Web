@@ -3,6 +3,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
+const { time } = require('console');
 const router = express.Router();
 
 const uploadDir = path.join(__dirname, '../imagenes');
@@ -150,14 +151,20 @@ router.get("/:id", (req, res) => {
   });
 
   // Ruta para actualizar una receta y sus detalles
-router.put("/:id", (req, res) => {
-    const { id } = req.params;
-    const { nombre, id_tipo_consumo, id_usuario_alta, fecha_alta, ingredientes } = req.body;
+router.put("/:id", (req, re, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('Error al procesar la imagen:', err);
+      return res.status(500).send('Error al procesar la imagen');
+    }  
+  const { id } = req.params;
+    const { nombre, id_tipo_consumo, tiempo, porciones, calorias } = req.body;
   
     // Validar los campos requeridos
-    if (!nombre || !id_tipo_consumo || !id_usuario_alta || !fecha_alta) {
+    if (!nombre || !id_tipo_consumo || !tiempo || !porciones || calorias) {
       return res.status(400).send("Faltan datos requeridos");
     }
+    const imagen = req.file ? `../imagenes/${req.file.filename}` : `/imagenes/defRec.png`;
   
     // Consulta para actualizar la receta
     const query1 = `
@@ -205,6 +212,7 @@ router.put("/:id", (req, res) => {
   
       res.json({ message: "Receta actualizada con éxito" });
     });
+  });
   });
 
   

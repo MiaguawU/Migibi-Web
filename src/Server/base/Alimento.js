@@ -99,7 +99,7 @@ router.get("/", (req, res) => {
   SELECT 
   ca.Id_Alimento AS id,
   ca.Alimento AS Nombre,
-  ca.Activo As Activo,
+  sd.Activo As Activo,
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
