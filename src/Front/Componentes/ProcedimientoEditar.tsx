@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Card, Checkbox, Button, ConfigProvider, message } from "antd";
+import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
 import axios from "axios";
 import "../Estilos/proceso.css";
 import PUERTO from "../../config";
+import btAg from '../../Img/btagregar.png';
+import InsModal from "./InstruccionModal";
 
 interface ProcedimientoProps {
   recetaId: number;
@@ -24,6 +26,17 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [resetTrigger, setResetTrigger] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+
+
+  const handleSubmit = async (values: any) => {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('quantity', values.quantity);
+    formData.append('unit', values.unit);
+    formData.append('type', values.type);
+  };
 
   // Función para obtener las instrucciones de la receta
   const datosInstrucciones = async () => {
@@ -57,6 +70,11 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
       setResetTrigger((prev) => !prev);
     }
   }, [onReset]);
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
 
   // Manejar cambios en los checkboxes
   const handleCheckboxChange = (index: number) => {
@@ -94,7 +112,14 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
     }
   };
 
+  const handleAgregar = () => {
+    console.log("Abrir modal o formulario para agregar nuevo ingrediente.");
+    toggleDrawer();
+  };
+
+
   return (
+    <>
     <ConfigProvider
       theme={{
         token: {
@@ -113,31 +138,62 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
             >
               Eliminar
             </Button>
-          </>
+            <Button type="link" onClick={toggleDrawer} className="card-button-link">Ver más</Button>
+            </>
+
         }
         className="card-container"
         bodyStyle={{ padding: "16px" }}
       >
         {loading ? (
-          <p>Cargando instrucciones...</p>
-        ) : (
+            <p>Cargando ingredientes...</p>
+          ) : (
           <div className="card-checkbox-container">
-            {items
-              .filter((item) => item.Activo > 0)
-              .map((item, index) => (
-                <div key={item.id} className="drawer-checkbox">
-                  <Checkbox
-                    checked={item.isChecked}
-                    onChange={() => handleCheckboxChange(index)}
-                  >
-                    {item.orden}. {item.name}
-                  </Checkbox>
-                </div>
-              ))}
+            {items.slice(0, 5).map((item, index) => (
+              <div key={index} className="card-checkbox">
+                <Checkbox
+                  checked={item.isChecked}
+                  onChange={() => handleCheckboxChange(index)}
+                  className="card-checkbox-text"
+                >
+                  {item.orden}.{item.name}
+                </Checkbox>
+              </div>
+            ))}
+            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
+              <img className="img" src={btAg} alt="Agregar" />
+            </Button>
           </div>
-        )}
+          )}
+
       </Card>
+      <Drawer
+          title="Agregar Ingrediente"
+          placement="right"
+          onClose={toggleDrawer}
+          open={isDrawerOpen}
+          width={300}
+        >
+          {items.map((item, index) => (
+            <div key={index} className="drawer-checkbox">
+              <Checkbox
+                checked={item.isChecked}
+                onChange={() => handleCheckboxChange(index)}
+                className="drawer-checkbox-text"
+              >
+                {item.name}
+              </Checkbox>
+            </div>
+          ))}
+        </Drawer>
     </ConfigProvider>
+    <InsModal
+    visible={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+    onSubmit={handleSubmit}
+  />
+</>
+
   );
 };
 
