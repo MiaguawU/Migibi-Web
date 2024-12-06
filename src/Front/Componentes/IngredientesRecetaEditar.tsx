@@ -12,6 +12,7 @@ interface IngredientesProps {
   onReset?: () => void; // Ahora opcional
 }
 
+
 interface Item {
   id: number; // Representa el Id_Stock_Detalle
   name: string;
@@ -21,11 +22,8 @@ interface Item {
   Activo: number;
 }
 
-const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({
-  recetaId,
-  onSubmit,
-  onReset,
-}) => {
+
+const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onReset }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +53,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({
     }
   };
 
+
   const id_receta = recetaId;
 
   // Función para obtener los ingredientes de la receta
@@ -82,7 +81,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({
     }
   };
 
-  // Efecto para cargar los datos al inicio
+  // Efecto para cargar los datos iniciales o cuando se activa el reset
   useEffect(() => {
     datosAlimento();
   }, [resetTrigger]); // Agregar resetTrigger como dependencia
@@ -201,7 +200,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({
           open={isDrawerOpen}
           width={300}
         >
-          <p>Formulario aquí...</p>
           {items.map((item, index) => (
             <div key={index} className="drawer-checkbox">
               <Checkbox
@@ -215,6 +213,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({
           ))}
         </Drawer>
       </ConfigProvider>
+
       {/* Modal externo para agregar producto */}
       <IngModal
         visible={isModalOpen}

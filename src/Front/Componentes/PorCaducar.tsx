@@ -24,8 +24,8 @@ const PorCaducar: React.FC = () => {
       console.log("Datos recibidos:", response.data);
 
       const perecederos = response.data.porcaducar.map((alimento: any) => {
-        const fechaCaducidad = alimento.Fecha_Caducidad
-          ? new Date(alimento.Fecha_Caducidad)
+        const fechaCaducidad = alimento.Fecha
+          ? new Date(alimento.Fecha)
           : null;
 
         const diasRestantes = fechaCaducidad
@@ -39,8 +39,8 @@ const PorCaducar: React.FC = () => {
           : "No definida";
 
         return {
-          id: alimento.Id_Stock_Detalle,
-          name: alimento.Alimento || "Alimento desconocido",
+          id: alimento.id,
+          name: alimento.Nombre || "Alimento desconocido",
           dias:
             diasRestantes === "No definida"
               ? "Fecha no disponible"

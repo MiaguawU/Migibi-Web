@@ -6,9 +6,10 @@ import PUERTO from "../../config";
 
 interface ProcedimientoProps {
   recetaId: number;
+  onReset?: () => void;
   onSubmit?: () => void;
-  onReset?: () => void; // Para manejar el reset externo
 }
+
 
 interface Item {
   id: number;
