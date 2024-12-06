@@ -1,5 +1,5 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `migibi`;  
+USE `migibi`; 
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: migibi
@@ -56,6 +56,7 @@ CREATE TABLE `cat_alimento` (
 --
 LOCK TABLES `cat_alimento` WRITE;
 /*!40000 ALTER TABLE `cat_alimento` DISABLE KEYS */;
+
 INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Es_Perecedero, Imagen_alimento) VALUES
 (1, 5, 'Huevos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
 (2, 7, 'Frijoles bayos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
@@ -106,7 +107,6 @@ INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_
 (49, 3, 'Pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
 (50, 4, 'Crema', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
 (98, 1, 'Papas fritas', 1, 4, '2024-06-05 16:29:34', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png');
-
 
 UNLOCK TABLES;
 
@@ -455,10 +455,95 @@ CREATE TABLE `receta_detalle` (
 -- Dumping data for table `receta_detalle`
 --
 
-LOCK TABLES `receta_detalle` WRITE;
-/*!40000 ALTER TABLE `receta_detalle` DISABLE KEYS */;
-INSERT INTO `receta_detalle` VALUES (1,1,4,2.0000,1,1,'2024-04-28 02:34:41',4,'2024-06-04 09:07:17',NULL,NULL,1),(2,1,6,1.0000,1,1,'2024-04-28 02:34:41',4,'2024-06-04 09:01:50',NULL,NULL,4),(3,1,3,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,2),(4,1,4,2.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,3),(5,2,8,1.0000,1,1,'2024-04-30 04:48:06',NULL,NULL,NULL,NULL,5),(6,2,8,1.0000,1,1,'2024-04-30 04:48:06',NULL,NULL,NULL,NULL,6),(7,2,3,0.2500,1,1,'2024-04-30 04:48:06',NULL,NULL,NULL,NULL,7),(8,2,4,1.0000,1,1,'2024-04-30 04:48:06',NULL,NULL,NULL,NULL,8),(9,2,3,0.2500,1,1,'2024-04-30 04:48:06',NULL,NULL,NULL,NULL,9),(10,2,4,1.0000,1,1,'2024-04-30 04:48:06',NULL,NULL,NULL,NULL,10),(316,2,4,0.2000,1,1,'2024-04-30 04:54:38',NULL,NULL,NULL,NULL,11),(407,2,4,0.5000,1,1,'2024-04-30 05:03:27',NULL,NULL,NULL,NULL,12),(408,2,4,1.0000,1,1,'2024-04-30 05:03:27',NULL,NULL,NULL,NULL,13),(409,2,4,1.0000,1,1,'2024-04-30 05:03:27',NULL,NULL,NULL,NULL,14),(410,2,4,1.0000,1,1,'2024-04-30 05:03:27',NULL,NULL,NULL,NULL,15),(411,2,2,4.0000,1,1,'2024-04-30 05:03:27',NULL,NULL,NULL,NULL,16),(412,3,4,1.0000,1,1,'2024-04-30 05:03:39',NULL,NULL,NULL,NULL,17),(413,3,3,0.5000,1,1,'2024-04-30 05:03:39',NULL,NULL,NULL,NULL,18),(414,3,10,0.2500,1,1,'2024-04-30 05:03:39',NULL,NULL,NULL,NULL,19),(415,3,6,0.5000,1,1,'2024-04-30 05:03:39',NULL,NULL,NULL,NULL,20),(416,3,3,0.2500,1,1,'2024-04-30 05:03:39',NULL,NULL,NULL,NULL,21),(417,3,3,0.2500,1,1,'2024-04-30 05:03:39',NULL,NULL,NULL,NULL,22),(418,3,6,2.0000,1,1,'2024-04-30 05:03:53',NULL,NULL,NULL,NULL,5),(419,3,6,2.0000,1,1,'2024-04-30 05:03:53',NULL,NULL,NULL,NULL,24),(420,4,10,0.2500,1,1,'2024-04-30 05:03:53',NULL,NULL,NULL,NULL,25),(421,4,3,0.1250,1,1,'2024-04-30 05:03:53',NULL,NULL,NULL,NULL,26),(422,4,8,1.0000,1,1,'2024-04-30 05:03:53',NULL,NULL,NULL,NULL,5),(423,4,4,0.5000,1,1,'2024-04-30 05:03:53',NULL,NULL,NULL,NULL,56),(424,4,4,1.0000,1,1,'2024-04-30 05:04:04',NULL,NULL,NULL,NULL,10),(425,4,4,0.2500,1,1,'2024-04-30 05:04:04',NULL,NULL,NULL,NULL,27),(426,4,4,1.0000,1,1,'2024-04-30 05:04:04',NULL,NULL,NULL,NULL,28),(427,4,10,1.0000,1,1,'2024-04-30 05:04:04',NULL,NULL,NULL,NULL,29),(428,4,4,1.0000,1,1,'2024-04-30 05:04:04',NULL,NULL,NULL,NULL,14),(429,4,4,0.5000,1,1,'2024-04-30 05:04:04',NULL,NULL,NULL,NULL,31),(441,4,4,0.5000,1,1,'2024-04-30 05:06:14',NULL,NULL,NULL,NULL,32),(443,5,3,0.1250,1,1,'2024-04-30 05:09:06',NULL,NULL,NULL,NULL,60),(444,5,3,0.1250,1,1,'2024-04-30 05:09:18',NULL,NULL,NULL,NULL,60),(445,5,3,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,33),(446,5,8,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,34),(447,5,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,10),(448,5,6,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,35),(449,5,9,55.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,36),(450,5,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,13),(451,5,10,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,37),(452,5,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,38),(453,5,6,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,39),(454,6,9,100.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,36),(455,6,8,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,34),(456,6,6,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,16),(457,6,5,2.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,40),(458,6,4,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,12),(459,6,5,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,41),(460,6,11,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,42),(461,6,3,0.1000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,33),(462,6,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,43),(463,6,4,0.1666,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,44),(464,6,3,0.2000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,45),(465,6,8,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,5),(466,6,8,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,24),(467,6,5,4.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,47),(468,7,3,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,21),(469,7,4,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,10),(470,7,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,12),(471,7,4,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,40),(472,7,6,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,16),(473,7,4,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,48),(474,7,3,0.1666,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,49),(475,7,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,13),(476,8,9,85.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,50),(477,8,10,0.1666,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,51),(478,8,9,40.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,52),(479,8,4,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,1),(480,8,8,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,53),(481,8,10,0.1666,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,25),(482,8,4,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,54),(483,8,8,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,39),(484,9,10,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,55),(485,9,10,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,37),(486,9,3,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,56),(487,9,4,5.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,57),(488,9,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,58),(489,9,4,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,59),(490,9,4,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,61),(491,10,10,0.0833,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,55),(492,10,3,0.0833,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,37),(493,10,10,0.0833,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,25),(494,10,3,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,33),(495,10,4,1.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,62),(496,10,11,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,63),(497,10,4,3.0000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,64),(498,11,10,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,55),(499,11,10,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,37),(500,11,3,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,65),(501,11,3,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,33),(502,11,4,0.1666,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,66),(503,11,3,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,67),(504,11,6,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,68),(505,12,3,0.5000,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,69),(506,12,10,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,37),(507,12,3,0.1250,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,22),(508,12,3,0.2500,1,1,'2024-04-30 05:09:32',NULL,NULL,NULL,NULL,67),(509,13,4,4.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(510,13,6,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,4),(511,13,3,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,2),(512,13,4,2.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,71),(516,14,4,4.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(517,14,6,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,4),(518,14,3,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,2),(519,14,4,2.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,72),(523,15,4,4.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,1),(524,15,6,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,4),(525,15,3,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,2),(526,15,4,2.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,73),(530,16,4,4.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,73),(531,16,6,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,4),(532,16,3,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,2),(533,16,4,2.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,74),(537,17,4,4.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,52),(538,17,6,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,4),(539,17,3,1.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,2),(540,17,4,2.0000,1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL,74),(542,2,6,0.2500,1,4,'2024-06-04 17:49:18',NULL,NULL,NULL,NULL,81),(555,13,4,1.0000,1,4,'2024-06-11 16:52:42',NULL,NULL,NULL,NULL,3);
-/*!40000 ALTER TABLE `receta_detalle` ENABLE KEYS */;
+
+INSERT INTO `receta_detalle` (`Id_Receta`, `Id_Alimento`, `Id_Unidad_Medida`, `Cantidad`) VALUES
+-- Cazuela de Huevo con Calabacitas y Frijoles
+(26, 1, 4, 3), -- 3 Huevos (pieza)
+(26, 2, 9, 200), -- 200g Calabacitas (gramo)
+(26, 3, 9, 150), -- 150g Frijoles (gramo)
+
+-- Pescado empanizado
+(27, 4, 9, 200), -- 200g Pescado (gramo)
+(27, 5, 9, 50), -- 50g Pan molido (gramo)
+
+-- Pechuga con espinacas al champiñón
+(28, 6, 9, 100), -- 100g Espinacas (gramo)
+(28, 7, 9, 150), -- 150g Champiñones (gramo)
+(28, 8, 9, 200), -- 200g Pechuga de pollo (gramo)
+
+-- Ensalada de atún
+(29, 9, 10, 1), -- 1 Lata de atún (lata)
+(29, 10, 9, 100), -- 100g Mayonesa (gramo)
+(29, 11, 9, 50), -- 50g Tomate (gramo)
+(29, 12, 9, 50), -- 50g Lechuga (gramo)
+
+-- Espagueti con albóndigas
+(30, 13, 9, 200), -- 200g Espagueti (gramo)
+(30, 14, 9, 150), -- 150g Carne molida (gramo)
+(30, 15, 9, 50), -- 50g Pan rallado (gramo)
+(30, 16, 9, 50), -- 50g Queso parmesano (gramo)
+
+-- Lasaña
+(31, 17, 9, 200), -- 200g Carne molida (gramo)
+(31, 18, 9, 100), -- 100g Queso ricotta (gramo)
+(31, 19, 9, 100), -- 100g Queso mozzarella (gramo)
+(31, 20, 9, 50), -- 50g Salsa de tomate (gramo)
+
+-- Sopa de fideo con brócoli
+(32, 21, 9, 100), -- 100g Fideos (gramo)
+(32, 22, 9, 150), -- 150g Brócoli (gramo)
+(32, 23, 9, 50), -- 50g Zanahoria (gramo)
+
+-- Empanadas de alcachofa
+(33, 24, 9, 200), -- 200g Alcachofa (gramo)
+(33, 25, 9, 50), -- 50g Harina (gramo)
+(33, 26, 9, 50), -- 50g Queso (gramo)
+(33, 27, 9, 50), -- 50g Jamón (gramo)
+
+-- Carlota de limón
+(34, 28, 9, 100), -- 100g Galletas marías (gramo)
+(34, 29, 9, 200), -- 200g Leche condensada (gramo)
+(34, 30, 9, 50), -- 50g Jugo de limón (gramo)
+
+-- Gelatina de mazapán
+(35, 31, 9, 100), -- 100g Leche (gramo)
+(35, 32, 9, 50), -- 50g Mazapán (gramo)
+(35, 33, 9, 20), -- 20g Gelatina (gramo)
+
+-- Agua de horchata
+(36, 34, 9, 200), -- 200g Arroz (gramo)
+(36, 35, 9, 50), -- 50g Azúcar (gramo)
+(36, 36, 4, 1), -- 1 Rama de canela (pieza)
+
+-- Piña colada
+(37, 37, 9, 200), -- 200g Piña (gramo)
+(37, 38, 9, 100), -- 100g Leche de coco (gramo)
+(37, 39, 9, 50), -- 50g Ron (gramo)
+
+-- Huevos con jamón y Frijoles
+(38, 1, 4, 3), -- 3 Huevos (pieza)
+(38, 40, 9, 100), -- 100g Jamón (gramo)
+(38, 3, 9, 150), -- 150g Frijoles (gramo)
+
+-- Calabacitas con queso panela y Frijoles
+(39, 2, 9, 200), -- 200g Calabacitas (gramo)
+(39, 41, 9, 100), -- 100g Queso panela (gramo)
+(39, 3, 9, 150), -- 150g Frijoles (gramo)
+
+-- Huevos con chorizo y Frijoles
+(40, 1, 4, 3), -- 3 Huevos (pieza)
+(40, 42, 9, 100), -- 100g Chorizo (gramo)
+(40, 3, 9, 150), -- 150g Frijoles (gramo)
+
+-- Papas con chorizo y Frijoles
+(41, 43, 9, 200), -- 200g Papas (gramo)
+(41, 42, 9, 100), -- 100g Chorizo (gramo)
+(41, 3, 9, 150), -- 150g Frijoles (gramo)
+
+-- Papas con queso y Frijoles
+(42, 43, 9, 200), -- 200g Papas (gramo)
+(42, 41, 9, 100), -- 100g Queso (gramo)
+(42, 3, 9, 150); -- 150g Frijoles (gramo)
 UNLOCK TABLES;
 
 --
@@ -496,10 +581,95 @@ CREATE TABLE `receta_instrucciones` (
 -- Dumping data for table `receta_instrucciones`
 --
 
-LOCK TABLES `receta_instrucciones` WRITE;
-/*!40000 ALTER TABLE `receta_instrucciones` DISABLE KEYS */;
-INSERT INTO `receta_instrucciones` VALUES (1,1,'Corta las calabacitas en cuartos',1,1,1,'2024-04-28 02:34:41',4,'2024-06-04 18:44:23',NULL,NULL),(2,1,'Mezcla el huevo con la sal con ajo y cocina hasta que el huevo esté dorado ligeramente',3,1,1,'2024-04-28 02:34:41',4,'2024-06-04 18:44:23',NULL,NULL),(3,1,'Agrega los frijoles con las calabacitas y cocina a fuego bajo por 9 minutos más',4,1,1,'2024-04-28 02:34:41',4,'2024-06-04 18:44:23',NULL,NULL),(4,1,'Sirve y disfruta',5,1,1,'2024-04-28 02:34:41',4,'2024-06-04 18:44:23',NULL,NULL),(9,2,'Mezcla la sal y la pimienta, espolvorea los filetes y cúbrelos con la harina, el huevo y por el pan molido. Calienta el aceite y fríelos por ambos lados, colócalos sobre papel absorbente para retirar el exceso de grasa.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(10,2,'Para la salsa, licúa los jitomates con la cebolla, el ajo y el concentrado de tomate con pollo, agrega el cilantro y mezcla.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(11,2,'Acompaña los filetes con la salsa',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(12,3,'En una sartén grande, derrite la mantequilla a fuego medio-alto.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(13,3,'Agrega las pechugas de pollo y cocínalas hasta que estén doradas por ambos lados.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(14,3,'Incorpora las espinacas y los champiñones, y cocina por unos minutos hasta que las espinacas se hayan marchitado.',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(15,3,'Agrega el caldo de pollo y la crema de leche, y sazona con sal y pimienta al gusto.',4,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(16,3,'Cocina a fuego lento por unos 10-15 minutos, o hasta que la salsa se haya espesado y el pollo esté completamente cocido.',5,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(17,4,'Mezcla la media crema con la mayonesa, la sal, el jugo de limón, los jitomates, la cebolla, el pepino, el atún, el cilantro y el chile serrano.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(18,4,'Sirve y acompaña con galletas saladas.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(19,5,'Para la salsa, licúa el puré de tomate con el agua, el concentrado de tomate y pollo, media cucharada de el ajo y media cucharada de la cebolla en polvo y los tomates rojos. Fríe la salsa en una cacerola con aceite caliente.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(20,5,'Mezcla la carne con la media cucharada de cebolla en polvo y la media cucharada de ajo en polvo y forma las albóndigas.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(21,5,'Agrega las albóndigas a la salsa que ya preparaste, cocina por 15 minutos y añade la leche evaporada. Sirve el espagueti previamente cocido y escurrido en un refractario y báñala con la salsa.',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(22,6,'En un tazón colocar la carne, el ajo en polvo, el caldo de carne de res, la pimienta molida y marinar por 5 minutos.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(23,6,'En una cacerola grande colocar el aceite, la cebolla, el ajo, el apio y sofreír por 2 minutos.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(24,6,'Añadir la carne y cocinar por 10 minutos revolviendo constantemente.',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(25,6,'Cuando la carne adquiera una tonalidad gris clara, añadir la salsa de tomate estilo boloñesa, el agua, las hojas de laurel, sal, pimienta y cocinar a fuego medio por 15 minutos.',4,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(26,6,'Al momento de montar la lasaña, untar con un poco de aceite un recipiente refractario o la bandeja que utilice. Colocar una pequeña cantidad de salsa, cubrir el fondo de la bandeja con lascas de pasta precocida, verter una cantidad pequeña de carne, añadir el queso mozzarella y una mínima parte de queso parmesano.',5,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(27,7,'Licúa la mitad del caldo con los jitomates, el ajo y la cebolla; cuela.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(28,7,'Calienta el aceite, fríe el fideo hasta que cambie de color, añade el resto del caldo con lo que licuaste y el brócoli; tapa y cocina a fuego medio de 8 a 10 minutos o hasta que el fideo y el brócoli estén suaves.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(29,7,'Agrega el concentrado de tomate con pollo, mezcla y cocina 2 minutos más. ',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(30,8,'Horno precalentado a 180 °C.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(31,8,'Con ayuda de un rodillo, extiende la pasta hojaldre sobre una superficie enharinada y corta cuadros de 15 cm. Coloca un poco de alcachofas y Queso Chihuahua al centro de cada cuadrado, cierra presionando las orillas con un tenedor y barniza con el huevo; colócalas sobre una charola con papel encerado, espolvorea un poco de ajonjolí sobre cada empanada y hornea a 180 °C por 30 minutos.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(32,8,'Para el dip, licua la media crema con el pimiento y la sal con cebolla en polvo. Reserva. ',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(33,8,'Acompaña con el dip de pimiento. ',4,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(34,9,'Licúa la Leche condensada con la leche evaporada y sin dejar de licuar, agrega poco a poco el jugo de limón.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(35,9,'En un refractario cuadrado, coloca una capa de galletas, un poco de la mezcla de limón y repite hasta terminar con el resto de los ingredientes. Cubre con plástico adherente y refrigera por 1 hora o hasta que esté firme.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(36,9,'Decora con las rodajas de limón, las galletas troceadas, las hojas de menta y la ralladura de limón.',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(37,10,'Licúa la leche evaporada con la leche condensada, la media crema, el agua y 5 mazapanes, con la licuadora encendida agrega poco a poco la grenetina disuelta.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(38,10,'Vierte lo que licuaste en un molde para gelatina engrasado, refrigera hasta que cuaje por completo.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(39,10,'Desmolda, decora con el resto del mazapán y las fresas.',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(40,11,'Licúa el arroz con la leche condensada, la leche evaporada, el agua y la canela.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(41,11,'Cuela y sirve en vasos con hielo.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(42,11,'Decora con canela molida.',3,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(43,12,'Licúa la leche evaporada, el jugo de piña y la crema de coco.',1,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(44,12,'Vierte en vasos con un poco de hielo.',2,1,1,'2024-04-30 05:10:22',NULL,NULL,NULL,NULL),(56,13,'Mezcla el huevo con la sal con ajo y cocina hasta que el huevo esté dorado ligeramente',1,1,4,'2024-06-11 17:14:56',4,'2024-06-11 17:16:06',NULL,NULL),(57,13,'Agrega los frijoles con las calabacitas y cocina a fuego bajo por 9 minutos más',2,1,4,'2024-06-11 17:15:48',4,'2024-06-11 17:16:06',NULL,NULL),(58,13,'Sirve y disfruta',3,1,4,'2024-06-11 17:16:06',4,'2024-06-11 17:16:06',NULL,NULL),(59,15,'Asa el chorizo hasta que esté dorado.',1,1,4,'2024-06-11 17:18:22',4,'2024-06-11 17:19:09',NULL,NULL),(60,15,'Mezcla el huevo con la sal con ajo y cocina hasta que el huevo esté dorado ligeramente\n',2,1,4,'2024-06-11 17:18:29',4,'2024-06-11 17:19:09',NULL,NULL),(61,15,'Agrega los frijoles y cocina a fuego bajo por 9 minutos más.',3,1,4,'2024-06-11 17:19:00',4,'2024-06-11 17:19:09',NULL,NULL),(62,15,'Sirve y disfruta',4,1,4,'2024-06-11 17:19:09',4,'2024-06-11 17:19:09',NULL,NULL),(63,16,'Asar el chorizo hasta que esté dorado.',1,1,4,'2024-06-11 17:19:26',4,'2024-06-11 17:20:08',NULL,NULL),(64,16,'Hervir las papas y cortarlas en cuadros.',2,1,4,'2024-06-11 17:19:42',4,'2024-06-11 17:20:08',NULL,NULL),(65,16,'Mezclar las papas con el chorizo.',3,1,4,'2024-06-11 17:19:56',4,'2024-06-11 17:20:08',NULL,NULL),(66,16,'Agregar sal al gusto y disfrutar.',4,1,4,'2024-06-11 17:20:07',4,'2024-06-11 17:20:08',NULL,NULL),(67,17,'Hervir las papas, pelarlas y cortar en cubos.',1,1,4,'2024-06-11 17:20:37',4,'2024-06-11 17:21:22',NULL,NULL),(68,17,'Revolver las papas con el queso y sal al gusto.',2,1,4,'2024-06-11 17:20:58',4,'2024-06-11 17:21:22',NULL,NULL),(69,17,'Agregar frijoles refritos a un lado.',3,1,4,'2024-06-11 17:21:12',4,'2024-06-11 17:21:23',NULL,NULL),(70,17,'Disfrutar',4,1,4,'2024-06-11 17:21:22',4,'2024-06-11 17:21:23',NULL,NULL);
-/*!40000 ALTER TABLE `receta_instrucciones` ENABLE KEYS */;
+INSERT INTO `receta_instrucciones` (`Id_Receta`, `Instruccion`, `Orden`, `Activo`, `Id_Usuario_Alta`, `Fecha_Alta`) VALUES
+(26, 'Lava y corta las calabacitas en rodajas.', 1, 1, 1, '2024-04-28 01:30:24'),
+(26, 'Calienta una sartén con un poco de aceite.', 2, 1, 1, '2024-04-28 01:30:24'),
+(26, 'Agrega las calabacitas y sofríe hasta que estén suaves.', 3, 1, 1, '2024-04-28 01:30:24'),
+(26, 'Añade los frijoles cocidos y mezcla.', 4, 1, 1, '2024-04-28 01:30:24'),
+(26, 'Bate los huevos y viértelos en la sartén.', 5, 1, 1, '2024-04-28 01:30:24'),
+(26, 'Cocina todo junto hasta que los huevos estén bien cocidos.', 6, 1, 1, '2024-04-28 01:30:24'),
+
+-- Pescado empanizado
+(27, 'Lava y seca los filetes de pescado.', 1, 1, 1, '2024-04-28 01:30:24'),
+(27, 'Coloca el pan molido en un plato hondo.', 2, 1, 1, '2024-04-28 01:30:24'),
+(27, 'Pasa los filetes de pescado por el pan molido, asegurándote de que queden bien cubiertos.', 3, 1, 1, '2024-04-28 01:30:24'),
+(27, 'Calienta suficiente aceite en una sartén.', 4, 1, 1, '2024-04-28 01:30:24'),
+(27, 'Fríe los filetes empanizados hasta que estén dorados por ambos lados.', 5, 1, 1, '2024-04-28 01:30:24'),
+(27, 'Escurre sobre papel absorbente y sirve.', 6, 1, 1, '2024-04-28 01:30:24'),
+
+-- Pechuga con espinacas al champiñón
+(28, 'Lava las espinacas y los champiñones.', 1, 1, 1, '2024-04-28 01:30:24'),
+(28, 'Corta los champiñones en láminas finas.', 2, 1, 1, '2024-04-28 01:30:24'),
+(28, 'En una sartén, saltea las espinacas y los champiñones con un poco de aceite.', 3, 1, 1, '2024-04-28 01:30:24'),
+(28, 'Condimenta la pechuga de pollo con sal y pimienta.', 4, 1, 1, '2024-04-28 01:30:24'),
+(28, 'Cocina la pechuga de pollo a la plancha hasta que esté dorada y bien cocida.', 5, 1, 1, '2024-04-28 01:30:24'),
+(28, 'Sirve la pechuga con las espinacas y champiñones salteados encima.', 6, 1, 1, '2024-04-28 01:30:24'),
+-- Ensalada de atún
+(29, 'Abre la lata de atún y escúrrelo bien.', 1, 1, 1, '2024-04-28 01:30:24'),
+(29, 'Corta el tomate y la lechuga en trozos pequeños.', 2, 1, 1, '2024-04-28 01:30:24'),
+(29, 'Mezcla todos los ingredientes en un bol.', 3, 1, 1, '2024-04-28 01:30:24'),
+(29, 'Añade mayonesa al gusto y mezcla bien.', 4, 1, 1, '2024-04-28 01:30:24'),
+
+-- Espagueti con albóndigas
+(30, 'Cuece el espagueti en agua con sal según las indicaciones del paquete.', 1, 1, 1, '2024-04-28 01:30:24'),
+(30, 'Forma albóndigas con la carne molida y empanízalas con pan rallado.', 2, 1, 1, '2024-04-28 01:30:24'),
+(30, 'Fría las albóndigas hasta que estén doradas por fuera.', 3, 1, 1, '2024-04-28 01:30:24'),
+(30, 'Sirve las albóndigas con el espagueti y espolvorea con queso parmesano.', 4, 1, 1, '2024-04-28 01:30:24'),
+
+-- Lasaña
+(31, 'Cocina la carne molida con un poco de aceite.', 1, 1, 1, '2024-04-28 01:30:24'),
+(31, 'Mezcla la carne cocida con la salsa de tomate.', 2, 1, 1, '2024-04-28 01:30:24'),
+(31, 'En un recipiente para hornear, intercala capas de carne, queso ricotta y queso mozzarella.', 3, 1, 1, '2024-04-28 01:30:24'),
+(31, 'Hornea la lasaña a 180°C durante 40 minutos.', 4, 1, 1, '2024-04-28 01:30:24'),
+
+-- Sopa de fideo con brócoli
+(32, 'Cocina los fideos en agua con sal.', 1, 1, 1, '2024-04-28 01:30:24'),
+(32, 'En otra sartén, saltea el brócoli con zanahoria.', 2, 1, 1, '2024-04-28 01:30:24'),
+(32, 'Añade los fideos cocidos al brócoli y mezcla bien.', 3, 1, 1, '2024-04-28 01:30:24'),
+
+-- Empanadas de alcachofa
+(33, 'Cocina la alcachofa y córtala en trozos pequeños.', 1, 1, 1, '2024-04-28 01:30:24'),
+(33, 'Mezcla la alcachofa con el queso y jamón.', 2, 1, 1, '2024-04-28 01:30:24'),
+(33, 'Forma las empanadas y fríelas en aceite caliente.', 3, 1, 1, '2024-04-28 01:30:24'),
+
+-- Carlota de limón
+(34, 'Sumerge las galletas marías en jugo de limón.', 1, 1, 1, '2024-04-28 01:30:24'),
+(34, 'En un molde, coloca las galletas y una capa de leche condensada.', 2, 1, 1, '2024-04-28 01:30:24'),
+(34, 'Repite las capas hasta terminar los ingredientes.', 3, 1, 1, '2024-04-28 01:30:24'),
+
+-- Gelatina de mazapan
+(35, 'Disuelve la gelatina en agua caliente.', 1, 1, 1, '2024-04-28 01:30:24'),
+(35, 'Mezcla la gelatina con leche y mazapán triturado.', 2, 1, 1, '2024-04-28 01:30:24'),
+(35, 'Refrigera la mezcla hasta que cuaje.', 3, 1, 1, '2024-04-28 01:30:24'),
+
+-- Agua de horchata
+(36, 'Lava el arroz y colócalo en agua con canela.', 1, 1, 1, '2024-04-28 01:30:24'),
+(36, 'Licúa el arroz con el agua, colando la mezcla.', 2, 1, 1, '2024-04-28 01:30:24'),
+(36, 'Añade azúcar al gusto y sirve fría.', 3, 1, 1, '2024-04-28 01:30:24'),
+
+-- Piña colada
+(37, 'Licúa la piña con la leche de coco y ron.', 1, 1, 1, '2024-04-28 01:30:24'),
+(37, 'Sirve bien fría en un vaso decorado.', 2, 1, 1, '2024-04-28 01:30:24'),
+
+-- Huevos con jamón y Frijoles
+(38, 'Fría los huevos y el jamón.', 1, 1, 1, '2024-04-28 01:30:24'),
+(38, 'Sirve con los frijoles ya cocidos.', 2, 1, 1, '2024-04-28 01:30:24'),
+
+-- Calabacitas con queso panela y Frijoles
+(39, 'Fría las calabacitas con el queso panela.', 1, 1, 1, '2024-04-28 01:30:24'),
+(39, 'Sirve con frijoles cocidos.', 2, 1, 1, '2024-04-28 01:30:24'),
+
+-- Huevos con chorizo y Frijoles
+(40, 'Fría los huevos con el chorizo.', 1, 1, 1, '2024-04-28 01:30:24'),
+(40, 'Sirve con frijoles ya cocidos.', 2, 1, 1, '2024-04-28 01:30:24'),
+
+-- Papas con chorizo y Frijoles
+(41, 'Cocina las papas con el chorizo.', 1, 1, 1, '2024-04-28 01:30:24'),
+(41, 'Sirve con los frijoles ya cocidos.', 2, 1, 1, '2024-04-28 01:30:24'),
+
+-- Papas con queso y Frijoles
+(42, 'Cocina las papas con el queso.', 1, 1, 1, '2024-04-28 01:30:24'),
+(42, 'Sirve con los frijoles ya cocidos.', 2, 1, 1, '2024-04-28 01:30:24');
 UNLOCK TABLES;
 
 --
@@ -640,7 +810,7 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `Id_Usuario` int NOT NULL AUTO_INCREMENT,
-  `Nombre_Usuario` varchar(250) NOT NULL ,
+  `Nombre_Usuario` varchar(250) NOT NULL unique,
   `Contrasena` varchar(250) NOT NULL ,
   `foto_perfil` VARCHAR(255),
   `Cohabitantes` int NOT NULL DEFAULT (1),

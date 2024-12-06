@@ -146,18 +146,10 @@ export default function EDreceta() {
     }
   };
 
-  // Inicialización del componente
   useEffect(() => {
     datosReceta();
     obtenerTipos();
   }, []);
-
-  const handleSyncedChange = (value: string) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      Nombre: value,
-    }));
-  };
 
   // Manejar cambios en el Select
   const handleSelectChange = (value: string | number) => {
@@ -176,9 +168,13 @@ export default function EDreceta() {
   // Manejar envío del formulario
   const handleSubmit = async () => {
     try {
+      await enviarDatosIngredientes();
+      await enviarDatosProcedimiento();
+  
+      // Aquí envías los datos de la receta principal
       const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, formData);
       if (response.status === 200) {
-        message.success("Receta actualizada correctamente.");
+        message.success("Receta y componentes actualizados correctamente.");
       } else {
         message.warning("No se pudo actualizar la receta.");
       }
@@ -187,6 +183,57 @@ export default function EDreceta() {
       message.error("Hubo un problema al enviar los datos.");
     }
   };
+
+  // Resetear el formulario
+  const onReset = () => {
+    datosReceta(); // Recargar los datos originales de la receta
+    obtenerTipos(); // Recargar los tipos
+    resetIngredientes(); // Reiniciar ingredientes
+    resetProcedimiento(); // Reiniciar procedimiento
+  };
+
+  const enviarDatosIngredientes = async () => {
+    try {
+      // Aquí puedes llamar a la API para enviar los datos actualizados desde Ingredientes.
+      console.log("Enviando datos de ingredientes...");
+    } catch (error) {
+      console.error("Error al enviar datos de ingredientes:", error);
+    }
+  };
+  
+  const enviarDatosProcedimiento = async () => {
+    try {
+      // Aquí puedes llamar a la API para enviar los datos actualizados desde Procedimiento.
+      console.log("Enviando datos de procedimiento...");
+    } catch (error) {
+      console.error("Error al enviar datos de procedimiento:", error);
+    }
+  };
+  
+  const resetIngredientes = () => {
+    // Aquí puedes implementar lógica para reiniciar ingredientes.
+    console.log("Reiniciando datos de ingredientes...");
+  };
+  
+  const resetProcedimiento = () => {
+    // Aquí puedes implementar lógica para reiniciar procedimiento.
+    console.log("Reiniciando datos de procedimiento...");
+  };
+
+  // Inicialización del componente
+  useEffect(() => {
+    datosReceta();
+    obtenerTipos();
+  }, []);
+
+  const handleSyncedChange = (value: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      Nombre: value,
+    }));
+  };
+
+
 
   
   const { TextArea } = Input;
@@ -200,10 +247,6 @@ export default function EDreceta() {
     setInputValue(e.target.value);
   };
 
-  const onReset = () => {
-    datosReceta();
-    obtenerTipos();
-  };
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
@@ -225,6 +268,10 @@ export default function EDreceta() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+
+
+  
 
     return (
       <div className='todo'>
@@ -363,10 +410,15 @@ export default function EDreceta() {
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} />
+              <Ingredientes recetaId={Number(id)} 
+            onSubmit={() => enviarDatosIngredientes()}
+            onReset={() => resetIngredientes()}/>
+
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
-                  <Proceso  recetaId={Number(id)} />
+                   <Proceso  recetaId={Number(id)} 
+             onSubmit={() => enviarDatosProcedimiento()}
+             onReset={() => resetProcedimiento()}/>
                 </div>
                 )}
               </div>

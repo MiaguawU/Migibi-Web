@@ -1,105 +1,85 @@
 import React, { useState, useEffect } from "react";
-import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
-import InsModal from "./InstruccionModal";
-import btAg from '../../Img/btAgregar.png';
-import '../Estilos/proceso.css'; // Importa el archivo CSS
+import { Card, Checkbox, Button, ConfigProvider, message } from "antd";
 import axios from "axios";
-import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
+import "../Estilos/proceso.css";
+import PUERTO from "../../config";
 
 interface ProcedimientoProps {
-  recetaId: number; // ID de la receta
+  recetaId: number;
+  onSubmit?: () => void;
+  onReset?: () => void; // Para manejar el reset externo
 }
 
 interface Item {
-  id: number; // Representa el Id_Stock_Detalle
+  id: number;
   name: string;
   isChecked: boolean;
   orden: number;
+  Activo: number;
 }
 
-const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) => {
+const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onSubmit, onReset }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [resetTrigger, setResetTrigger] = useState(false);
 
-  // Manejar envío del formulario desde el modal
-  const handleSubmit = async (values: any) => {
-    const formData = new FormData();
-    formData.append('name', values.name);
-    formData.append('quantity', values.quantity);
-    formData.append('unit', values.unit);
-    formData.append('type', values.type);
-  };
-
-  const id_receta = recetaId;
-
-  // Función para obtener los ingredientes de la receta
+  // Función para obtener las instrucciones de la receta
   const datosInstrucciones = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/proceso/${id_receta}`);
-      console.log("Datos recibidos:", response.data);
-
-      const proceso = response.data.map((instrucciones: any) => ({
-        id: instrucciones.id,
-        name: instrucciones.Nombre || "Alimento desconocido",
+      const response = await axios.get(`${PUERTO}/proceso/${recetaId}`);
+      const proceso = response.data.map((instruccion: any) => ({
+        id: instruccion.id,
+        name: instruccion.Nombre,
         isChecked: false,
-        orden: instrucciones.Orden,
+        orden: instruccion.Orden,
+        Activo: instruccion.Activo,
       }));
-
       setItems(proceso);
-      message.success("instrucciones obtenidas exitosamente");
+      message.success("Instrucciones obtenidas exitosamente.");
     } catch (error) {
-      console.error("Error al obtener Ingredientes:", error);
+      console.error("Error al obtener instrucciones:", error);
       message.error("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Efecto para cargar los datos al inicio
+  // Cargar datos al inicio y después de un reset
   useEffect(() => {
     datosInstrucciones();
-  }, []);
+  }, [resetTrigger]);
 
-  // Alternar el estado del Drawer (Agregar ingredientes)
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
+  // Escuchar cambios en el evento onReset
+  useEffect(() => {
+    if (onReset) {
+      setResetTrigger((prev) => !prev);
+    }
+  }, [onReset]);
 
-  // Manejar el cambio en los checkboxes
+  // Manejar cambios en los checkboxes
   const handleCheckboxChange = (index: number) => {
     const updatedItems = [...items];
     updatedItems[index].isChecked = !updatedItems[index].isChecked;
     setItems(updatedItems);
 
     const itemId = updatedItems[index].id;
-
     setSelectedIds((prevIds) =>
       updatedItems[index].isChecked
-        ? [...prevIds, itemId] // Agregar si está seleccionado
-        : prevIds.filter((id) => id !== itemId) // Remover si está deseleccionado
+        ? [...prevIds, itemId]
+        : prevIds.filter((id) => id !== itemId)
     );
   };
 
-  // Enviar los IDs seleccionados al servidor
+  // Eliminar instrucciones seleccionadas
   const enviarIdsSeleccionados = async () => {
     if (selectedIds.length === 0) {
-      message.warning("No has seleccionado ningún alimento.");
+      message.warning("No has seleccionado ninguna instrucción.");
       return;
     }
-
     try {
-      const response = await axios.put(`${PUERTO}/caducar`, {
-        ids: selectedIds,
-        Cantidad: 0,
-      });
-
-      console.log(response.data.message);
-      message.success("Ingredientes eliminados exitosamente.");
-
-      // Actualizar el estado local para desmarcar los seleccionados
+      await axios.put(`${PUERTO}/proED`, { ids: selectedIds, Cantidad: 0 });
+      message.success("Instrucciones eliminadas exitosamente.");
       setItems((prevItems) =>
         prevItems.map((item) => ({
           ...item,
@@ -108,30 +88,23 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
       );
       setSelectedIds([]);
     } catch (error) {
-      console.error("Error al actualizar alimentos:", error);
-      message.error("No se pudo eliminar los ingredientes.");
+      console.error("Error al eliminar instrucciones:", error);
+      message.error("No se pudo eliminar las instrucciones.");
     }
   };
 
-  // Manejar el evento del botón "Agregar"
-  const handleAgregar = () => {
-    console.log("Abrir modal o formulario para agregar nuevo ingrediente.");
-    toggleDrawer();
-  };
-
   return (
-    <>
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: "#638552",
-          },
-        }}
-      >
-        <Card
-          title={<span className="card-title">Instrucciones</span>}
-          extra={
-            <>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#638552",
+        },
+      }}
+    >
+      <Card
+        title={<span className="card-title">Instrucciones</span>}
+        extra={
+          <>
             <Button
               type="primary"
               onClick={enviarIdsSeleccionados}
@@ -139,61 +112,31 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
             >
               Eliminar
             </Button>
-            <Button type="link" onClick={toggleDrawer} className="card-button-link">Ver más</Button>
-            </>
-          }
-          className="card-container"
-          bodyStyle={{ padding: "16px" }}
-        >
-          {loading ? (
-            <p>Cargando ingredientes...</p>
-          ) : (
+          </>
+        }
+        className="card-container"
+        bodyStyle={{ padding: "16px" }}
+      >
+        {loading ? (
+          <p>Cargando instrucciones...</p>
+        ) : (
           <div className="card-checkbox-container">
-            {items.slice(0, 5).map((item, index) => (
-              <div key={index} className="card-checkbox">
-                <Checkbox
-                  checked={item.isChecked}
-                  onChange={() => handleCheckboxChange(index)}
-                  className="card-checkbox-text"
-                >
-                  {item.orden}.{item.name} 
-                </Checkbox>
-              </div>
-            ))}
-            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
-              <img className="img" src={btAg} alt="Agregar" />
-            </Button>
+            {items
+              .filter((item) => item.Activo > 0)
+              .map((item, index) => (
+                <div key={item.id} className="drawer-checkbox">
+                  <Checkbox
+                    checked={item.isChecked}
+                    onChange={() => handleCheckboxChange(index)}
+                  >
+                    {item.orden}. {item.name}
+                  </Checkbox>
+                </div>
+              ))}
           </div>
-          )}
-        </Card>
-
-        <Drawer
-          title="Agregar Ingrediente"
-          placement="right"
-          onClose={toggleDrawer}
-          open={isDrawerOpen}
-          width={300}
-        >
-          {items.map((item, index) => (
-            <div key={index} className="drawer-checkbox">
-              <Checkbox
-                checked={item.isChecked}
-                onChange={() => handleCheckboxChange(index)}
-                className="drawer-checkbox-text"
-              >
-                {item.name}
-              </Checkbox>
-            </div>
-          ))}
-        </Drawer>
-      </ConfigProvider>
-      {/* Modal externo para agregar producto */}
-      <InsModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
-      />
-    </>
+        )}
+      </Card>
+    </ConfigProvider>
   );
 };
 
