@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
 import IngModal from "./IngredienteModal";
-import btAg from '../../Img/btAgregar.png';
+import btAg from '../../Img/btagregar.png';
 import '../Estilos/ing.css'; // Importa el archivo CSS
 import axios from "axios";
 import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
 
 interface IngredientesProps {
   recetaId: number; // ID de la receta
+  onSubmit?: () => void;
+  onReset?: () => void; // Ahora opcional
 }
 
 interface Item {
@@ -19,20 +21,38 @@ interface Item {
   Activo: number;
 }
 
-const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => {
+const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({
+  recetaId,
+  onSubmit,
+  onReset,
+}) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [resetTrigger, setResetTrigger] = useState(false); // Estado para disparar reinicio
 
   // Manejar envío del formulario desde el modal
   const handleSubmit = async (values: any) => {
-    const formData = new FormData();
-    formData.append('name', values.name);
-    formData.append('quantity', values.quantity);
-    formData.append('unit', values.unit);
-    formData.append('type', values.type);
+    try {
+      const formData = {
+        name: values.name,
+        quantity: values.quantity,
+        unit: values.unit,
+        type: values.type,
+      };
+
+      const response = await axios.post(`${PUERTO}/ingredientes`, formData);
+      console.log("Ingrediente agregado:", response.data);
+
+      message.success("Ingrediente agregado correctamente.");
+      datosAlimento(); // Refrescar la lista de ingredientes
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error al agregar ingrediente:", error);
+      message.error("No se pudo agregar el ingrediente.");
+    }
   };
 
   const id_receta = recetaId;
@@ -65,7 +85,12 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
   // Efecto para cargar los datos al inicio
   useEffect(() => {
     datosAlimento();
-  }, []);
+  }, [resetTrigger]); // Agregar resetTrigger como dependencia
+
+  // Efecto para escuchar el evento onReset
+  useEffect(() => {
+    onReset && setResetTrigger((prev) => !prev);
+  }, [onReset]);
 
   // Alternar el estado del Drawer (Agregar ingredientes)
   const toggleDrawer = () => {
@@ -117,12 +142,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
     }
   };
 
-  // Manejar el evento del botón "Agregar"
-  const handleAgregar = () => {
-    console.log("Abrir modal o formulario para agregar nuevo ingrediente.");
-    toggleDrawer();
-  };
-
   return (
     <>
       <ConfigProvider
@@ -135,13 +154,18 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
         <Card
           title={<span className="card-title">Ingredientes</span>}
           extra={
-            <><Button
-              type="primary"
-              onClick={enviarIdsSeleccionados}
-              disabled={selectedIds.length === 0}
-            >
-              Eliminar
-            </Button><Button type="link" onClick={toggleDrawer} className="card-button-link">Ver más</Button></>
+            <>
+              <Button
+                type="primary"
+                onClick={enviarIdsSeleccionados}
+                disabled={selectedIds.length === 0}
+              >
+                Eliminar
+              </Button>
+              <Button type="link" onClick={toggleDrawer} className="card-button-link">
+                Ver más
+              </Button>
+            </>
           }
           className="card-container"
           bodyStyle={{ padding: "16px" }}
@@ -149,24 +173,24 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
           {loading ? (
             <p>Cargando ingredientes...</p>
           ) : (
-          <div className="card-checkbox-container">
-            {items
-                .filter((item) => item.Activo > 0) 
+            <div className="card-checkbox-container">
+              {items
+                .filter((item) => item.Activo > 0)
                 .map((item, index) => (
-              <div key={index} className="card-checkbox">
-                <Checkbox
-                  checked={item.isChecked}
-                  onChange={() => handleCheckboxChange(index)}
-                  className="card-checkbox-text"
-                >
-                  {item.name} {item.cantidad} {item.unidad}
-                </Checkbox>
-              </div>
-            ))}
-            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
-              <img className="img" src={btAg} alt="Agregar" />
-            </Button>
-          </div>
+                  <div key={index} className="card-checkbox">
+                    <Checkbox
+                      checked={item.isChecked}
+                      onChange={() => handleCheckboxChange(index)}
+                      className="card-checkbox-text"
+                    >
+                      {item.name} {item.cantidad} {item.unidad}
+                    </Checkbox>
+                  </div>
+                ))}
+              <Button className="btAg" onClick={() => setIsModalOpen(true)}>
+                <img className="img" src={btAg} alt="Agregar" />
+              </Button>
+            </div>
           )}
         </Card>
 
@@ -199,7 +223,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId }) => 
       />
     </>
   );
-  
 };
 
 export default IngredientesRecetaEditar;

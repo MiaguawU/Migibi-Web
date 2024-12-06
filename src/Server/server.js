@@ -21,6 +21,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require('path');
 const Procedimiento = require("./base/Procedimiento")
+const ProREAL = require("./base/ProcedimientoREAL")
 
 dotenv.config();
 
@@ -122,6 +123,7 @@ app.use("/ingredientes", Ingredientes);
 app.use("/tipoC", tipo_consumo);
 //Procedimiento (Instrucciones)
 app.use("/proceso", Procedimiento);
+app.use("/proED" , ProREAL);
 
 //modificar alimentos
 app.use("/alimento", alimento);
