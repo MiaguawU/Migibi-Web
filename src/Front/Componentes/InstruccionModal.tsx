@@ -1,11 +1,13 @@
 import React, { useState} from 'react';
-import { Modal, Form, Input, Button, InputNumber, Select, ConfigProvider} from 'antd';
-
+import { Modal, Form, Input, Button, InputNumber, Select, ConfigProvider, message} from 'antd';
+import axios from "axios";
+import PUERTO from "../../config";
 
 const { TextArea } = Input;
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
+  recetaId: number;
   onSubmit: (values: any) => void;
 }
 
@@ -20,14 +22,50 @@ const formItemLayout = {
   },
 };
 
-const InsModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) => {
+const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId ,onSubmit }) => {
   const [form] = Form.useForm();
 
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
   
+
+  const handleSubmit = async (values: any) => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+  
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+    const user = usuarios[currentUser];
+  
+    if (!user) {
+      message.warning("Usuario no encontrado en los datos locales.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('order', values.order);
+    formData.append('instruccion', values.name);
+    formData.append('Id_Usuario_Alta', currentUser);
+  
+  
+    try {
+      const response = await axios.post(`${PUERTO}/alimento`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      message.success('Producto agregado');
+      form.resetFields();
+    } catch (error) {
+      console.error(error);
+      message.error('Error al agregar producto');
+    }
+  };
+  
+
   const handleFinish = (values: any) => {
     onSubmit(values); // Llama a la función que maneja los datos
     form.resetFields(); // Resetea el formulario después de enviar
+    handleSubmit(values);
   };
 
   return (
