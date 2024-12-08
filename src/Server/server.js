@@ -21,6 +21,9 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require('path');
 const Procedimiento = require("./base/Procedimiento")
+const ProREAL = require("./base/ProcedimientoREAL")
+const tipo_alimento =  require("./base/cat_tipo_alimento");
+const unidad_medida = require("./base/cat_unidad_medida");
 
 dotenv.config();
 
@@ -122,11 +125,20 @@ app.use("/ingredientes", Ingredientes);
 app.use("/tipoC", tipo_consumo);
 //Procedimiento (Instrucciones)
 app.use("/proceso", Procedimiento);
+app.use("/proED" , ProREAL);
+
+
 
 //modificar alimentos
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);
 app.use("/alimentoInactivo", routerAlimentoInactivo);
+//tipo_alimento
+app.use("/tipoA", tipo_alimento);
+//unidad
+app.use("/unidad", unidad_medida);
+
+
 
 app.disable('etag'); // En Express.js
 

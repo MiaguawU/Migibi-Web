@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps } from 'antd';
 import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import axios from "axios";
+import PUERTO from "../../config";
 
 const { Option } = Select;
 
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (values: any) => void;
+}
+
+interface Tipo {
+  Id_Tipo_Alimento: number;
+  Tipo_Alimento: string;
+}
+
+interface Unidad {
+  Id_Unidad_Medida: number;
+  Unidad_Medida: string;
 }
 
 const formItemLayout = {
@@ -34,29 +45,109 @@ const props: UploadProps = {
   },
 };
 
-const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) => {
+const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const [form] = Form.useForm();
+  const [Tipos, setTipos] = useState<Tipo[]>([]);  
+  const [Unidades, setUnidad] = useState<Unidad[]>([]); 
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
-  const [searchTerm, setSearchTerm] = useState('');
-  const [alimentosPerecederos, setAlimentosPerecederos] = useState<string[]>([]);
-  const [alimentosNoPerecederos, setAlimentosNoPerecederos] = useState<string[]>([]);
+  const props: UploadProps = {
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith('image/'); // Verifica que sea cualquier tipo de imagen
+      if (!isImage) {
+        message.error(`${file.name} no es un archivo de imagen válido`);
+      }
+      return isImage || Upload.LIST_IGNORE;
+    },
+    onChange: (info) => {
+      console.log(info.fileList);
+    },
+  };
   
-  const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
-    const nombre = alimento;
-    return (
-      nombre.includes(searchTerm) 
-    );
-  });
+
+  useEffect(() => {
+    if (visible) {
+      obtenerTipos();
+      obtenerUnidad();
+    }
+  }, [visible]);
+
+  const obtenerTipos = async () => {
+    try {
+      const response = await axios.get(`${PUERTO}/tipoA`);
+      setTipos(response.data);
+    } catch {
+      message.error("No se pudieron cargar los tipos.");
+    }
+  };
+  const obtenerUnidad = async () => {
+    try {
+      const response = await axios.get(`${PUERTO}/unidad`);
+      setUnidad(response.data);
+    } catch {
+      message.error("No se pudieron cargar las unidades.");
+    }
+  };
+
+  const agregarAlimento= async () => {
+    try {
+      const response = await axios.get(`${PUERTO}/unidad`);
+      setUnidad(response.data);
+    } catch {
+      message.error("No se pudieron cargar las unidades.");
+    }
+  };
+
+  const handleSubmit = async (values: any) => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
   
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+    const user = usuarios[currentUser];
+  
+    if (!user) {
+      message.warning("Usuario no encontrado en los datos locales.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('nombre', values.name);
+    formData.append('fecha_caducidad', values.expirationDate || '');
+    formData.append('cantidad', values.quantity);
+    formData.append('id_unidad', values.unit);
+    formData.append('tipo', values.type);
+    formData.append('Id_Usuario_Alta', currentUser);
+  
+    if (values.imgsrc && values.imgsrc.file) {
+      formData.append('image', values.imgsrc.file.originFileObj);
+    } else { 
+      
+    }
+    
+  
+    try {
+      const response = await axios.post(`${PUERTO}/alimento`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      message.success('Producto agregado');
+      form.resetFields();
+    } catch (error) {
+      console.error(error);
+      message.error('Error al agregar producto');
+    }
+  };
+  
+
   const handleFinish = (values: any) => {
-    onSubmit(values); // Llama a la función que maneja los datos
+    handleSubmit(values); // Llama a la función que maneja los datos
     form.resetFields(); // Resetea el formulario después de enviar
+    handleSubmit(values);
   };
 
-  const handleSearch = (value: string) => {
-    setSearchTerm(value.toLowerCase());
-  };
+  
+
   return (
     <ConfigProvider
       theme={{
@@ -79,33 +170,22 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
         visible={visible}
         onCancel={onClose}
         footer={null} // Elimina los botones predeterminados del modal
-        
       >
-        
         <Form
           {...formItemLayout}
           form={form}
           style={{ maxWidth: 600 }}
           onFinish={handleFinish} // Se conecta al envío
         >
-          {/* Input de nombre con botón */}
           <Form.Item
             name="name"
             label="Nombre"
             rules={[{ required: true, message: 'Por favor, introduce el nombre' }]}
           >
-            <Input.Search
-              placeholder="Buscar ingrediente"
-              onSearch={handleSearch}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+            <Input placeholder="Nombre alimento" />
           </Form.Item>
 
-          {/* Selector de Fecha */}
-          <Form.Item
-            name="expirationDate"
-            label="Fecha de caducidad"
-          >
+          <Form.Item name="expirationDate" label="Fecha de caducidad">
             <DatePicker
               style={{ width: '100%' }}
               format="YYYY-MM-DD"
@@ -113,7 +193,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
             />
           </Form.Item>
 
-          {/* Input de cantidad */}
           <Form.Item
             name="quantity"
             label="Cantidad"
@@ -132,55 +211,53 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) 
             />
           </Form.Item>
 
-          {/* Select de unidades */}
           <Form.Item
             name="unit"
             label="Unidad"
             rules={[{ required: true, message: 'Por favor, selecciona una unidad' }]}
           >
             <Select placeholder="Selecciona una unidad">
-              <Option value="kg">kg</Option>
-              <Option value="g">g</Option>
-              <Option value="l">l</Option>
-              <Option value="pz">pz</Option>
+              {Unidades.map((unidad) => (
+                <Option key={unidad.Id_Unidad_Medida} value={unidad.Id_Unidad_Medida}>
+                  {unidad.Unidad_Medida}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
-          {/* Select de tipo */}
           <Form.Item
             name="type"
             label="Tipo"
             rules={[{ required: true, message: 'Por favor, selecciona el tipo de alimento' }]}
           >
             <Select placeholder="Selecciona el tipo de alimento">
-              <Option value="kg">Vegetal</Option>
-              <Option value="g">Fruta</Option>
-              <Option value="l">Camaron</Option>
-              <Option value="pz">Pepe</Option>
+              {Tipos.map((tipo) => (
+                <Option key={tipo.Id_Tipo_Alimento} value={tipo.Id_Tipo_Alimento}>
+                  {tipo.Tipo_Alimento}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
-
           <Form.Item name="imgsrc" label="Imagen">
-            <Upload accept=".jpg,.png" listType="picture" maxCount={1} {...props}>
-              <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            <Upload listType="picture" maxCount={1} {...props}>
+              <Button icon={<UploadOutlined />}>Subir Imagen</Button>
             </Upload>
           </Form.Item>
 
-          {/* Botón de enviar */}
+
           <Form.Item
             wrapperCol={{
-                xs: { span: 24 },
-                sm: { span: 24 }, // Ocupa todo el espacio
-                offset: 0, // Sin desplazamiento
-            }}>
+              xs: { span: 24 },
+              sm: { span: 24 }, // Ocupa todo el espacio
+              offset: 0, // Sin desplazamiento
+            }}
+          >
             <Button type="primary" htmlType="submit" block>
               Guardar
             </Button>
           </Form.Item>
-
         </Form>
-
       </Modal>
     </ConfigProvider>
   );

@@ -1,11 +1,29 @@
-const express = require('express');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const db = require('./connection');
-const router = express.Router();
+const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const db = require("./connection");
+const util = require("util");
+const Joi = require("joi");
 
-const uploadDir = path.join(__dirname, '../imagenes');
+const router = express.Router();
+const BASE_IMAGE_URL = process.env.BASE_IMAGE_URL; // URL base del servidor
+
+// Validación de datos con Joi
+const recetaSchema = Joi.object({
+  nombre: Joi.string().required(),
+  tiempo: Joi.string().required(),
+  porciones: Joi.number().integer().min(1).required(),
+  calorias: Joi.number().integer().min(0).required(),
+  id_tipo_consumo: Joi.number().integer().required(),
+});
+
+
+// Asincronizar consultas de la base de datos
+const queryAsync = util.promisify(db.query).bind(db);
+
+// Configuración para almacenamiento de imágenes
+const uploadDir = path.join(__dirname, "../imagenes");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -13,16 +31,14 @@ if (!fs.existsSync(uploadDir)) {
 const storage = multer.diskStorage({
   destination: uploadDir,
   filename: (req, file, cb) => {
-    console.log("Archivo recibido:", file);
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
   },
 });
 
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024,  // Limite de tamaño de archivo 5MB
-  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // Límite de tamaño de archivo 5MB
   fileFilter: (req, file, cb) => {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
       return cb(new Error("Solo se permiten imágenes PNG, JPG o JPEG"));
@@ -31,207 +47,148 @@ const upload = multer({
   },
 });
 
+// Endpoint: Crear una receta
 router.post("/", (req, res, next) => {
-  // Procesar la carga de la imagen antes de continuar con el resto del proceso
-  upload.single('image')(req, res, (err) => {
+  upload.single("image")(req, res, (err) => {
     if (err) {
-      console.error('Error al procesar la imagen:', err);
-      return res.status(500).send('Error al procesar la imagen');
+      console.error("Error al procesar la imagen:", err);
+      return res.status(500).send("Error al procesar la imagen");
     }
 
-    const { nombre, id_tipo_consumo, tiempo, calorias , id_usuario_alta, fecha_alta } = req.body;
+    const { nombre, id_tipo_consumo, tiempo, calorias } = req.body;
 
-    console.log("Headers:", req.headers);
-    console.log("Body recibido:", req.body);
+    const { error } = recetaSchema.validate({ nombre, id_tipo_consumo, tiempo, calorias });
+    if (error) return res.status(400).send(error.details[0].message);
 
-    // Validar que los campos requeridos estén presentes
-    if (!nombre || !id_tipo_consumo || !id_usuario_alta || !fecha_alta) {
-      return res.status(400).send("Faltan datos requeridos");
-    }
-
-    // Establecer la imagen predeterminada si no se sube una imagen
     const imagen = req.file ? `../imagenes/${req.file.filename}` : `/imagenes/defRec.png`;
 
-    // Consulta 1: Inserción en la tabla `receta`
-    const query1 = `
-      INSERT INTO receta (Nombre, Id_Tipo_Consumo, Tiempo, Calorias, Imagen_receta, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+    const query = `
+      INSERT INTO receta (Nombre, Id_Tipo_Consumo, Tiempo, Calorias, Imagen_receta) 
+      VALUES (?, ?, ?, ?, ?)
     `;
-    const values1 = [nombre, id_tipo_consumo, tiempo, calorias, imagen, id_usuario_alta, fecha_alta];
-
-    // Ejecutar la inserción en la tabla `receta`
-    db.query(query1, values1, (err1, result1) => {
-      if (err1) {
-        console.error("Error al insertar en receta:", err1);
-        return res.status(500).send("Error al agregar receta");
-      }
-
-      // Obtener el id de la receta recién insertada
-      const idReceta = result1.insertId;
-
-      const query = `
-      UPDATE receta_detalle
-      SET Id_Receta = ?
-      WHERE Id_Receta_Detalle = ?
-    `;
-    const values = [idReceta];
+    const values = [nombre, id_tipo_consumo, tiempo, calorias, imagen];
 
     db.query(query, values, (err, result) => {
       if (err) {
-        console.error("Error al actualizar el detalle de receta:", err);
-        return res.status(500).send("Error al actualizar el ingrediente");
+        console.error("Error al agregar receta:", err);
+        return res.status(500).send("Error al agregar receta");
       }
-      if (result.affectedRows === 0) {
-        return res.status(404).send("Detalle de receta no encontrado");
-      }
-      res.json({ message: "Ingrediente actualizado con éxito" });
-    });
-
-    const query5 = `
-      UPDATE receta_instrucciones
-      SET Id_Receta = ?
-      WHERE Id_Receta_Instrucciones = ?
-    `;
-    const values5 = [idReceta];
-
-    db.query(query5, values5, (err5, result5) => {
-      if (err) {
-        console.error("Error al actualizar la instrucción:", err5);
-        return res.status(500).send("Error al actualizar la instrucción");
-      }
-      if (result5.affectedRows === 0) {
-        return res.status(404).send("Instrucción no encontrada");
-      }
-      res.json({ message: "Instrucción actualizada con éxito" });
-    });
-
-      res.json({ id: idReceta, message: "Receta y detalles agregados con éxito" });
+      res.json({ id: result.insertId, message: "Receta agregada con éxito" });
     });
   });
 });
 
-// Ruta para obtener una receta y sus detalles
-router.get("/:id", (req, res) => {
-    const { id } = req.params;
-  
-    //nombre receta
-    //imagen
-    //tiempo
-    //tipo
-    //porciones
-    //calorias
-    
-    const query1 = `
-          SELECT 
-              r.Nombre AS Nombre,
-              r.Calorias AS Calorias,
-              r.Id_Tipo_Consumo AS id_Tipo,
-              r.Imagen_receta AS Imagen,
-              r.Tiempo AS Tiempo
-          FROM 
-              receta r
-          WHERE 
-              r.Id_Receta = ?;`;
-
-        console.log("id recibido");
-    
-    db.query(query1, [id], (err1, result1) => {
-      if (err1) {
-        console.error("Error al obtener receta:", err1);
-        return res.status(500).send("Error al obtener receta");
-      }
-  
-      if (result1.length === 0) {
-        return res.status(404).send("Receta no encontrada");
-      }
-      console.log("receta enviada", result1);
-      res.json(result1)
-    });
-  });
-
-  // Ruta para actualizar una receta y sus detalles
-router.put("/:id", (req, res) => {
-    const { id } = req.params;
-    const { nombre, id_tipo_consumo, id_usuario_alta, fecha_alta, ingredientes } = req.body;
-  
-    // Validar los campos requeridos
-    if (!nombre || !id_tipo_consumo || !id_usuario_alta || !fecha_alta) {
-      return res.status(400).send("Faltan datos requeridos");
+// Endpoint: Actualizar una receta
+router.put("/:id", (req, res, next) => {
+  upload.single("image")(req, res, (err) => {
+    if (err) {
+      console.error("Error al procesar la imagen:", err);
+      return res.status(500).send("Error al procesar la imagen");
     }
-  
-    // Consulta para actualizar la receta
-    const query1 = `
+
+    const { id } = req.params;
+    const { nombre, id_tipo_consumo, tiempo, porciones, calorias } = req.body;
+    console.log("Datos recibidos en el servidor:", req.body);
+
+
+    // Validar los datos del cuerpo
+    const { error } = recetaSchema.validate({
+      nombre,
+      id_tipo_consumo,
+      tiempo,
+      calorias,
+      porciones,
+    });    
+    if (error) {
+      console.error("Error en la validación:", error.details[0].message);
+      return res.status(400).send(error.details[0].message);
+    }
+    
+
+    // Verificar si se subió una imagen
+    const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defRec.png`;
+
+    // Actualizar la receta
+    const query = `
       UPDATE receta 
-      SET Nombre = ?, Id_Tipo_Consumo = ?, Id_Usuario_Alta = ?, Fecha_Alta = ? 
+      SET Nombre = ?, Id_Tipo_Consumo = ?, Tiempo = ?, Porciones = ?, Calorias = ?, Imagen_receta = ?
       WHERE Id_Receta = ?
     `;
-    const values1 = [nombre, id_tipo_consumo, id_usuario_alta, fecha_alta, id];
-  
-    db.query(query1, values1, (err1, result1) => {
-      if (err1) {
-        console.error("Error al actualizar receta:", err1);
+    const values = [nombre, id_tipo_consumo, tiempo, porciones, calorias, imagen, id];
+
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error al actualizar receta:", err);
         return res.status(500).send("Error al actualizar receta");
       }
-  
-      // Actualizar los detalles de la receta
-      if (ingredientes && Array.isArray(ingredientes)) {
-        // Primero eliminamos los detalles de receta existentes
-        const deleteQuery = `DELETE FROM receta_detalle WHERE Id_Receta = ?`;
-        db.query(deleteQuery, [id], (err2) => {
-          if (err2) {
-            console.error("Error al eliminar detalles de receta:", err2);
-            return res.status(500).send("Error al actualizar detalles de receta");
-          }
-  
-          // Insertar los nuevos ingredientes
-          const insertQuery = `
-            INSERT INTO receta_detalle (Id_Receta, Id_Ingrediente, Cantidad, Id_Unidad_Medida) 
-            VALUES (?, ?, ?, ?)
-          `;
-  
-          ingredientes.forEach(ingrediente => {
-            const { id_ingrediente, cantidad, id_unidad } = ingrediente;
-            const values2 = [id, id_ingrediente, cantidad, id_unidad];
-  
-            db.query(insertQuery, values2, (err3) => {
-              if (err3) {
-                console.error("Error al insertar en receta_detalle:", err3);
-                return res.status(500).send("Error al actualizar ingredientes");
-              }
-            });
-          });
-        });
-      }
-  
       res.json({ message: "Receta actualizada con éxito" });
     });
   });
+});
 
-  
-  // Ruta para eliminar una receta y sus detalles
+
+// Endpoint: Eliminar una receta
 router.delete("/:id", (req, res) => {
-    const { id } = req.params;
-  
-    // Eliminar los detalles de receta
-    const deleteDetailsQuery = `DELETE FROM receta_detalle WHERE Id_Receta = ?`;
-    db.query(deleteDetailsQuery, [id], (err1) => {
-      if (err1) {
-        console.error("Error al eliminar detalles de receta:", err1);
-        return res.status(500).send("Error al eliminar detalles de receta");
+  const { id } = req.params;
+
+  const deleteDetailsQuery = `DELETE FROM receta_detalle WHERE Id_Receta = ?`;
+  db.query(deleteDetailsQuery, [id], (err) => {
+    if (err) {
+      console.error("Error al eliminar detalles de receta:", err);
+      return res.status(500).send("Error al eliminar detalles de receta");
+    }
+
+    const deleteRecipeQuery = `DELETE FROM receta WHERE Id_Receta = ?`;
+    db.query(deleteRecipeQuery, [id], (err) => {
+      if (err) {
+        console.error("Error al eliminar receta:", err);
+        return res.status(500).send("Error al eliminar receta");
       }
-  
-      // Eliminar la receta
-      const deleteRecipeQuery = `DELETE FROM receta WHERE Id_Receta = ?`;
-      db.query(deleteRecipeQuery, [id], (err2) => {
-        if (err2) {
-          console.error("Error al eliminar receta:", err2);
-          return res.status(500).send("Error al eliminar receta");
-        }
-  
-        res.json({ message: "Receta y detalles eliminados con éxito" });
-      });
+      res.json({ message: "Receta y detalles eliminados con éxito" });
     });
   });
-  
+});
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+
+  //nombre receta
+  //imagen
+  //tiempo
+  //tipo
+  //porciones
+  //calorias
+ 
+  const query1 = `
+        SELECT
+            r.Nombre AS Nombre,
+            r.Calorias AS Calorias,
+            r.Id_Tipo_Consumo AS id_Tipo,
+            r.Imagen_receta AS Imagen,
+            r.Tiempo AS Tiempo,
+            r.Porciones 
+        FROM
+            receta r
+        WHERE
+            r.Id_Receta = ?;`;
+
+
+      console.log("id recibido");
+ 
+  db.query(query1, [id], (err1, result1) => {
+    if (err1) {
+      console.error("Error al obtener receta:", err1);
+      return res.status(500).send("Error al obtener receta");
+    }
+
+    if (result1.length === 0) {
+      return res.status(404).send("Receta no encontrada");
+    }
+    console.log("receta enviada", result1);
+    res.json(result1)
+  });
+});
+
+
 
 module.exports = router;

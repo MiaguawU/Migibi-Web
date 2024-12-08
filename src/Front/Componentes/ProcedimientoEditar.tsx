@@ -1,124 +1,115 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
-import InsModal from "./InstruccionModal";
-import btAg from '../../Img/btAgregar.png';
-import '../Estilos/proceso.css'; // Importa el archivo CSS
 import axios from "axios";
-import PUERTO from "../../config"; // Asegúrate de que PUERTO esté configurado correctamente
+import "../Estilos/proceso.css";
+import PUERTO from "../../config";
+import btAg from "../../Img/btagregar.png";
+import InsModal from "./InstruccionModal";
 
 interface ProcedimientoProps {
-  recetaId: number; // ID de la receta Id: number;
-  onSubmit?: () => void;
-  onReset?: () => void;
+  recetaId: number; // ID de la receta
+  onSubmit?: boolean;
+  onReset?: boolean;
 }
 
 interface Item {
-  id: number; // Representa el Id_Stock_Detalle
+  id: number;
   name: string;
   isChecked: boolean;
   orden: number;
+  Activo: number;
 }
 
-const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) => {
+const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onSubmit, onReset }) => {
   const [items, setItems] = useState<Item[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resetTrigger, setResetTrigger] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tempDeleted, setTempDeleted] = useState<Item[]>([]);
+  const [tempAdded, setTempAdded] = useState<Item[]>([]);
 
-  // Manejar envío del formulario desde el modal
-  const handleSubmit = async (values: any) => {
-    const formData = new FormData();
-    formData.append('name', values.name);
-    formData.append('quantity', values.quantity);
-    formData.append('unit', values.unit);
-    formData.append('type', values.type);
-  };
-
-  const id_receta = recetaId;
-
-  // Función para obtener los ingredientes de la receta
+  // Función para obtener las instrucciones de la receta
   const datosInstrucciones = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/proceso/${id_receta}`);
-      console.log("Datos recibidos:", response.data);
-
-      const proceso = response.data.map((instrucciones: any) => ({
-        id: instrucciones.id,
-        name: instrucciones.Nombre || "Alimento desconocido",
-        isChecked: false,
-        orden: instrucciones.Orden,
-      }));
-
+      const response = await axios.get(`${PUERTO}/proceso/${recetaId}`);
+      const proceso = response.data
+        .filter((instruccion: any) => instruccion.Activo > 0) // Filtro de instrucciones con Activo > 0
+        .map((instruccion: any) => ({
+          id: instruccion.id,
+          name: instruccion.Nombre,
+          isChecked: false,
+          orden: instruccion.Orden,
+          Activo: instruccion.Activo,
+        }));
       setItems(proceso);
-      message.success("instrucciones obtenidas exitosamente");
+      setTempDeleted([]);
+      setTempAdded([]);
+      message.success("Instrucciones obtenidas exitosamente.");
     } catch (error) {
-      console.error("Error al obtener Ingredientes:", error);
+      console.error("Error al obtener instrucciones:", error);
       message.error("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Efecto para cargar los datos al inicio
+  // Efecto para cargar datos al inicio y después de un reset
   useEffect(() => {
     datosInstrucciones();
-  }, []);
+  }, [resetTrigger]);
 
-  // Alternar el estado del Drawer (Agregar ingredientes)
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
+  useEffect(() => {
+    if (onReset) {
+      // Reinicia el estado de los checkboxes
+      setItems((prevItems) =>
+        prevItems.map((item) => ({ ...item, isChecked: false }))
+      );
+      setResetTrigger((prev) => !prev); // Dispara la recarga de datos si es necesario
+    }
+  }, [onReset]);
+
+  useEffect(() => {
+    if (onSubmit) {
+      subirCambios();
+    }
+  }, [onSubmit]);
+
+  const subirCambios = async () => {
+    try {
+      if (tempAdded.length > 0) {
+        await axios.post(`${PUERTO}/proceso/${recetaId}/agregar`, tempAdded);
+      }
+      if (tempDeleted.length > 0) {
+        const idsToDelete = tempDeleted.map((item) => item.id);
+        await axios.put(`${PUERTO}/proED`, { ids: idsToDelete });
+      }
+      message.success("Cambios enviados exitosamente.");
+    } catch (error) {
+      console.error("Error al guardar cambios:", error);
+      message.error("No se pudo guardar los cambios.");
+    }
   };
 
-  // Manejar el cambio en los checkboxes
+  const handleDeleteInstruction = (index: number) => {
+    const itemToDelete = items[index];
+    if (!tempAdded.some((item) => item.id === itemToDelete.id)) {
+      setTempDeleted((prev) => [...prev, itemToDelete]);
+    }
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleCheckboxChange = (index: number) => {
-    const updatedItems = [...items];
-    updatedItems[index].isChecked = !updatedItems[index].isChecked;
-    setItems(updatedItems);
-
-    const itemId = updatedItems[index].id;
-
-    setSelectedIds((prevIds) =>
-      updatedItems[index].isChecked
-        ? [...prevIds, itemId] // Agregar si está seleccionado
-        : prevIds.filter((id) => id !== itemId) // Remover si está deseleccionado
+    setItems((prevItems) =>
+      prevItems.map((item, i) =>
+        i === index ? { ...item, isChecked: !item.isChecked } : item
+      )
     );
   };
 
-  // Enviar los IDs seleccionados al servidor
-  const enviarIdsSeleccionados = async () => {
-    if (selectedIds.length === 0) {
-      message.warning("No has seleccionado ningún alimento.");
-      return;
-    }
-
-    try {
-      const response = await axios.put(`${PUERTO}/caducar`, {
-        ids: selectedIds,
-        Cantidad: 0,
-      });
-
-      console.log(response.data.message);
-      message.success("Ingredientes eliminados exitosamente.");
-
-      // Actualizar el estado local para desmarcar los seleccionados
-      setItems((prevItems) =>
-        prevItems.map((item) => ({
-          ...item,
-          isChecked: selectedIds.includes(item.id) ? false : item.isChecked,
-        }))
-      );
-      setSelectedIds([]);
-    } catch (error) {
-      console.error("Error al actualizar alimentos:", error);
-      message.error("No se pudo eliminar los ingredientes.");
-    }
-  };
-
-  // Manejar el evento del botón "Agregar"
-  const handleAgregar = () => {
-    console.log("Abrir modal o formulario para agregar nuevo ingrediente.");
-    toggleDrawer();
+  const handleAddInstruction = (newInstruction: Item) => {
+    setTempAdded((prev) => [...prev, newInstruction]);
+    setItems((prev) => [...prev, newInstruction]);
   };
 
   return (
@@ -133,46 +124,42 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
         <Card
           title={<span className="card-title">Instrucciones</span>}
           extra={
-            <>
-            <Button
-              type="primary"
-              onClick={enviarIdsSeleccionados}
-              disabled={selectedIds.length === 0}
-            >
-              Eliminar
+            <Button type="link" onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+              Ver más
             </Button>
-            <Button type="link" onClick={toggleDrawer} className="card-button-link">Ver más</Button>
-            </>
           }
           className="card-container"
           bodyStyle={{ padding: "16px" }}
         >
           {loading ? (
-            <p>Cargando ingredientes...</p>
+            <p>Cargando instrucciones...</p>
           ) : (
-          <div className="card-checkbox-container">
-            {items.slice(0, 5).map((item, index) => (
-              <div key={index} className="card-checkbox">
-                <Checkbox
-                  checked={item.isChecked}
-                  onChange={() => handleCheckboxChange(index)}
-                  className="card-checkbox-text"
-                >
-                  {item.orden}.{item.name} 
-                </Checkbox>
-              </div>
-            ))}
-            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
-              <img className="img" src={btAg} alt="Agregar" />
-            </Button>
-          </div>
+            <div className="card-checkbox-container">
+              {items.slice(0, 5).map((item, index) => (
+                <div key={index} className="card-checkbox">
+                  <Checkbox
+                    checked={item.isChecked}
+                    onChange={() => handleCheckboxChange(index)}
+                    className="card-checkbox-text"
+                  >
+                    {item.orden}. {item.name}
+                  </Checkbox>
+                  <Button danger onClick={() => handleDeleteInstruction(index)}>
+                    Eliminar
+                  </Button>
+                </div>
+              ))}
+              <Button className="btAg" onClick={() => setIsModalOpen(true)}>
+                <img className="img" src={btAg} alt="Agregar" />
+              </Button>
+            </div>
           )}
         </Card>
 
         <Drawer
-          title="Agregar Ingrediente"
+          title="Instrucciones"
           placement="right"
-          onClose={toggleDrawer}
+          onClose={() => setIsDrawerOpen(false)}
           open={isDrawerOpen}
           width={300}
         >
@@ -183,18 +170,23 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId }) =
                 onChange={() => handleCheckboxChange(index)}
                 className="drawer-checkbox-text"
               >
-                {item.name}
+                {item.orden}. {item.name}
               </Checkbox>
+              <Button danger onClick={() => handleDeleteInstruction(index)}>
+                Eliminar
+              </Button>
             </div>
           ))}
         </Drawer>
       </ConfigProvider>
-      {/* Modal externo para agregar producto */}
+
       <InsModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
-      />
+          visible={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={(newInstruction: Item) => handleAddInstruction(newInstruction)}
+          recetaId={recetaId}
+        />
+
     </>
   );
 };

@@ -25,7 +25,7 @@ interface Tipo {
 }
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
-  console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
+  console.log(value);
 };
 
 function getBase64(file: File, callback: (url: string) => void) {
@@ -40,7 +40,6 @@ const props: UploadProps = {
   listType: 'picture',
   previewFile(file) {
     console.log('Your upload file:', file);
-    // Your process logic. Here we just mock to the same file
     return fetch('https://next.json-generator.com/api/json/get/4ytyBoLK8', {
       method: 'POST',
       body: file,
@@ -50,32 +49,6 @@ const props: UploadProps = {
   },
 };
 
-  const enviarDatosIngredientes = async () => {
-    try {
-      // Aquí puedes llamar a la API para enviar los datos actualizados desde Ingredientes.
-      console.log("Enviando datos de ingredientes...");
-    } catch (error) {
-      console.error("Error al enviar datos de ingredientes:", error);
-    }
-  };
-  const enviarDatosProcedimiento = async () => {
-    try {
-      // Aquí puedes llamar a la API para enviar los datos actualizados desde Procedimiento.
-      console.log("Enviando datos de procedimiento...");
-    } catch (error) {
-      console.error("Error al enviar datos de procedimiento:", error);
-    }
-  };
-  const resetIngredientes = () => {
-    // Aquí puedes implementar lógica para reiniciar ingredientes.
-    console.log("Reiniciando datos de ingredientes...");
-  };
-  
-  const resetProcedimiento = () => {
-    // Aquí puedes implementar lógica para reiniciar procedimiento.
-    console.log("Reiniciando datos de procedimiento...");
-  };
-
 export default function EDreceta() {
   const [syncedValue1, setSyncedValue1] = useState("Valor inicial 1");
   const [syncedValue2, setSyncedValue2] = useState("Valor inicial 2");
@@ -84,6 +57,8 @@ export default function EDreceta() {
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resetTrigger, setResetTrigger] = useState(false);
+  const [enviarDatos, setenviarDatos] = useState(false);
   const [formData, setFormData] = useState<{
     Nombre: string;
     Imagen: string;
@@ -99,6 +74,16 @@ export default function EDreceta() {
     Porciones: 1,
     Calorias: 0,
   });
+
+  const [recetaInicial, setRecetaInicial] = useState({
+    Nombre: '',
+    Imagen: def,
+    Tiempo: dayjs('00:00:00', 'HH:mm:ss'),
+    id_Tipo: '',
+    Porciones: 1,
+    Calorias: 0,
+  });
+  
 
   const uploadProps = {
     showUploadList: false, // No mostrar la lista de archivos
@@ -134,13 +119,7 @@ export default function EDreceta() {
     }
   };
 
-  // Resetear el formulario
-  const onReset = () => {
-    datosReceta(); // Recargar los datos originales de la receta
-    obtenerTipos(); // Recargar los tipos
-    resetIngredientes(); // Reiniciar ingredientes
-    resetProcedimiento(); // Reiniciar procedimiento
-  };
+  
   // Obtener datos de la receta
   const datosReceta = async () => {
     setLoading(true);
@@ -149,25 +128,27 @@ export default function EDreceta() {
         message.warning("No se encontró el id de la receta.");
         return;
       }
+  
       const response = await axios.get(`${PUERTO}/recetaCRUD/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-
+  
       if (response.data && response.data.length > 0) {
         const receta = response.data[0];
-        setFormData({
+        const recetaCargada = {
           Nombre: receta.Nombre || '',
           Imagen: receta.Imagen?.startsWith("http")
             ? receta.Imagen
             : `${PUERTO}${receta.Imagen}`,
-          Tiempo: dayjs(receta.Tiempo, 'HH:mm:ss').isValid()
-            ? dayjs(receta.Tiempo, 'HH:mm:ss')
-            : dayjs('00:00:00', 'HH:mm:ss'),
+          Tiempo: receta.Tiempo ? dayjs(receta.Tiempo, 'HH:mm:ss') : dayjs(), // Valor por defecto
           id_Tipo: receta.id_Tipo || '',
           Porciones: receta.Porciones || 1,
           Calorias: receta.Calorias || 0,
-        });
-        message.success("Receta obtenida");
+        };
+        
+        setFormData(recetaCargada);        
+        setRecetaInicial(recetaCargada); // Guardar datos iniciales
+        message.success("Receta obtenida correctamente.");
       } else {
         message.warning("No se encontró información de la receta.");
       }
@@ -178,19 +159,23 @@ export default function EDreceta() {
       setLoading(false);
     }
   };
+  
 
   // Inicialización del componente
   useEffect(() => {
     datosReceta();
     obtenerTipos();
-  }, []);
+  }, [id]);
+  
 
   const handleSyncedChange = (value: string) => {
+    console.log("Nuevo valor para Nombre:", value);
     setFormData((prevData) => ({
       ...prevData,
       Nombre: value,
     }));
   };
+  
 
   // Manejar cambios en el Select
   const handleSelectChange = (value: string | number) => {
@@ -206,20 +191,38 @@ export default function EDreceta() {
     }
   };
 
-  // Manejar envío del formulario
-  const handleSubmit = async () => {
+ 
+  const actualizar = async () => {
     try {
-      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, formData);
+      if (!id) {
+        message.warning("No se encontró el id de la receta.");
+        return;
+      }
+  
+      const datosAEnviar = {
+        nombre: formData.Nombre,
+        tiempo: formData.Tiempo?.format('HH:mm:ss') || null,
+        porciones: formData.Porciones || 1, // En minúscula
+        calorias: formData.Calorias || 0,
+        id_tipo_consumo: formData.id_Tipo || '',
+        imagen: formData.Imagen || def,
+      };
+      
+      
+      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosAEnviar);
+  
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
       } else {
-        message.warning("No se pudo actualizar la receta.");
+        message.error("No se pudo actualizar la receta.");
       }
     } catch (error) {
       console.error("Error al actualizar receta:", error);
       message.error("Hubo un problema al enviar los datos.");
     }
   };
+  
+  
 
   
   const { TextArea } = Input;
@@ -233,6 +236,16 @@ export default function EDreceta() {
     setInputValue(e.target.value);
   };
 
+  const onReset = () => {
+    datosReceta(); // Recargar receta
+    obtenerTipos(); // Recargar tipos de consumo
+    setResetTrigger((prev) => !prev); // Cambiar trigger para componentes dependientes
+  };
+
+  const onSubmit = async () => {
+    await actualizar();
+    setenviarDatos((prev) => !prev); 
+  };
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
@@ -257,7 +270,7 @@ export default function EDreceta() {
 
     return (
       <div className='todo'>
-        <Form  form={form} onFinish={handleSubmit}>
+        <Form  form={form} >
           <div className='receta'>
               { (isMobile || isTablet) && (
               <div className='rect'>
@@ -271,12 +284,22 @@ export default function EDreceta() {
                       },
                     }}
                   >
-                    <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
+                    <SyncedInputs
+                        variant="borderless"
+                        className="nRec"
+                        placeholder1="receta"
+                        value={formData.Nombre}
+                        onChange={handleSyncedChange}
+                      />
+
                     <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                  <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
+                <Button htmlType="button" className='btEn' onClick={onSubmit}>
+                      <p className='tx2'>Enviar</p>
+                    </Button>
+
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
                 </div>
               </div>
@@ -346,25 +369,7 @@ export default function EDreceta() {
                     onChange={(value) =>
                       setFormData({ ...formData, Calorias: value || 0 })
                     }/>
-                    {/**
-                  <Select
-                    labelInValue
-                    defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-                    style={{ width: 120 }}
-                    onChange={handleChange}
-                    options={[
-                      {
-                        value: 'jack',
-                        label: 'Jack (100)',
-                      },
-                      {
-                        value: 'lucy',
-                        label: 'Lucy (101)',
-                      },
-                    ]}
-                    className='sl2'
-                    
-                  /> Nisa */}
+                   
                 </div>
               </div>
             </div>
@@ -386,18 +391,17 @@ export default function EDreceta() {
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                  <Button htmlType="submit"  className='btEn'><p className='tx2'>Enviar</p></Button>
+                  <Button htmlType="submit"  className='btEn' onClick={onSubmit}><p className='tx2'>Enviar</p></Button>
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
                 </div>
               </div>
               )}
               <div className='ing'>
-                <Ingredientes recetaId={Number(id)} 
-                onSubmit={() => enviarDatosIngredientes()}
-                onReset={() => resetIngredientes()}/>
+                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
-                  <Proceso  recetaId={Number(id)} />
+                  <Proceso recetaId={Number(id)} />
+
                 </div>
                 )}
               </div>
@@ -405,9 +409,7 @@ export default function EDreceta() {
             <div className='f3'>
               {!isMobile && !isTablet && (
               <div className='proceso'>
-                <Proceso recetaId={Number(id)} 
-                onSubmit={() => enviarDatosIngredientes()}
-                onReset={() => resetIngredientes()}/>
+                <Proceso recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger} />
               </div>
               )}
             </div>

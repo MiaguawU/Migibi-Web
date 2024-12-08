@@ -18,28 +18,27 @@ passport.use(
         if (err) return done(err);
 
         if (results.length > 0) {
-          // Usuario existente: actualizar datos
-          const query = "UPDATE usuario SET Nombre_Usuario = ?, foto_perfil = ? WHERE Email = ?";
-          db.query(query, [nombre, fotoPerfil, email], (err) => {
-            if (err) return done(err);
+          // Usuario existente: actualizar datos solo si han cambiado
+          const usuarioExistente = results[0];
+          if (usuarioExistente.Nombre_Usuario !== nombre || usuarioExistente.foto_perfil !== fotoPerfil) {
+            const query = "UPDATE usuario SET Nombre_Usuario = ?, foto_perfil = ? WHERE Email = ?";
+            db.query(query, [nombre, fotoPerfil, email], (updateErr) => {
+              if (updateErr) return done(updateErr);
 
-            const updatedUser = {
-              Id_Usuario: results[0].Id_Usuario,
-              Nombre_Usuario: nombre,
-              Email: email,
-              foto_perfil: fotoPerfil,
-              Cohabitantes: results[0].Cohabitantes,
-              Es_Gmail: 1,
-            };
-            return done(null, updatedUser); // Usuario actualizado
-          });
+              usuarioExistente.Nombre_Usuario = nombre;
+              usuarioExistente.foto_perfil = fotoPerfil;
+              return done(null, usuarioExistente); // Usuario actualizado
+            });
+          } else {
+            return done(null, usuarioExistente); // Datos ya están actualizados
+          }
         } else {
           // Usuario nuevo: insertar datos
-          const con = 'sopaDEpollo22';
+          const contrasenaPredeterminada = "sopaDEpollo22";
           const query =
             "INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena) VALUES (?, ?, ?, ?, ?)";
-          db.query(query, [nombre, email, fotoPerfil, 1, con], (err, result) => {
-            if (err) return done(err);
+          db.query(query, [nombre, email, fotoPerfil, 1, contrasenaPredeterminada], (insertErr, result) => {
+            if (insertErr) return done(insertErr);
 
             const newUser = {
               Id_Usuario: result.insertId,

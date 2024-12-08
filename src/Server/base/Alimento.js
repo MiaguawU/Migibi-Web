@@ -1,11 +1,29 @@
-const express = require('express'); 
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const db = require('./connection');
-const router = express.Router();
+const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const db = require("./connection");
+const util = require("util");
+const Joi = require("joi");
 
-const uploadDir = path.join(__dirname, '../imagenes');
+const router = express.Router();
+const BASE_IMAGE_URL = process.env.SERVER_PORT; // URL base del servidor
+
+// Validación de datos con Joi
+const alimentoSchema = Joi.object({
+  nombre: Joi.string().required(),
+  tipo: Joi.number().required(),
+  id_unidad: Joi.number().required(),
+  cantidad: Joi.number().min(1).required(),
+  fecha_caducidad: Joi.date().optional(),
+  Id_Usuario_Alta: Joi.number().required(),
+});
+
+// Asincronizar consultas de la base de datos
+const queryAsync = util.promisify(db.query).bind(db);
+
+// Configuración para almacenamiento de imágenes
+const uploadDir = path.join(__dirname, "../imagenes");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -13,15 +31,15 @@ if (!fs.existsSync(uploadDir)) {
 const storage = multer.diskStorage({
   destination: uploadDir,
   filename: (req, file, cb) => {
-    console.log("Archivo recibido:", file);
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
   },
 });
 
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024,  // Limite de tamaño de archivo 5MB
+    fileSize: 5 * 1024 * 1024, // Límite de tamaño de archivo 5MB
   },
   fileFilter: (req, file, cb) => {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
@@ -32,66 +50,74 @@ const upload = multer({
 });
 
 // Agregar un alimento
-router.post("/", (req, res, next) => {
-  upload.single('image')(req, res, (err) => {
+router.post("/", async (req, res) => {
+  upload.single("image")(req, res, async (err) => {
     if (err) {
-      console.error('Error al procesar la imagen:', err);
-      return res.status(500).send('Error al procesar la imagen');
+      console.error("Error al procesar la imagen:", err);
+      return res.status(500).send("Error al procesar la imagen");
     }
 
-    const { nombre, tipo, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta  } = req.body;
-    console.log(req.body);
-    
-    const hoy = Date.now();
-    let es_perecedero = 1;
+    const { nombre, tipo, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta } = req.body;
 
-    const Fecha_Alta= hoy.toISOString();;
-    
-    if(!fecha_caducidad){
-      es_perecedero = 0;
+    // Validación de datos
+    const { error } = alimentoSchema.validate(req.body);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+
+    const hoy = new Date();
+    const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+    const es_perecedero = fecha_caducidad ? 1 : 0;
+
+    let Fecha_Caducidad = null;
+    if (fecha_caducidad) {
+      try {
+        const date = new Date(fecha_caducidad);
+        Fecha_Caducidad = date.toISOString().slice(0, 19).replace("T", " ");
+      } catch (parseError) {
+        return res.status(400).json({ error: "Formato de fecha inválido" });
+      }
     }
 
-    console.log("Headers:", req.headers); 
-    console.log("Body recibido:", req.body);
+    // Asegurar que el prefijo `/imagenes/` esté incluido
+    const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
 
-    if (!nombre || !tipo || !id_unidad || !es_perecedero || !cantidad) {
-      return res.status(400).send("Faltan datos requeridos");
-    }
-
-    const imagen = req.file ? `../imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
-
+    // Inserción en `cat_alimento`
     const query1 = `
       INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     const values1 = [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta];
 
-    const query2 = `
-      INSERT INTO stock_detalle (Id_Tipo_Alimento, Id_Unidad_Medida, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    let values2 = [tipo, id_unidad, fecha_caducidad, null, es_perecedero, Id_Usuario_Alta, Fecha_Alta];
-
     db.query(query1, values1, (err, result1) => {
       if (err) {
         console.error("Error al insertar en cat_alimento:", err);
-        return res.status(500).send("Error al agregar alimento");
+        return res.status(500).json({ error: "Error al agregar el alimento." });
       }
 
-      const idAlimento = result1.insertId;
-      values2[3] = idAlimento;
+      const Id_Alimento = result1.insertId; // Obtener el ID generado por la inserción
+
+      // Inserción en `stock_detalle`
+      const query2 = `
+        INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      const values2 = [id_unidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero, Id_Usuario_Alta, Fecha_Alta];
 
       db.query(query2, values2, (err2, result2) => {
         if (err2) {
           console.error("Error al insertar en stock_detalle:", err2);
-          return res.status(500).send("Error al agregar stock");
+          return res.status(500).json({ error: "Error al agregar el detalle del stock." });
         }
 
-        res.json({ id: idAlimento, message: "Alimento agregado con éxito" });
+        res.status(201).json({
+          message: "Alimento y detalle del stock agregados exitosamente.",
+          alimento: { id: Id_Alimento, nombre, tipo, es_perecedero, imagen },
+          stock: { id: result2.insertId, id_unidad, cantidad, fecha_caducidad: Fecha_Caducidad },
+        });
       });
     });
   });
 });
+
 
 //obtener alimentos del refri
 router.get("/", (req, res) => {
@@ -99,7 +125,7 @@ router.get("/", (req, res) => {
   SELECT 
   ca.Id_Alimento AS id,
   ca.Alimento AS Nombre,
-  ca.Activo As Activo,
+  sd.Activo As Activo,
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
@@ -141,7 +167,6 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
       }
 
       res.json({ Perecedero: result1, NoPerecedero: result2 });
-      console.log(result1);
     });
   });
 });

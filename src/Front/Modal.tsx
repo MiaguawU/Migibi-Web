@@ -74,12 +74,6 @@ const Products: React.FC = () => {
         rowKey="id"
       />
 
-      {/* Modal externo para agregar producto */}
-      <InsModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
-      />
     </div>
   );
 };
