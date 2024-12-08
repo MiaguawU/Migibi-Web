@@ -142,8 +142,12 @@ function App() {
               <Route path="/avisodeprivacidad" element={<VerR />} />
               <Route path="/prueba" element={<Prueba />} />
               <Route path="/cad" element={<Caducar />} />
-              <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} />} />
-              <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} />} />
+              <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} 
+      onSubmit={true}
+      onReset={true}  />} />
+              <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} 
+              onSubmit={true}
+      onReset={true}  />} />
 
             </Routes>
           </main>

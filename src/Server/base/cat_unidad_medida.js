@@ -66,7 +66,7 @@ router.get("/", (req, res) => {
   const { activo } = req.query;
 
   // Construir la consulta SQL
-  let query = `SELECT * FROM cat_unidad_medida`;
+  let query = `SELECT Id_Unidad_Medida, Unidad_Medida FROM cat_unidad_medida`;
 
 
   // Ejecutar la consulta

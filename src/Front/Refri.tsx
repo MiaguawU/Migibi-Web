@@ -29,6 +29,8 @@ export default function Inicio() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false); 
 
+  
+
   const agregarAlimento = async () =>{
     setLoading(true);
     try {
@@ -144,26 +146,7 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-  // Manejar envío del formulario desde el modal
-  const handleSubmit = async (values: any) => {
-    const formData = new FormData();
-    formData.append('name', values.name);
-    formData.append('expirationDate', values.expirationDate.format('YYYY-MM-DD')); 
-    formData.append('quantity', values.quantity);
-    formData.append('unit', values.unit);
-    formData.append('type', values.type);
-    formData.append('imgsrc', values.imgsrc);
-// Agregar un nuevo ingrediente
-    try {
-     
-      await axios.post(`${PUERTO}/productos`, formData);
-      message.success('Producto agregado');
-      datosAlimento(); 
-      setIsModalOpen(false); 
-    } catch (error) {
-      message.error('Error al agregar producto');
-    }
-  };
+  
 
   const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
     const nombre = alimento.ingrediente.toLowerCase();
@@ -253,7 +236,6 @@ export default function Inicio() {
             <ProductModal
               visible={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              onSubmit={handleSubmit}
             />
           </div>
         </>

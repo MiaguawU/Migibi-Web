@@ -6,10 +6,13 @@ const db = require('./connection');
 const router = express.Router();
 
 // Crear un nueva instrucción de receta 
-router.post("/", (req, res) => {
+router.post("/:id", (req, res) => {
     // Desestructuración de los datos del body
-    const { instruccion, orden, Id_Usuario_Alta, Fecha_Alta } = req.body;
-    const  id_receta = 1; //id temporal para despues agregar el verdadero
+    const { instruccion, orden, Id_Usuario_Alta } = req.body;
+    const  id_receta = req.params; 
+
+    const hoy = new Date();
+    const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
 
     console.log("Headers:", req.headers); 
     console.log("Body recibido:", req.body);
@@ -35,6 +38,7 @@ router.post("/", (req, res) => {
       res.json({ id: result.insertId, message: "Instrucción agregada con éxito" });
     });
 });
+
 
 // Obtener todas las instrucciones de una receta específica (GET)
 router.get("/:id", (req, res) => {
