@@ -142,6 +142,7 @@ router.get("/", (req, res) => {
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
   sd.Fecha_Caducidad,
+  ca.Id_Usuario_Alta,
   cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
 FROM stock_detalle sd
 LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
@@ -158,6 +159,7 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
+  ca.Id_Usuario_Alta,
   cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
 FROM stock_detalle sd
 LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento

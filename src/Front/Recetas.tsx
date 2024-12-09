@@ -4,7 +4,7 @@ import { Input, Button, ConfigProvider, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
-import RecipeCard from './Componentes/RecetaCard'
+import RecipeCard from './Componentes/RecetaCard';
 
 const { Search } = Input;
 
@@ -16,6 +16,7 @@ interface CardData {
   time: string; 
   image: string;
   Activo: number;
+  Id_Usuario_Alta: number;
 }
 
 const Recetas: React.FC = (): JSX.Element => {
@@ -24,13 +25,45 @@ const Recetas: React.FC = (): JSX.Element => {
   const [filteredRecipes, setFilteredRecipes] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   const datosReceta = async () => {
     setLoading(true);
     try {
+      // Obtener el usuario actual desde el localStorage
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+  
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+      const user = usuarios[currentUser];
+  
+      if (!user) {
+        message.warning("Usuario no encontrado en los datos locales.");
+        setLoading(false);
+        return;
+      }
+  
+      // Parsear el ID del usuario como número
+      const userId = parseInt(currentUser, 10);
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+  
+      // Obtener recetas del servidor
       const response = await axios.get(`${PUERTO}/recetaGeneral`);
       if (response.data) {
+        // Filtrar recetas activas y que coincidan con el usuario o sean predeterminadas
         const recData = response.data
-          .filter((receta: any) => receta.Activo > 0)
+          .filter(
+            (receta: any) =>
+              receta.Activo > 0 && (receta.Id_Usuario_Alta === userId || receta.Id_Usuario_Alta === 1)
+          )
           .map((receta: any) => ({
             id: receta.Id_Receta || ' ',
             title: receta.Nombre || ' ',
@@ -39,18 +72,22 @@ const Recetas: React.FC = (): JSX.Element => {
             time: String(receta.Tiempo || '0'),
             image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
             Activo: receta.Activo,
+            Id_Usuario_Alta: receta.Id_Usuario_Alta,
           }));
-
+  
+        // Actualizar el estado con las recetas filtradas
         setRecipes(recData);
-        setLoading(false);
         message.success("Recetas obtenidas exitosamente");
       }
     } catch (error) {
       console.error("Error al obtener recetas", error);
-      setLoading(false);
-      message.error("No se pudo conectar con el servidor.");
+      message.error("No se pudo conectar con el servidor o ID de usuario inválido.");
+    } finally {
+      setLoading(false); // Asegurar que el estado de carga se detenga
     }
   };
+  
+  
 
   const eliminarReceta = async (id: number) => {
     try {
@@ -64,10 +101,8 @@ const Recetas: React.FC = (): JSX.Element => {
       message.error("No se pudo eliminar la receta.");
     }
   };
-  
 
   const handleEdit = (id: number) => {
-    // Navigate to the edit page (you can pass the recipe ID or other params if needed)
     navigate(`/edReceta?id=${id}`);
   };
 
@@ -88,18 +123,10 @@ const Recetas: React.FC = (): JSX.Element => {
     setFilteredRecipes(filtered);
   }, [searchTerm, recipes]);
 
-  // Manejar búsqueda
   const handleSearch = (value: string) => {
     setSearchTerm(value.toLowerCase());
   };
 
-  const navigate = useNavigate();
-
-  const IRver = () => {
-    navigate('/verR');
-  };
-
-  // Ensure that loading state is handled properly
   if (loading) {
     return (
       <ConfigProvider
@@ -112,7 +139,6 @@ const Recetas: React.FC = (): JSX.Element => {
         }}
       >
         <div className="recetas-container">
-          {/* Loading state */}
           <div className="header">
             <Search
               placeholder="Buscar por nombre, calorías o tiempo"
@@ -121,10 +147,8 @@ const Recetas: React.FC = (): JSX.Element => {
               onChange={(e) => handleSearch(e.target.value)}
               style={{ width: '80%' }}
             />
-            <Button className="btA" onClick={IRver}>Agregar</Button>
+            <Button className="btA" onClick={() => navigate('/verR')}>Agregar</Button>
           </div>
-
-          {/* Loading Spinner or Message */}
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <p>Cargando recetas...</p>
           </div>
@@ -133,7 +157,6 @@ const Recetas: React.FC = (): JSX.Element => {
     );
   }
 
-  // Return valid JSX for loaded state
   return (
     <ConfigProvider
       theme={{
@@ -145,7 +168,6 @@ const Recetas: React.FC = (): JSX.Element => {
       }}
     >
       <div className="recetas-container">
-        {/* Encabezado con búsqueda */}
         <div className="header">
           <Search
             placeholder="Buscar por nombre, calorías o tiempo"
@@ -154,10 +176,8 @@ const Recetas: React.FC = (): JSX.Element => {
             onChange={(e) => handleSearch(e.target.value)}
             style={{ width: '80%' }}
           />
-          <Button className="btA" onClick={IRver}>Agregar</Button>
+          <Button className="btA" onClick={() => navigate('/verR')}>Agregar</Button>
         </div>
-
-        {/* Listado de recetas */}
         <div
           style={{
             width: '100vw',

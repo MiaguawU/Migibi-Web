@@ -20,6 +20,7 @@ interface CardData {
   caducidadPasada: boolean | null;
   Tipo: string;
   Activo: number;
+  Id_Usuario_Alta: number;
 }
 
 export default function Inicio() {
@@ -81,11 +82,27 @@ export default function Inicio() {
 
   const datosAlimento = async () => {
     try {
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+  
+      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+  
       const response = await axios.get(`${PUERTO}/alimento`);
       const { Perecedero, NoPerecedero } = response.data;
-
+  
       if (Array.isArray(Perecedero) && Array.isArray(NoPerecedero)) {
-        const perecederos = Perecedero.map((alimento) => {
+        const perecederos = Perecedero.filter(
+          (alimento) => alimento.Id_Usuario_Alta === userId
+        ).map((alimento) => {
           const fechaCaducidad = alimento.Fecha_Caducidad ? new Date(alimento.Fecha_Caducidad) : null;
           const caducidadPasada = fechaCaducidad && fechaCaducidad < new Date();
           const diasRestantes = fechaCaducidad
@@ -97,7 +114,7 @@ export default function Inicio() {
               )
             : 'No definida';
           const fecha = fechaCaducidad ? fechaCaducidad.toLocaleDateString() : 'Fecha no disponible';
-
+  
           return {
             id: alimento.id || ' ',
             ingrediente: alimento.Nombre || ' ',
@@ -109,10 +126,13 @@ export default function Inicio() {
             caducidadPasada,
             Tipo: alimento.Tipo_Alimento,
             Activo: alimento.Activo,
+            Id_Usuario_Alta: alimento.Id_Usuario_Alta,
           };
         });
-
-        const noPerecederos = NoPerecedero.map((alimento) => ({
+  
+        const noPerecederos = NoPerecedero.filter(
+          (alimento) => alimento.Id_Usuario_Alta === userId
+        ).map((alimento) => ({
           id: alimento.id || ' ',
           ingrediente: alimento.Nombre || ' ',
           cantidad: alimento.Cantidad || 0,
@@ -123,8 +143,9 @@ export default function Inicio() {
           caducidadPasada: false,
           Tipo: alimento.Tipo_Alimento,
           Activo: alimento.Activo,
+          Id_Usuario_Alta: alimento.Id_Usuario_Alta,
         }));
-
+  
         setAlimentosPerecederos(perecederos);
         setAlimentosNoPerecederos(noPerecederos);
         message.success("Alimentos obtenidos exitosamente");
@@ -138,6 +159,7 @@ export default function Inicio() {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     datosAlimento();
