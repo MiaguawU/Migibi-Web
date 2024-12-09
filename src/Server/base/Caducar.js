@@ -13,7 +13,8 @@ router.get("/", (req, res) => {
     sd.Id_Stock_Detalle AS id,
     ca.Alimento AS Nombre,
     sd.Cantidad AS Cantidad,
-    sd.Fecha_Caducidad AS Fecha
+    sd.Fecha_Caducidad AS Fecha,
+    ca.Id_Usuario_Alta
   FROM stock_detalle sd
   LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
   WHERE ca.Es_Perecedero = 1 and sd.Activo = 1

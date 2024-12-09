@@ -79,52 +79,81 @@ router.post("/", (req, res, next) => {
 });
 
 // Endpoint: Actualizar una receta
-router.put("/:id", (req, res, next) => {
-  upload.single("image")(req, res, (err) => {
+// Endpoint: Actualizar una receta
+router.put("/:id", (req, res) => {
+  upload.single("imagen")(req, res, async (err) => {
     if (err) {
       console.error("Error al procesar la imagen:", err);
-      return res.status(500).send("Error al procesar la imagen");
+      return res.status(500).json({ error: "Error al procesar la imagen" });
     }
 
     const { id } = req.params;
     const { nombre, id_tipo_consumo, tiempo, porciones, calorias } = req.body;
-    console.log("Datos recibidos en el servidor:", req.body);
 
-
-    // Validar los datos del cuerpo
+    // Validar datos enviados por el cliente
     const { error } = recetaSchema.validate({
       nombre,
       id_tipo_consumo,
       tiempo,
       calorias,
       porciones,
-    });    
+    });
+
     if (error) {
       console.error("Error en la validación:", error.details[0].message);
-      return res.status(400).send(error.details[0].message);
+      return res.status(400).json({ error: error.details[0].message });
     }
-    
 
-    // Verificar si se subió una imagen
-    const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defRec.png`;
+    try {
+      // Verificar si la receta existe y obtener su imagen actual
+      const selectQuery = `SELECT Imagen_receta FROM receta WHERE Id_Receta = ?`;
+      const [receta] = await new Promise((resolve, reject) =>
+        db.query(selectQuery, [id], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        })
+      );
 
-    // Actualizar la receta
-    const query = `
-      UPDATE receta 
-      SET Nombre = ?, Id_Tipo_Consumo = ?, Tiempo = ?, Porciones = ?, Calorias = ?, Imagen_receta = ?
-      WHERE Id_Receta = ?
-    `;
-    const values = [nombre, id_tipo_consumo, tiempo, porciones, calorias, imagen, id];
-
-    db.query(query, values, (err, result) => {
-      if (err) {
-        console.error("Error al actualizar receta:", err);
-        return res.status(500).send("Error al actualizar receta");
+      if (!receta) {
+        return res.status(404).json({ error: "Receta no encontrada" });
       }
-      res.json({ message: "Receta actualizada con éxito" });
-    });
+
+      // Determinar la imagen a usar
+      const nuevaImagen = req.file ? `/imagenes/${req.file.filename}` : receta.Imagen_receta;
+
+      // Actualizar la receta
+      const updateQuery = `
+        UPDATE receta 
+        SET 
+          Nombre = ?, 
+          Id_Tipo_Consumo = ?, 
+          Tiempo = ?, 
+          Porciones = ?, 
+          Calorias = ?, 
+          Imagen_receta = ?, 
+          Activo = 1
+        WHERE Id_Receta = ?
+      `;
+
+      const values = [nombre, id_tipo_consumo, tiempo, porciones, calorias, nuevaImagen, id];
+
+      console.log("Valores para la actualización:", values);
+
+      db.query(updateQuery, values, (err, result) => {
+        if (err) {
+          console.error("Error al actualizar receta:", err);
+          return res.status(500).json({ error: "Error al actualizar receta" });
+        }
+        res.json({ message: "Receta actualizada con éxito" });
+      });
+    } catch (err) {
+      console.error("Error al manejar la solicitud de actualización:", err);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
   });
 });
+
+
 
 
 // Endpoint: Eliminar una receta

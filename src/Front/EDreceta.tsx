@@ -66,6 +66,7 @@ export default function EDreceta() {
     id_Tipo: string | number;
     Porciones: number;
     Calorias: number;
+    FileImagen?: File;
   }>({
     Nombre: '',
     Imagen: def,
@@ -86,17 +87,19 @@ export default function EDreceta() {
   
 
   const uploadProps = {
-    showUploadList: false, // No mostrar la lista de archivos
+    showUploadList: false,
     beforeUpload: (file: File) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
         message.error("Solo puedes subir archivos de imagen.");
         return false;
       }
-      getBase64(file, (url) => setFormData((prev) => ({ ...prev, Imagen: url })));
-      return false; // Evitar la subida automática
+      setFormData((prev) => ({ ...prev, Imagen: URL.createObjectURL(file), FileImagen: file })); // Previsualización y guardado del archivo
+      return false; // Evitar subida automática
     },
+    
   };
+  
 
   // Obtener tipos de consumo
   const obtenerTipos = async () => {
@@ -200,20 +203,23 @@ export default function EDreceta() {
         return;
       }
   
-      const datosAEnviar = {
-        nombre: formData.Nombre,
-        tiempo: formData.Tiempo?.format('HH:mm:ss') || null,
-        porciones: formData.Porciones || 1, // En minúscula
-        calorias: formData.Calorias || 0,
-        id_tipo_consumo: formData.id_Tipo || '',
-        imagen: formData.Imagen || def,
-      };
-      
-      
-      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosAEnviar);
+      // Crear un nuevo FormData
+      const datosForm = new FormData();
+      datosForm.append("nombre", formData.Nombre || ""); // Asegúrate de que formData.Nombre exista
+      datosForm.append("tiempo", formData.Tiempo?.format("HH:mm:ss") || "");
+      datosForm.append("porciones", String(formData.Porciones));
+      datosForm.append("calorias", String(formData.Calorias));
+      datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
+      datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
+
+  
+      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
   
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
       } else {
         message.error("No se pudo actualizar la receta.");
       }
@@ -223,6 +229,8 @@ export default function EDreceta() {
     }
   };
   
+  
+
   
 
   
@@ -309,13 +317,17 @@ export default function EDreceta() {
             
             <div className='f1'>
               <div className='imgDiv'>
-                <img src={formData.Imagen} alt='Receta' 
-                style={{
-                  maxHeight: '400px',
-                  maxWidth: '300px',
-                  border: '1px solid #3E7E1E',
-                  borderRadius: '10px' 
-                }}/>
+              <img
+                  src={formData.Imagen || def}
+                  alt="Receta"
+                  style={{
+                    maxHeight: '400px',
+                    maxWidth: '300px',
+                    border: '1px solid #3E7E1E',
+                    borderRadius: '10px',
+                  }}
+                />
+
                 <Upload {...uploadProps}>{/*...props de Nisa*/}
                   <Button className='btUp' icon={<UploadOutlined />}></Button>
                 </Upload>
@@ -389,7 +401,7 @@ export default function EDreceta() {
                     }}
                   >
                     <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
-                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                    {/*<Button className='btImg' ><img src={btCom} className='imgCom'/></Button>*/}
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>

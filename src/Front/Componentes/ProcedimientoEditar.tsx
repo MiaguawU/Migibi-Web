@@ -28,6 +28,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempDeleted, setTempDeleted] = useState<Item[]>([]);
   const [tempAdded, setTempAdded] = useState<Item[]>([]);
+  const [enviarDatos, setenviarDatos] = useState(false);
 
   // Función para obtener las instrucciones de la receta
   const datosInstrucciones = async () => {
@@ -69,12 +70,6 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
     }
   }, [onReset]);
 
-  useEffect(() => {
-    if (onSubmit) {
-      subirCambios();
-    }
-  }, [onSubmit]);
-
   const subirCambios = async () => {
     try {
       if (tempAdded.length > 0) {
@@ -84,12 +79,22 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
         const idsToDelete = tempDeleted.map((item) => item.id);
         await axios.put(`${PUERTO}/proED`, { ids: idsToDelete });
       }
-      message.success("Cambios enviados exitosamente.");
+      message.success("Cambios enviados correctamente.");
+      setTempAdded([]);
+      setTempDeleted([]);
     } catch (error) {
       console.error("Error al guardar cambios:", error);
-      message.error("No se pudo guardar los cambios.");
+      message.error("Error al guardar los cambios.");
     }
   };
+
+  useEffect(() => {
+    if (onSubmit) {
+      setenviarDatos((prev) => !prev); 
+      subirCambios();
+    }
+  }, [onSubmit]);
+
 
   const handleDeleteInstruction = (index: number) => {
     const itemToDelete = items[index];
@@ -107,10 +112,6 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
     );
   };
 
-  const handleAddInstruction = (newInstruction: Item) => {
-    setTempAdded((prev) => [...prev, newInstruction]);
-    setItems((prev) => [...prev, newInstruction]);
-  };
 
   return (
     <>
@@ -183,7 +184,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
       <InsModal
           visible={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSubmit={(newInstruction: Item) => handleAddInstruction(newInstruction)}
+          onSubmit={enviarDatos}
           recetaId={recetaId}
         />
 

@@ -181,6 +181,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
       <IngModal
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        recetaId={recetaId}
         onSubmit={(newItem: Item) => setItems((prev) => [...prev, newItem])}
       />
     </>
