@@ -24,6 +24,7 @@ const Procedimiento = require("./base/Procedimiento")
 const ProREAL = require("./base/ProcedimientoREAL")
 const tipo_alimento =  require("./base/cat_tipo_alimento");
 const unidad_medida = require("./base/cat_unidad_medida");
+const recetaSecreta = require("./base/recetaSecreta");
 
 dotenv.config();
 
@@ -117,7 +118,8 @@ app.get(
 
 //modificar recetas
 app.use("/recetaGeneral", recetaGeneral);
-app.use("/recetaCRUD" , recetaCRUD)
+app.use("/recetaCRUD" , recetaCRUD);
+app.use("/agReceta", recetaSecreta);
 //ingredientes
 app.use("/ingED", IngredienteReal);
 app.use("/ingredientes", Ingredientes);
@@ -140,7 +142,7 @@ app.use("/unidad", unidad_medida);
 
 
 
-app.disable('etag'); // En Express.js
+app.disable('etag'); 
 
 const filePath = path.join(__dirname, 'images', 'defaultPerfil.png');
 

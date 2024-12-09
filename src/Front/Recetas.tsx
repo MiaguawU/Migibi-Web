@@ -4,7 +4,7 @@ import { Input, Button, ConfigProvider, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
-import RecipeCard from './Componentes/RecetaCard';
+import RecipeCard from './Componentes/RecetaCard'
 
 const { Search } = Input;
 
@@ -96,7 +96,7 @@ const Recetas: React.FC = (): JSX.Element => {
   const navigate = useNavigate();
 
   const IRver = () => {
-    navigate('/edReceta');
+    navigate('/verR');
   };
 
   // Ensure that loading state is handled properly

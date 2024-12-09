@@ -24,6 +24,8 @@ import Prueba from './Front/PruebaCam';
 import AuthForm from './Front/Componentes/AuthForm';  
 import IngRecetaEditar from './Front/Componentes/IngredientesRecetaEditar';
 import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
+import InstruccionModal from './Front/Componentes/InstruccionModal';
+import Ingrediente from './Front/Componentes/IngredienteModal';
 type ItemType = Required<MenuProps>['items'][number];
 
 const mainItems: ItemType[] = [
@@ -57,11 +59,10 @@ function App() {
   };
 
   useEffect(() => {
-    const usuariosSession = JSON.parse(sessionStorage.getItem("usuarios") || "{}");
     const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
-    const currentUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+    const currentUser =  localStorage.getItem("currentUser");
   
-    if (currentUser && (usuariosSession[currentUser] || usuariosLocal[currentUser])) {
+    if (currentUser && ( usuariosLocal[currentUser])) {
       setAccedio(true); // Si hay un usuario activo, marcar como autenticado
     } else {
       setAccedio(false);
@@ -76,8 +77,8 @@ function App() {
 
   // Lógica para manejar el login
   const onLogin = (userData: any) => {
-    sessionStorage.setItem("usuarios", JSON.stringify({ [userData.id]: userData }));
-    sessionStorage.setItem("currentUser", userData.id);
+    localStorage.setItem("usuarios", JSON.stringify({ [userData.id]: userData }));
+    localStorage.setItem("currentUser", userData.id);
     setAccedio(true);
     console.log("Usuario logueado y datos almacenados en sessionStorage:", userData);
   };
@@ -146,6 +147,9 @@ function App() {
       onSubmit={true}
       onReset={true}  />} />
               <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} 
+              onSubmit={true}
+      onReset={true}  />} />
+      <Route path="/instruccion" element={<ProcRecetaEditar recetaId={0} 
               onSubmit={true}
       onReset={true}  />} />
 
