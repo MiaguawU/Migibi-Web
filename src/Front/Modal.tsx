@@ -73,7 +73,6 @@ const Products: React.FC = () => {
         ]}
         rowKey="id"
       />
-
     </div>
   );
 };
