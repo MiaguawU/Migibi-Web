@@ -5,6 +5,7 @@ import PorCaducar from './Componentes/PorCaducar';
 import ProductModal from './Componentes/ProductoRefriModal'; // Importa el modal separado
 import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
 import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import ModalEd from './Componentes/AlimentoEditar';
 
 const { Meta } = Card;
 
@@ -28,7 +29,7 @@ export default function Inicio() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false); 
-
+  const [edAlimento, setEdAlimento] = useState<number | null>(null);
   
 
   const agregarAlimento = async () =>{
@@ -158,8 +159,9 @@ export default function Inicio() {
         cantidad.includes(searchTerm)) &&
       alimento.cantidad > 0 && alimento.Activo > 0
     );
-  });
+  });  
 
+  
   return (
     <ConfigProvider
       theme={{
@@ -218,7 +220,7 @@ export default function Inicio() {
                   </div>
                   <Space size="small" style={{ marginTop: '10px' }}>
                     <Tooltip title="Editar">
-                      <EditOutlined style={{ color: '#6F895A', fontSize: 20 }} />
+                      <EditOutlined style={{ color: '#6F895A', fontSize: 20 }}  onClick={() => setEdAlimento(card.id)}/>
                     </Tooltip>
                     {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
                       <Tooltip title="Advertencia">
@@ -236,6 +238,11 @@ export default function Inicio() {
             <ProductModal
               visible={isModalOpen}
               onClose={() => setIsModalOpen(false)}
+            />
+            <ModalEd
+              visible={edAlimento !== null}
+              onClose={() => setEdAlimento(null)}
+              alimentoId={edAlimento}
             />
           </div>
         </>

@@ -6,23 +6,21 @@ const db = require('./connection');
 const router = express.Router();
 
 // Crear una nueva receta (POST)
-router.post("/", (req, res, next) => {
-  const { nombre, id_usuario_alta, fecha_alta, id_tipo_consumo, imagen_receta } = req.body;
+router.post("/:id", (req, res) => {
+  const id= req.params;
 
-  // Validar que los campos requeridos estén presentes
-  if (!nombre || !id_usuario_alta || !fecha_alta || !id_tipo_consumo || !imagen_receta) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
-
-  // Consulta para insertar una nueva receta
   const query = `
-    INSERT INTO receta (Nombre, Id_Usuario_Alta, Fecha_Alta, Id_Tipo_Consumo, Imagen_receta) 
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO receta (Nombre, Id_Usuario_Alta, Fecha_Alta, Id_Tipo_Consumo, Activo)
+    VALUES ('Receta_nueva', ?, ?, 1, 0)
   `;
-  const values = [nombre, id_usuario_alta, fecha_alta, id_tipo_consumo, imagen_receta];
+
+  const hoy = new Date();
+    const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+
+  const values = [id, Fecha_Alta];
 
   // Ejecutar la consulta
-  db.query(query, values, (err, result) => {
+  db.query(query, values ,(err, result) => {
     if (err) {
       console.error("Error al agregar receta:", err);
       return res.status(500).send("Error al agregar receta");
