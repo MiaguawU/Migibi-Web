@@ -42,10 +42,8 @@ if (Object.keys(userData).length > 0) {
       if (id) {
         usuarios[id] = { username, email, foto_perfil, Cohabitantes };
         localStorage.setItem("usuarios", JSON.stringify(usuarios));
-        sessionStorage.setItem("usuarios", JSON.stringify(usuarios)); // Guardar usuarios en sessionStorage
         localStorage.setItem("currentUser", id);
-        sessionStorage.setItem("currentUser", id); // Guardar el usuario actual
-        console.log("Datos guardados en sessionStorage y localStorage.");
+        console.log("Datos guardados en  localStorage.");
       } else {
         console.warn("ID de usuario no proporcionado. No se guardaron los datos.");
       }

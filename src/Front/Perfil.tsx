@@ -29,7 +29,8 @@ const UserProfile: React.FC = () => {
       // Eliminar datos relacionados con la sesión en localStorage y sessionStorage
       sessionStorage.removeItem("usuarios");
       sessionStorage.removeItem("currentUser");
-  
+      localStorage.removeItem("usuarios");
+      localStorage.removeItem("currentUser");
       // Notificar al usuario del éxito
       message.success("Sesión cerrada correctamente.");
       

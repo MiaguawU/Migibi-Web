@@ -4,12 +4,15 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
 const router = express.Router();
+const Joi = require("joi");
 
-// Crear un nueva instrucción de receta 
+// Crear un nueva instrucción de una nueva receta 
 router.post("/", (req, res) => {
     // Desestructuración de los datos del body
     const { instruccion, orden, Id_Usuario_Alta, Fecha_Alta } = req.body;
     const  id_receta = 1; //id temporal para despues agregar el verdadero
+
+    
 
     console.log("Headers:", req.headers); 
     console.log("Body recibido:", req.body);

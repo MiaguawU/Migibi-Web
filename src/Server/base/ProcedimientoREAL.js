@@ -1,42 +1,44 @@
-const express = require('express');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const db = require('./connection');
+const express = require("express");
+const Joi = require("joi"); // Asegúrate de tener Joi instalado
+const db = require("./connection");
 const router = express.Router();
 
-// Crear un nueva instrucción de receta 
-router.post("/:id", (req, res) => {
-    // Desestructuración de los datos del body
-    const { instruccion, orden, Id_Usuario_Alta } = req.body;
-    const  id_receta = req.params; 
+// Esquema de validación con Joi
+const instruccionSchema = Joi.object({
+  instruccion: Joi.string().required(),
+  orden: Joi.number().required(),
+});
 
-    const hoy = new Date();
-    const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+// Crear una nueva instrucción de receta (POST)
+router.post("/:id", async (req, res) => {
+  const { id } = req.params; // Id de la receta
+  const { instruccion, orden, Id_Usuario_Alta } = req.body;
 
-    console.log("Headers:", req.headers); 
-    console.log("Body recibido:", req.body);
+  // Validar entrada
+  const { error } = instruccionSchema.validate({ instruccion, orden });
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
 
-    // Validar que los campos requeridos estén presentes
-    if (!id_receta || !instruccion || !orden) {
-      return res.status(400).send("Faltan datos requeridos");
+  // Fecha actual
+  const hoy = new Date();
+  const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+
+  // Query SQL para insertar una nueva instrucción
+  const query = `
+    INSERT INTO receta_instrucciones (Id_Receta, Instruccion, Orden, Id_Usuario_Alta, Fecha_Alta)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const values = [id, instruccion, orden, Id_Usuario_Alta, Fecha_Alta];
+
+  // Ejecutar la consulta
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error al insertar instrucción:", err);
+      return res.status(500).json({ error: "Error al agregar la instrucción" });
     }
-
-    // Consulta de inserción en la tabla `receta_instrucciones`
-    const query = `
-      INSERT INTO receta_instrucciones (Id_Receta, Instruccion, Orden, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const values = [id_receta, instruccion, orden, Id_Usuario_Alta, Fecha_Alta];
-
-    // Ejecutar la consulta para insertar la instrucción
-    db.query(query, values, (err, result) => {
-      if (err) {
-        console.error("Error al insertar instrucción:", err);
-        return res.status(500).send("Error al agregar instrucción");
-      }
-      res.json({ id: result.insertId, message: "Instrucción agregada con éxito" });
-    });
+    res.json({ id: result.insertId, message: "Instrucción agregada con éxito" });
+  });
 });
 
 

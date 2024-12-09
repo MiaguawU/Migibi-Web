@@ -3,12 +3,14 @@ import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProv
 import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
+import moment from 'moment';
 
 const { Option } = Select;
 
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
+  alimentoId: number | null;
 }
 
 interface Tipo {
@@ -45,7 +47,7 @@ const props: UploadProps = {
   },
 };
 
-const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
+const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }) => {
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);  
   const [Unidades, setUnidad] = useState<Unidad[]>([]); 
@@ -68,8 +70,33 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     if (visible) {
       obtenerTipos();
       obtenerUnidad();
+      if (alimentoId) {
+        obtenerAlimento();
+      } else {
+        form.resetFields(); // Limpia el formulario si no hay alimentoId
+      }
     }
-  }, [visible]);
+  }, [visible, alimentoId]);
+
+  const obtenerAlimento = async () => {
+    if (!alimentoId) return;
+    try {
+      const response = await axios.get(`${PUERTO}/alimento/${alimentoId}`);
+      const alimento = response.data;
+  
+      // Configurar valores del formulario
+      form.setFieldsValue({
+        name: alimento.Nombre,
+        expirationDate: alimento.Fecha ? moment(alimento.Fecha, "YYYY-MM-DD") : null,
+        quantity: alimento.Cantidad,
+        unit: alimento.id_unidad,
+        type: alimento.id_tipo,
+      });
+    } catch (error) {
+      message.error("No se pudo cargar el alimento.");
+    }
+  };
+  
 
   const obtenerTipos = async () => {
     try {
@@ -88,6 +115,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     }
   };
   const handleSubmit = async (values: any) => {
+
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
       message.warning("No hay un usuario logueado actualmente.");
@@ -103,12 +131,13 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     }
   
     const formData = new FormData();
-    formData.append('nombre', values.name);
-    formData.append('fecha_caducidad', values.expirationDate || '');
-    formData.append('cantidad', values.quantity);
-    formData.append('id_unidad', values.unit);
-    formData.append('tipo', values.type);
-    formData.append('Id_Usuario_Alta', currentUser);
+        formData.append('nombre', values.name);
+        formData.append('tipo', values.type);
+        formData.append('id_unidad', values.unit);
+        formData.append('cantidad', values.quantity);
+        formData.append('fecha_caducidad', values.expirationDate ? values.expirationDate.format("YYYY-MM-DD") : ''); // Formatear la fecha
+        formData.append('Id_Usuario_Alta', currentUser);
+
   
     if (values.imgsrc && values.imgsrc.file) {
       formData.append('image', values.imgsrc.file.originFileObj);
@@ -116,24 +145,22 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       
     }
     
-  
     try {
-      const response = await axios.post(`${PUERTO}/alimento`, formData, {
+      const response = await axios.put(`${PUERTO}/alimento/${alimentoId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      message.success('Producto agregado');
+      message.success('Producto actualizado');
       form.resetFields();
     } catch (error) {
       console.error(error);
-      message.error('Error al agregar producto');
+      message.error('Error al actualizar');
     }
   };
   
 
   const handleFinish = (values: any) => {
-    handleSubmit(values); // Llama a la función que maneja los datos
-    form.resetFields(); // Resetea el formulario después de enviar
     handleSubmit(values);
+    obtenerAlimento();
   };
 
   
@@ -156,16 +183,16 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       }}
     >
       <Modal
-        title="Agregar Producto"
+        title={alimentoId ? "Editar Producto" : "Agregar Producto"}
         visible={visible}
         onCancel={onClose}
-        footer={null} // Elimina los botones predeterminados del modal
+        footer={null}
       >
         <Form
           {...formItemLayout}
           form={form}
           style={{ maxWidth: 600 }}
-          onFinish={handleFinish} // Se conecta al envío
+          onFinish={handleFinish}
         >
           <Form.Item
             name="name"
@@ -197,7 +224,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
               min={0}
               max={1000}
               step={0.01}
-              precision={2} // Dos decimales
+              precision={2}
             />
           </Form.Item>
 
@@ -235,12 +262,11 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
             </Upload>
           </Form.Item>
 
-
           <Form.Item
             wrapperCol={{
               xs: { span: 24 },
-              sm: { span: 24 }, // Ocupa todo el espacio
-              offset: 0, // Sin desplazamiento
+              sm: { span: 24 },
+              offset: 0,
             }}
           >
             <Button type="primary" htmlType="submit" block>

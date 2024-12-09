@@ -9,6 +9,7 @@ interface Item {
   dias: string;
   isChecked: boolean;
   cantidad: string;
+  Id_Usuario_Alta: number;
 }
 
 const PorCaducar: React.FC = () => {
@@ -20,36 +21,53 @@ const PorCaducar: React.FC = () => {
   // Función para obtener alimentos por caducar
   const datosAlimento = async () => {
     try {
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+  
+      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+  
       const response = await axios.get(`${PUERTO}/caducar`);
       console.log("Datos recibidos:", response.data);
-
-      const perecederos = response.data.porcaducar.map((alimento: any) => {
-        const fechaCaducidad = alimento.Fecha
-          ? new Date(alimento.Fecha)
-          : null;
-
-        const diasRestantes = fechaCaducidad
-          ? Math.max(
-              0,
-              Math.ceil(
-                (fechaCaducidad.getTime() - new Date().getTime()) /
-                  (1000 * 60 * 60 * 24)
+  
+      const perecederos = response.data.porcaducar
+        .filter((alimento: any) => alimento.Id_Usuario_Alta === userId) // Filtrar por usuario
+        .map((alimento: any) => {
+          const fechaCaducidad = alimento.Fecha
+            ? new Date(alimento.Fecha)
+            : null;
+  
+          const diasRestantes = fechaCaducidad
+            ? Math.max(
+                0,
+                Math.ceil(
+                  (fechaCaducidad.getTime() - new Date().getTime()) /
+                    (1000 * 60 * 60 * 24)
+                )
               )
-            )
-          : "No definida";
-
-        return {
-          id: alimento.id,
-          name: alimento.Nombre || "Alimento desconocido",
-          dias:
-            diasRestantes === "No definida"
-              ? "Fecha no disponible"
-              : `${diasRestantes} días`,
-          isChecked: false,
-          cantidad: alimento.Cantidad,
-        };
-      });
-
+            : "No definida";
+  
+          return {
+            id: alimento.id,
+            name: alimento.Nombre || "Alimento desconocido",
+            dias:
+              diasRestantes === "No definida"
+                ? "Fecha no disponible"
+                : `${diasRestantes} días`,
+            isChecked: false,
+            cantidad: alimento.Cantidad,
+            Id_Usuario_Alta: alimento.Id_Usuario_Alta,
+          };
+        });
+  
       setItems(perecederos);
       message.success("Alimentos obtenidos exitosamente");
     } catch (error) {
@@ -59,7 +77,7 @@ const PorCaducar: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
   // Ejecutar la función al montar el componente
   useEffect(() => {
     datosAlimento();

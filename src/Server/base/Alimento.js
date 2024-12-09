@@ -49,6 +49,18 @@ const upload = multer({
   },
 });
 
+function formatFechaCaducidad(fecha) {
+  if (!fecha) return null;
+  try {
+    const date = new Date(fecha);
+    return date.toISOString().slice(0, 19).replace("T", " ");
+  } catch (error) {
+    console.error("Error al formatear fecha:", error);
+    return null; // Devuelve null si la fecha no es válida
+  }
+}
+
+
 // Agregar un alimento
 router.post("/", async (req, res) => {
   upload.single("image")(req, res, async (err) => {
@@ -125,11 +137,12 @@ router.get("/", (req, res) => {
   SELECT 
   ca.Id_Alimento AS id,
   ca.Alimento AS Nombre,
-  sd.Activo As Activo,
+  ca.Activo As Activo,
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
   sd.Fecha_Caducidad,
+  ca.Id_Usuario_Alta,
   cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
 FROM stock_detalle sd
 LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
@@ -146,6 +159,7 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
   sd.Cantidad AS Cantidad,
   cum.Abreviatura AS Unidad,
   ca.Imagen_alimento AS Imagen,
+  ca.Id_Usuario_Alta,
   cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
 FROM stock_detalle sd
 LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
@@ -173,61 +187,116 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
 
 
 
+// Obtener un alimento por ID
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const query = `
+    SELECT 
+      ca.Alimento AS Nombre,
+      sd.Cantidad AS Cantidad,
+      sd.Id_Unidad_Medida AS id_unidad,
+      ca.Id_Tipo_Alimento AS id_tipo,
+      sd.Fecha_Caducidad AS Fecha
+    FROM 
+      stock_detalle sd
+    JOIN 
+      cat_alimento ca
+    ON 
+      sd.Id_Alimento = ca.Id_Alimento
+    WHERE 
+      ca.Id_Alimento = ?;
+  `;
+
+  try {
+    const result = await queryAsync(query, [id]);
+    if (result.length > 0) {
+      res.json(result[0]);
+    } else {
+      res.status(404).json({ error: "No se encontró el alimento" });
+    }
+  } catch (error) {
+    console.error("Error al obtener alimento:", error);
+    res.status(500).json({ error: "Error al obtener alimento" });
+  }
+});
+
 // Actualizar un alimento
-router.put("/:id", upload.single('image'), (req, res) => {
-  const { id } = req.params;
-  const { nombre, tipo, id_unidad, es_perecedero, cantidad, fecha_caducidad, Id_Usuario_Alta, Fecha_Alta } = req.body;
-  
-  const imagen = req.file ? `../imagenes/${req.file.filename}` : `imagenes/defIng.png`;
-  
-  if (!nombre || !tipo || !id_unidad || !es_perecedero || !cantidad) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
+router.put("/:id", upload.single("image"), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { nombre, tipo, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta } = req.body;
 
-  // Si no se carga una nueva imagen, se mantiene la actual
-  if (!imagen) {
-    const queryImagen = 'SELECT Imagen_alimento FROM cat_alimento WHERE Id_Alimento = ?';
-    db.query(queryImagen, [id], (err, result) => {
-      if (err || result.length === 0) {
-        return res.status(404).send("Alimento no encontrado");
+    // Validación de datos del alimento
+    const { error } = alimentoSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const hoy = new Date();
+    const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+    const es_perecedero = fecha_caducidad ? 1 : 0;
+
+    // Manejo de la fecha de caducidad
+    let Fecha_Caducidad = null;
+    if (fecha_caducidad) {
+      try {
+        const date = new Date(fecha_caducidad);
+        Fecha_Caducidad = date.toISOString().slice(0, 19).replace("T", " ");
+      } catch (parseError) {
+        return res.status(400).json({ error: "Formato de fecha inválido" });
       }
-      imagen = result[0].Imagen_alimento; // Mantener la imagen actual
-      updateAlimento();
-    });
-  } else {
-    updateAlimento();
-  }
+    }
 
-  // Actualizar el alimento
-  function updateAlimento() {
+    // Obtener la imagen existente si no se proporciona una nueva
+    let imagen;
+    if (req.file) {
+      // Si hay un archivo subido, se usa esa imagen
+      imagen = `/imagenes/${req.file.filename}`;
+    } else {
+      // Si no, obtenemos la imagen actual desde la base de datos
+      const queryImagen = `SELECT Imagen_alimento FROM cat_alimento WHERE Id_Alimento = ?`;
+      const [result] = await queryAsync(queryImagen, [id]);
+      if (!result) {
+        return res.status(404).json({ error: "Alimento no encontrado" });
+      }
+      imagen = result.Imagen_alimento;
+    }
+
+    // Actualizar los datos del alimento
     const query1 = `
-      UPDATE cat_alimento SET Alimento = ?, Id_Tipo_Alimento = ?, Es_Perecedero = ?, Imagen_alimento = ?, 
-      Id_Usuario_Alta = ?, Fecha_Alta = ? WHERE Id_Alimento = ?
+      UPDATE cat_alimento 
+      SET Alimento = ?, Id_Tipo_Alimento = ?, Es_Perecedero = ?, Imagen_alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = 1
+      WHERE Id_Alimento = ?
     `;
     const values1 = [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta, id];
 
-    db.query(query1, values1, (err, result1) => {
-      if (err) {
-        return res.status(500).send("Error al actualizar el alimento");
-      }
+    await queryAsync(query1, values1);
 
-      // Actualizar stock_detalle si se proporcionan datos de stock
-      const query2 = `
-        UPDATE stock_detalle SET Id_Unidad_Medida = ?, Fecha_Caducidad = ?, Es_Perecedero = ?, 
-        Id_Usuario_Alta = ?, Fecha_Alta = ? WHERE Id_Alimento = ?
-      `;
-      const values2 = [id_unidad, fecha_caducidad, es_perecedero, Id_Usuario_Alta, Fecha_Alta, id];
+    // Actualizar los detalles del stock
+    const query2 = `
+      UPDATE stock_detalle 
+      SET Id_Unidad_Medida = ?, Cantidad = ?, Fecha_Caducidad = ?, Es_Perecedero = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = 1
+      WHERE Id_Alimento = ?
+    `;
+    const values2 = [id_unidad, cantidad, Fecha_Caducidad, es_perecedero, Id_Usuario_Alta, Fecha_Alta, id];
 
-      db.query(query2, values2, (err2, result2) => {
-        if (err2) {
-          return res.status(500).send("Error al actualizar stock");
-        }
+    await queryAsync(query2, values2);
 
-        res.json({ id, message: "Alimento actualizado con éxito" });
-      });
+    // Respuesta exitosa
+    res.status(200).json({
+      message: "Alimento y detalle del stock actualizados exitosamente.",
+      alimento: { id, nombre, tipo, es_perecedero, imagen },
+      stock: { id_unidad, cantidad, fecha_caducidad: Fecha_Caducidad },
     });
+  } catch (error) {
+    console.error("Error al actualizar el alimento:", error);
+    res.status(500).json({ error: "Error al actualizar el alimento" });
   }
 });
+
+
+
 
 
 module.exports = router;
