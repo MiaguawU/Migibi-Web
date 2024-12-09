@@ -24,6 +24,11 @@ const Procedimiento = require("./base/Procedimiento")
 const ProREAL = require("./base/ProcedimientoREAL")
 const tipo_alimento =  require("./base/cat_tipo_alimento");
 const unidad_medida = require("./base/cat_unidad_medida");
+const recetas_diaGeneral = require("./base/receta_diaGeneral");
+const recetas_diaDesayuno = require("./base/receta_diaDesayuno");
+const recetas_diaComida = require("./base/receta_diaComida");
+const recetas_diaCena = require("./base/receta_diaCena");
+const hoyGeneral = require("./base/HoyGeneral");
 
 dotenv.config();
 
@@ -127,8 +132,6 @@ app.use("/tipoC", tipo_consumo);
 app.use("/proceso", Procedimiento);
 app.use("/proED" , ProREAL);
 
-
-
 //modificar alimentos
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);
@@ -138,7 +141,14 @@ app.use("/tipoA", tipo_alimento);
 //unidad
 app.use("/unidad", unidad_medida);
 
+//Recetas_Dia y plan
+app.use("/planGeneral", recetas_diaGeneral);
+app.use("/editarDesayuno", recetas_diaDesayuno);
+app.use("/editarComida", recetas_diaComida);
+app.use("/editarCena", recetas_diaCena);
 
+//Hoy
+app.use("/hoyGeneral", hoyGeneral);
 
 app.disable('etag'); // En Express.js
 

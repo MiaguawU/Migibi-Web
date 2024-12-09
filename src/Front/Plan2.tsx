@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { Row, Card, Col, ConfigProvider } from 'antd'; 
+import React, { useState, useEffect } from "react";
+import { Row, Card, Col, ConfigProvider, message } from 'antd'; 
+import axios from "axios";
+import PUERTO from "../config";
+import {formatoFechaLegible} from "./Metodos/FormatoFecha";
 
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
@@ -19,8 +22,26 @@ const handleDelete = () => {
   console.log("Eliminar receta");
 };
 
+interface CardData {
+  id: number;
+  title: string;
+  portions: string;
+  calories: string;
+  time: string;
+  image: string;
+}
+interface comidaSemana {
+  comida: string;
+  recetas: CardData[];
+}
+interface semanaData {
+  fecha: string; 
+  comidas: comidaSemana[] 
+}
 export default function Inicio() {   
   const [weekIndex, setWeekIndex] = useState(0);
+  const [loading, setLoading] = useState(true);  
+  const [DiasPlan, setDiasPlan] = useState<semanaData[]>([]);
 
   const weeks = [
     "Semana del 1 al 7 de noviembre",
@@ -37,34 +58,93 @@ export default function Inicio() {
     if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
   };
 
-  interface CardData {
-    id: number;
-    title: string;
-    portions: string;
-    calories: string;
-    time: string;
-    image: string;
-  }
+  const datosRecetasSemana = async () => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+    const id = Number(currentUser);
+  
+    setLoading(true);
+    try {
+      const response = await axios.get(`${PUERTO}/hoyGeneral/${id}`);
+  
+      if (response.data) {
+        const semanaData: semanaData[] = response.data.map((registro: any) => ({
+          fecha: new Date(registro.Fecha).toISOString().split("T")[0], // Formato de fecha
+          comidas: [
+            {
+              comida: "Desayuno",
+              recetas: registro.Activo_Desayuno > 0
+                ? [
+                    {
+                      id: registro.Id_Receta_Desayuno || 0,
+                      title: registro.Nombre_Desayuno || "",
+                      portions: String(registro.Porciones_Desayuno || "0"),
+                      calories: String(registro.Calorias_Desayuno || "0"),
+                      time: registro.Tiempo_Desayuno || "",
+                      image: registro.Imagen_Desayuno
+                        ? `${PUERTO}${registro.Imagen_Desayuno}`
+                        : "defRec.png",
+                    },
+                  ]
+                : [],
+            },
+            {
+              comida: "Comida",
+              recetas: registro.Activo_Comida > 0
+                ? [
+                    {
+                      id: registro.Id_Receta_Comida || 0,
+                      title: registro.Nombre_Comida || "",
+                      portions: String(registro.Porciones_Comida || "0"),
+                      calories: String(registro.Calorias_Comida || "0"),
+                      time: registro.Tiempo_Comida || "",
+                      image: registro.Imagen_Comida
+                        ? `${PUERTO}${registro.Imagen_Comida}`
+                        : "defRec.png",
+                    },
+                  ]
+                : [],
+            },
+            {
+              comida: "Cena",
+              recetas: registro.Activo_Cena > 0
+                ? [
+                    {
+                      id: registro.Id_Receta_Cena || 0,
+                      title: registro.Nombre_Cena || "",
+                      portions: String(registro.Porciones_Cena || "0"),
+                      calories: String(registro.Calorias_Cena || "0"),
+                      time: registro.Tiempo_Cena || "",
+                      image: registro.Imagen_Cena
+                        ? `${PUERTO}${registro.Imagen_Cena}`
+                        : "defRec.png",
+                    },
+                  ]
+                : [],
+            },
+          ],
+        }));
+  
+        console.log("HoyData procesada:", semanaData);
+        setDiasPlan(semanaData);
+        setLoading(false);
+        message.success("Recetas del día obtenidas exitosamente.");
+      }
+    } catch (error) {
+      console.error("Error al obtener las recetas del día", error);
+      setLoading(false);
+      message.error("No se pudo conectar con el servidor.");
+    }
+  };
+  
+  
+  useEffect(() => {
+    datosRecetasSemana();
+  }, []);
 
-  const cardsData: CardData[] = [
-    {id: 1, title: 'Pastel', portions: '30', calories: "2000Kcal", time: '2hr', image: 'https://via.placeholder.com/300'},
-    // Puedes agregar más datos aquí
-  ];
-
-  interface comidaSemana {
-    comida: string;
-    recetas: CardData[];
-  }
-
-  const comidasData: comidaSemana[] = [
-    {comida: "Desayuno", recetas: cardsData},
-    {comida: "Comida", recetas: cardsData}
-  ];
-
-  const semanaData: { fecha: string; comidas: comidaSemana[] }[] = [
-    {fecha: "Jueves 10 de noviembre 2024", comidas: comidasData},
-    {fecha: "Viernes 11 de noviembre 2024", comidas: comidasData}
-  ];
 
   return (  
     <ConfigProvider
@@ -103,11 +183,11 @@ export default function Inicio() {
 
         <br />
 
-        {semanaData.map((dia, index) => (
+        {DiasPlan.map((dia, index) => (
           <div key={index}>
             <div style={{backgroundColor: '#D3E2B4', height: '45px', borderRadius: '10px', display: "flex", alignItems: "center", flexWrap: "wrap"}}>
               <div style={{margin: '10px', marginTop: '5px', alignItems: 'center'}}>
-                <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071'}}>{dia.fecha}</a>      
+                <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071'}}>{formatoFechaLegible(dia.fecha)}</a>      
               </div>
             </div>
             <br /><br />
