@@ -71,6 +71,8 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
       localStorage.setItem("usuarios", JSON.stringify(usuarios));
       localStorage.setItem("currentUser", id);
+      sessionStorage.setItem("usuarios", JSON.stringify(usuarios));
+      sessionStorage.setItem("currentUser", id);
 
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
 
