@@ -397,11 +397,10 @@ export default function EDreceta() {
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
+                <Ingredientes  recetaId={Number(id)} />
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
-                  <Proceso recetaId={Number(id)} />
-
+                  <Proceso  recetaId={Number(id)} />
                 </div>
                 )}
               </div>

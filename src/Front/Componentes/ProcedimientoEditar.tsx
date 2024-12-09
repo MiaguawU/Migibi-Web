@@ -99,6 +99,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Manejar el cambio en los checkboxes
   const handleCheckboxChange = (index: number) => {
     setItems((prevItems) =>
       prevItems.map((item, i) =>
