@@ -2,7 +2,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import SyncedInputs from "./Componentes/SyncedInput";
 import Ingredientes from './Componentes/IngredientesRecetaEditar';
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import type { UploadProps } from 'antd';
 import type { InputNumberProps } from 'antd';
 import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber, message, ConfigProvider } from "antd";
@@ -22,6 +22,10 @@ const { TextArea } = Input;
 interface Tipo {
   Id_Tipo_Consumo: number;
   Tipo_Consumo: string;
+}
+
+interface id_rec {
+  id_r: number;
 }
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
@@ -53,7 +57,9 @@ export default function EDreceta() {
   const [syncedValue1, setSyncedValue1] = useState("Valor inicial 1");
   const [syncedValue2, setSyncedValue2] = useState("Valor inicial 2");
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
+  const navigate = useNavigate();
+const location = useLocation();
+const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o null
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +90,26 @@ export default function EDreceta() {
     Porciones: 1,
     Calorias: 0,
   });
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = ""; // Prevenir la recarga o cierre.
+    };
+  
+    const initializeRecipe = async () => {
+      await agregar(); // Crear receta al cargar.
+      await obtenerId(); // Obtener el ID de la nueva receta.
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    initializeRecipe(); // Ejecutar funciones iniciales.
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+  
   
 
   const uploadProps = {
@@ -100,50 +126,69 @@ export default function EDreceta() {
     
   };
 
-  const agregar = async () =>{
+  const agregar = async () => {
     try {
       const currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) {
-      message.warning("No hay un usuario logueado actualmente.");
-      return;
-    }
-    const id_us = Number(currentUser);
-      const response = await axios.post(`${PUERTO}/RecetaGeneral/${id_us}`, {
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        return;
+      }
+  
+      const id_us = Number(currentUser);
+      const response = await axios.post(`${PUERTO}/RecetaGeneral/${id_us}`, {}, {
         headers: { "Content-Type": "application/json" },
       });
-      if(response){
-        setTipos(response.data );
-        console.log("Tipos recibidos:", response.data);
+  
+      if (response.status === 200) {
+        message.success("Receta creada correctamente.");
+      } else {
+        message.error("Error al crear la receta.");
       }
-      else{
-        message.error("No se pudo conectar al server");
-      }
-      
     } catch (error) {
-      console.error("Error al cargar tipos:", error);
-      message.error("No se pudo conectar al serv");
+      console.error("Error al crear la receta:", error);
+      message.error("No se pudo conectar al servidor.");
     }
-  }
+  };
+  
 
-  const obtenerId = async () =>{
+  const obtenerId = async () => {
     try {
-      
-      const response = await axios.post(`${PUERTO}/agReceta`, {
+      const response = await axios.get(`${PUERTO}/agReceta`, {
         headers: { "Content-Type": "application/json" },
       });
-      if(response){
-        setTipos(response.data );
-        console.log("Tipos recibidos:", response.data);
-      }
-      else{
-        message.error("No se pudo conectar al server");
-      }
       
+      console.log("Respuesta del servidor:", response);  // Aquí puedes ver qué datos están llegando
+      
+      if (response.status === 200 && response.data?.id) {
+        const newId = response.data.id; // Verifica la estructura de la respuesta
+        setId(newId);  // Guarda el id en el estado
+        console.log("ID de nueva receta:", newId);
+      } else {
+        message.error("No se pudo obtener el ID de la receta.");
+      }
     } catch (error) {
-      console.error("Error al cargar tipos:", error);
-      message.error("No se pudo conectar al serv");
+      console.error("Error al obtener el ID:", error);
+      message.error("No se pudo conectar al servidor.");
     }
-  }
+  };
+  
+  
+  
+  
+  useEffect(() => {
+    const handlePopState = () => {
+      // Redirigir a la misma página para prevenir retroceso
+      navigate(location.pathname, { replace: true });
+      message.warning("No puedes retroceder mientras creas una receta.");
+    };
+  
+    window.addEventListener("popstate", handlePopState);
+  
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [navigate, location]);
+  
   
 
   // Obtener tipos de consumo
@@ -204,28 +249,33 @@ export default function EDreceta() {
  
   const actualizar = async () => {
     try {
-      if (!id) {
-        message.warning("No se encontró el id de la receta.");
-        return;
+      if (id === null) {
+        message.warning("No se encontró el ID de la receta.");
+        return; // Salir si no hay id
       }
   
-      // Crear un nuevo FormData
       const datosForm = new FormData();
-      datosForm.append("nombre", formData.Nombre || ""); // Asegúrate de que formData.Nombre exista
+      datosForm.append("nombre", formData.Nombre || ""); 
       datosForm.append("tiempo", formData.Tiempo?.format("HH:mm:ss") || "");
       datosForm.append("porciones", String(formData.Porciones));
       datosForm.append("calorias", String(formData.Calorias));
       datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
-      datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
-
+      if (formData.FileImagen) {
+        datosForm.append("imagen", formData.FileImagen); // Solo añade la imagen si existe
+      }
   
-      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // Enviar la solicitud PUT con el id en la URL
+      const response = await axios.put(
+        `${PUERTO}/recetaCRUD/${id}`, // Usa el ID directamente en la URL
+        datosForm,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
   
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
-        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualiza la receta inicial si es necesario
       } else {
         message.error("No se pudo actualizar la receta.");
       }
@@ -234,6 +284,8 @@ export default function EDreceta() {
       message.error("Hubo un problema al enviar los datos.");
     }
   };
+  
+  
   
   
 
@@ -257,9 +309,23 @@ export default function EDreceta() {
   };
 
   const onSubmit = async () => {
+    if (id === null) {
+      message.error("No se ha encontrado el ID de la receta.");
+      return;
+    }
     await actualizar();
-    setenviarDatos((prev) => !prev); 
+    setenviarDatos((prev) => !prev); // Esto probablemente asegura que el componente Ingredientes se refresque.
   };
+  
+  useEffect(() => {
+    if (id !== null) {
+      // Aquí ya puedes llamar a la función actualizar
+      actualizar();
+    } else {
+      message.error("No se ha obtenido el ID.");
+    }
+  }, [id]);  // Asegúrate de que se ejecute solo cuando id cambie.
+  
   
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -307,7 +373,7 @@ export default function EDreceta() {
                         onChange={handleSyncedChange}
                       />
 
-                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                   
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
@@ -416,7 +482,7 @@ export default function EDreceta() {
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
+              <Ingredientes recetaId={id ?? 0} onSubmit={enviarDatos} onReset={resetTrigger} />
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
                   <Proceso recetaId={Number(id)} />
@@ -428,7 +494,7 @@ export default function EDreceta() {
             <div className='f3'>
               {!isMobile && !isTablet && (
               <div className='proceso'>
-                <Proceso recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger} />
+                <Proceso recetaId={id ?? 0} onSubmit={enviarDatos} onReset={resetTrigger} />
               </div>
               )}
             </div>
@@ -440,4 +506,5 @@ export default function EDreceta() {
 };
 
   
+
   

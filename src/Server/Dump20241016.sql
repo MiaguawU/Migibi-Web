@@ -1,5 +1,6 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `migibi`; 
+
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: migibi
@@ -58,57 +59,58 @@ LOCK TABLES `cat_alimento` WRITE;
 /*!40000 ALTER TABLE `cat_alimento` DISABLE KEYS */;
 
 INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Es_Perecedero, Imagen_alimento) VALUES
-(1, 5, 'Huevos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(2, 7, 'Frijoles bayos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(3, 1, 'Calabacita', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(4, 9, 'Sal con ajo en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(5, 9, 'Sal', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(6, 9, 'Pimienta negra molida', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(7, 6, 'Harina de trigo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(8, 5, 'Huevos batidos', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(9, 6, 'Pan molido', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(10, 1, 'Jitomate', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(11, 1, 'Cebolla asada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(12, 9, 'Diente de ajo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(13, 9, 'Concentrado de tomate con pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(14, 9, 'Cilantro', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(15, 3, 'Filete de pescado', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(16, 10, 'Aceite vegetal', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(17, 3, 'Pechuga de pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(18, 1, 'Espinaca', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(19, 1, 'Champiñones', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(20, 10, 'Mantequilla', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(21, 5, 'Caldo de pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(22, 4, 'Crema de leche', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(24, 9, 'Pimienta', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(25, 4, 'Media crema', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(26, 5, 'Mayonesa', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(27, 1, 'Cebolla morada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(28, 2, 'Pepino', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(29, 3, 'Atun', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(31, 9, 'Chile cerrano', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(32, 6, 'Paquete de galletas saladas', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(33, 8, 'Agua', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(34, 9, 'Ajo en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(35, 10, 'Aceite de maiz', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(36, 3, 'Carne de res molida', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(37, 4, 'Leche evaporada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(38, 6, 'Paquete de pasta de espaguetti', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(39, 9, 'Sal con cebolla en polvo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(40, 1, 'Cebolla', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(41, 5, 'Manteca de cerdo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(42, 10, 'Jugo de naranja', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(43, 3, 'Res', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(44, 3, 'Pechuga de pollo empanizada', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(45, 1, 'Zanahoria', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(46, 7, 'Pechuga de pavo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(47, 6, 'Masa de maiz', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(48, 2, 'Tomates', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(49, 3, 'Pollo', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(50, 4, 'Crema', 1, 1, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(1, 5, 'Huevos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(2, 7, 'Frijoles bayos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(3, 1, 'Calabacita', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(4, 9, 'Sal con ajo en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(5, 9, 'Sal', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(6, 9, 'Pimienta negra molida', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(7, 6, 'Harina de trigo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(8, 5, 'Huevos batidos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(9, 6, 'Pan molido', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(10, 1, 'Jitomate', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(11, 1, 'Cebolla asada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(12, 9, 'Diente de ajo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(13, 9, 'Concentrado de tomate con pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(14, 9, 'Cilantro', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(15, 3, 'Filete de pescado', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(16, 10, 'Aceite vegetal', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(17, 3, 'Pechuga de pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(18, 1, 'Espinaca', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(19, 1, 'Champiñones', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(20, 10, 'Mantequilla', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(21, 5, 'Caldo de pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(22, 4, 'Crema de leche', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(24, 9, 'Pimienta', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(25, 4, 'Media crema', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(26, 5, 'Mayonesa', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(27, 1, 'Cebolla morada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(28, 2, 'Pepino', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(29, 3, 'Atun', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(31, 9, 'Chile cerrano', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(32, 6, 'Paquete de galletas saladas', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(33, 8, 'Agua', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(34, 9, 'Ajo en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(35, 10, 'Aceite de maiz', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(36, 3, 'Carne de res molida', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(37, 4, 'Leche evaporada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(38, 6, 'Paquete de pasta de espaguetti', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(39, 9, 'Sal con cebolla en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
+(40, 1, 'Cebolla', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(41, 5, 'Manteca de cerdo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(42, 10, 'Jugo de naranja', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(43, 3, 'Res', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(44, 3, 'Pechuga de pollo empanizada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(45, 1, 'Zanahoria', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(46, 7, 'Pechuga de pavo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(47, 6, 'Masa de maiz', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(48, 2, 'Tomates', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(49, 3, 'Pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
+(50, 4, 'Crema', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
 (98, 1, 'Papas fritas', 1, 4, '2024-06-05 16:29:34', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png');
 
 UNLOCK TABLES;
+
 
 
 
@@ -410,7 +412,7 @@ INSERT INTO `receta` (`Nombre`, `Activo`, `Id_Usuario_Alta`, `Fecha_Alta`, `Id_T
 ('Calabacitas con queso panela y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:25:00', 220),
 ('Huevos con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:30:00', 350),
 ('Papas con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:35:00', 400),
-('Papas con queso y Frijoles', 0, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:40:00', 450);
+('Papas con queso y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:40:00', 450);
 
 
 /*!40000 ALTER TABLE `receta` ENABLE KEYS */;
@@ -818,7 +820,7 @@ CREATE TABLE `usuario` (
   `Email` varchar(250) DEFAULT NULL UNIQUE,
   `Es_Gmail` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`Id_Usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB auto_increment=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 DELIMITER //

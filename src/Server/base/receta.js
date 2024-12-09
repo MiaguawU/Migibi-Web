@@ -7,29 +7,32 @@ const router = express.Router();
 
 // Crear una nueva receta (POST)
 router.post("/:id", (req, res) => {
-  const id= req.params;
+  const idUsuario = parseInt(req.params.id, 10);
+
+  if (!idUsuario) {
+    return res.status(400).json({ message: "ID de usuario inválido o no proporcionado" });
+  }
 
   const query = `
-    INSERT INTO receta (Nombre, Id_Usuario_Alta, Fecha_Alta, Id_Tipo_Consumo, Activo)
-    VALUES ('Receta_nueva', ?, ?, 1, 0)
+    INSERT INTO receta (Nombre, Id_Usuario_Alta, Fecha_Alta, Id_Tipo_Consumo, Tiempo , Calorias, Activo)
+    VALUES ('Receta_nueva', ?, ?, 1, '00:30:00', 20 ,0);
   `;
 
   const hoy = new Date();
-    const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+  const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
 
-  const values = [id, Fecha_Alta];
+  const values = [idUsuario, Fecha_Alta];
 
-  // Ejecutar la consulta
-  db.query(query, values ,(err, result) => {
+  db.query(query, values, (err, result) => {
     if (err) {
       console.error("Error al agregar receta:", err);
       return res.status(500).send("Error al agregar receta");
     }
 
-    // Responder con el ID de la nueva receta
     res.json({ id: result.insertId, message: "Receta agregada con éxito" });
   });
 });
+
 
 // Obtener receta(s) (GET)
 router.get("/", (req, res) => {
@@ -40,6 +43,7 @@ router.get("/", (req, res) => {
               Tiempo, 
               Calorias, 
               Imagen_receta,
+              Id_Usuario_Alta,
               Activo
             FROM receta`;
 
