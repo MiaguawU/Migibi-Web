@@ -401,7 +401,7 @@ export default function EDreceta() {
                     }}
                   >
                     <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
-                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                    {/*<Button className='btImg' ><img src={btCom} className='imgCom'/></Button>*/}
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
