@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Row, Card, Col, ConfigProvider, message } from 'antd'; 
+import { Button, Card, ConfigProvider, message } from 'antd'; 
 import axios from "axios";
 import PUERTO from "../config";
 import {formatoFechaLegible} from "./Metodos/FormatoFecha";
-
+import PlanEditar from "./Componentes/PlanEditar";
+import PlanAgregar from "./Componentes/PlanAgregar";
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
-import imgdesayuno from "../Img/imgdesayuno.png";
-import relojarena from "../Img/relojarena.png";
-import cuadros from "../Img/cuadros.png";
-import caducar from "../Img/biCa.png";
-import agregar from "../Img/btagregar2.png";
+//import imgdesayuno from "../Img/imgdesayuno.png";
+//import relojarena from "../Img/relojarena.png";
+//import cuadros from "../Img/cuadros.png";
+//import caducar from "../Img/biCa.png";
+//import agregar from "../Img/btagregar2.png";
 
 const { Meta } = Card;
-
-const handleEdit = () => {
-  console.log("Editar receta");
-};
-
-const handleDelete = () => {
-  console.log("Eliminar receta");
-};
 
 interface CardData {
   id: number;
@@ -35,13 +28,20 @@ interface comidaSemana {
   recetas: CardData[];
 }
 interface semanaData {
+  id: number;
   fecha: string; 
   comidas: comidaSemana[] 
 }
+
 export default function Inicio() {   
   const [weekIndex, setWeekIndex] = useState(0);
   const [loading, setLoading] = useState(true);  
   const [DiasPlan, setDiasPlan] = useState<semanaData[]>([]);
+  const [isEditarOpen, setIsEditarOpen] = useState(false); // Estado del modal
+  const [isAgregarOpen, setIsAgregarOpen] = useState(false); // Estado del modal
+  const [diaSelected, setdiaSelected] = useState(0);
+  const [comidaSelected, setcomidaSelected] = useState("");
+
 
   const weeks = [
     "Semana del 1 al 7 de noviembre",
@@ -72,6 +72,7 @@ export default function Inicio() {
   
       if (response.data) {
         const semanaData: semanaData[] = response.data.map((registro: any) => ({
+          id: registro.Id_Recetas_Dia,
           fecha: new Date(registro.Fecha).toISOString().split("T")[0], // Formato de fecha
           comidas: [
             {
@@ -146,6 +147,46 @@ export default function Inicio() {
   }, []);
 
 
+  const handleEdit = (idDia: number, comidaNombre: string) => {
+    setdiaSelected(idDia);
+    setcomidaSelected(comidaNombre);
+    setIsEditarOpen(true);
+  };
+  
+  const handleDelete = async(idDia: number, comidaNombre: string) => {
+    setdiaSelected(idDia);
+    setcomidaSelected(comidaNombre);
+    console.log(diaSelected);
+    console.log(comidaSelected);
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+
+    const payload = {
+        Id_Recetas_Dia: idDia,
+      Id_Usuario_Modif: Number(currentUser)
+    };
+
+    try {
+      const response = await axios.put(`${PUERTO}/editar${comidaSelected}/borrar/${diaSelected}`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.status === 200) {
+        message.success("Receta editada correctamente.");
+        datosRecetasSemana();
+      } else {
+        message.error("Error al editar la receta.");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      message.error("Error al procesar la solicitud.");
+    }
+  };
+
+
   return (  
     <ConfigProvider
       theme={{
@@ -164,12 +205,33 @@ export default function Inicio() {
     >
       <div style={{ paddingLeft: '15px', paddingRight: '15px' }}>
         <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex'}}>
-          <div style={{height: '100%', display: 'flex'}}>
+          <div style={{height: '100%', display: 'flex', alignItems: 'center', padding: '15px'}}>
+            <ConfigProvider
+            theme={{
+              token: {
+                fontFamily: "Jomhuria, Serif",
+                fontSize: 40,
+                colorText: "#6B8762",
+                colorPrimary: '#00b96b',
+                borderRadius: 10,
+                colorBgContainer: '#CAE2B5',
+              }}}>
+              <Button
+                key={`AgregarNuevoPlan`}
+                style={{height: "40px", margin: '10px', marginTop: '5px',}}
+                onClick={() => {setIsAgregarOpen(true);}}>
+                Agregar receta
+              </Button>
+              </ConfigProvider>
+              {/**
+               * 
             <img src={imgdesayuno} style={{height: '100px'}} />
             <img src={relojarena} style={{height: '66px'}} />  
+               */}
           </div>
           <div style={{height: '100%', display: 'flex', paddingLeft: '0'}}>
-            <img src={cuadros} style={{height: '58px'}} />
+            {/** 
+            <img src={cuadros} style={{height: '58px'}} />*/}
           </div>
         </div>
 
@@ -197,7 +259,8 @@ export default function Inicio() {
                   <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071'}}>{comida.comida}</a>
                   <div>
                     <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px'}}>
-                      {comida.recetas.map((card) => (
+                    {comida.recetas.length > 0 ? (
+                      comida.recetas.map((card) => (
                         <RecipeCard
                           key={card.id}
                           id={card.id}
@@ -206,10 +269,37 @@ export default function Inicio() {
                           calories={card.calories}
                           time={card.time}
                           image={card.image}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
+                          onEdit={() => handleEdit(dia.id, comida.comida)}
+                          onDelete={() => handleDelete(dia.id, comida.comida)}
                         />
-                      ))}
+                      ))
+                    ) : (
+                      
+                    <ConfigProvider
+                    theme={{
+                      token: {
+                        fontFamily: "Jomhuria, Serif",
+                        fontSize: 40,
+                        colorText: "#8BA577",
+                        colorPrimary: '#00b96b',
+                        borderRadius: 10,
+                        colorBgContainer: '#CAE2B5',
+                      }}}>
+                      <Button
+                        key={`add-recipe-${dia.id}-${comida.comida}`}
+                        style={{height: "40px"}}
+                        onClick={() => {
+                          setdiaSelected(dia.id);
+                          console.log(dia.id);
+                          setcomidaSelected(comida.comida);
+                          console.log(dia.id);
+                          setIsEditarOpen(true); // Abre el modal para agregar receta
+                        }}
+                      >
+                        Agregar receta
+                      </Button>
+                      </ConfigProvider>
+                    )}
                     </div>
                   </div>
                   <br /><br />
@@ -220,6 +310,18 @@ export default function Inicio() {
             <br />
           </div>
         ))}
+        <PlanEditar
+              visible= {isEditarOpen}
+              onClose={() => setIsEditarOpen(false)}
+              planId={diaSelected}
+              comida={comidaSelected}
+              onSubmit={datosRecetasSemana}
+            />
+        <PlanAgregar
+              visible= {isAgregarOpen}
+              onClose={() => setIsAgregarOpen(false)}
+              onSubmit={datosRecetasSemana}
+            />
       </div>
     </ConfigProvider>
   );

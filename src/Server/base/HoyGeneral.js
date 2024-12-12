@@ -66,7 +66,7 @@ WHERE
   
   // Ejecutar la consulta
   db.query(query, [id],  (err, result) => {
-   
+    console.log (query);
     if (err) {
       console.error("Error al obtener plan:", err);
       return res.status(500).send("Error al obtener plan");

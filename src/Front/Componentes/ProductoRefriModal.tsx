@@ -133,7 +133,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const handleFinish = (values: any) => {
     handleSubmit(values); // Llama a la función que maneja los datos
     form.resetFields(); // Resetea el formulario después de enviar
-    handleSubmit(values);
   };
 
   

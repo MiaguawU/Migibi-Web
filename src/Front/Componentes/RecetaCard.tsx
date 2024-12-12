@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Button, Tooltip } from "antd";
+import type { PopconfirmProps } from 'antd';
+import { Card, Button, Tooltip, Popconfirm, ConfigProvider } from "antd";
 import { EditOutlined, DeleteOutlined, ShareAltOutlined, ClockCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
 
 interface RecipeCardProps {
@@ -13,9 +14,12 @@ interface RecipeCardProps {
   onDelete: () => void;
 }
 
+const cancel: PopconfirmProps['onCancel'] = (e) => {
+};
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, time, image, onEdit, onDelete }) => {
   return (
+    <ConfigProvider>
     <Card
         hoverable
         style={{
@@ -28,7 +32,16 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, 
           <Button type="text" icon={<EditOutlined style={{color: "#86A071"}}/>} onClick={onEdit} />
         </Tooltip>,
         <Tooltip title="Eliminar">
-          <Button type="text" danger icon={<DeleteOutlined />} onClick={onDelete} />
+          <Popconfirm
+            title="Borrar la receta"
+            description="¿Está seguro de borrar la receta de su plan?"
+            onConfirm={onDelete}
+            onCancel={cancel}
+            okText="Sí"
+            cancelText="No"
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
         </Tooltip>,
       ]}
     >
@@ -83,6 +96,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, 
         </div>
        </div>
     </Card>
+    </ConfigProvider>
   );
 };
 
