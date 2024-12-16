@@ -99,6 +99,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
       });
 
       localStorage.setItem('user', JSON.stringify(response.data));
+      sessionStorage.setItem('user', JSON.stringify(response.data));
 
       message.success("Registro exitoso");
     } catch (error) {
