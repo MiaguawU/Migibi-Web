@@ -1,9 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOMClient from 'react-dom/client';
+import ReactDOM from "react-dom";
 import './index.css';
 import App from './App';
 import axios from 'axios';
 import reportWebVitals from './reportWebVitals';
+import "antd/dist/reset.css"; 
+import { ConfigProvider } from 'antd';
 
 // Interfaz para los datos del usuario
 interface UserData {
@@ -42,10 +45,8 @@ if (Object.keys(userData).length > 0) {
       if (id) {
         usuarios[id] = { username, email, foto_perfil, Cohabitantes };
         localStorage.setItem("usuarios", JSON.stringify(usuarios));
-        sessionStorage.setItem("usuarios", JSON.stringify(usuarios)); // Guardar usuarios en sessionStorage
         localStorage.setItem("currentUser", id);
-        sessionStorage.setItem("currentUser", id); // Guardar el usuario actual
-        console.log("Datos guardados en sessionStorage y localStorage.");
+        console.log("Datos guardados en  localStorage.");
       } else {
         console.warn("ID de usuario no proporcionado. No se guardaron los datos.");
       }
@@ -55,14 +56,14 @@ if (Object.keys(userData).length > 0) {
   })();
 }
 
-const root = ReactDOM.createRoot(
+const root = ReactDOMClient.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 root.render(
-  <React.StrictMode>
+  <ConfigProvider>
     <App />
-  </React.StrictMode>
+  </ConfigProvider>
 );
 
 reportWebVitals();

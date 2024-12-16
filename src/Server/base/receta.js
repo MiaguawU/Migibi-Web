@@ -6,32 +6,33 @@ const db = require('./connection');
 const router = express.Router();
 
 // Crear una nueva receta (POST)
-router.post("/", (req, res, next) => {
-  const { nombre, id_usuario_alta, fecha_alta, id_tipo_consumo, imagen_receta } = req.body;
+router.post("/:id", (req, res) => {
+  const idUsuario = parseInt(req.params.id, 10);
 
-  // Validar que los campos requeridos estén presentes
-  if (!nombre || !id_usuario_alta || !fecha_alta || !id_tipo_consumo || !imagen_receta) {
-    return res.status(400).send("Faltan datos requeridos");
+  if (!idUsuario) {
+    return res.status(400).json({ message: "ID de usuario inválido o no proporcionado" });
   }
 
-  // Consulta para insertar una nueva receta
   const query = `
-    INSERT INTO receta (Nombre, Id_Usuario_Alta, Fecha_Alta, Id_Tipo_Consumo, Imagen_receta) 
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO receta (Nombre, Id_Usuario_Alta, Fecha_Alta, Id_Tipo_Consumo, Tiempo , Calorias, Activo)
+    VALUES ('Receta_nueva', ?, ?, 1, '00:30:00', 20 ,0);
   `;
-  const values = [nombre, id_usuario_alta, fecha_alta, id_tipo_consumo, imagen_receta];
 
-  // Ejecutar la consulta
+  const hoy = new Date();
+  const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+
+  const values = [idUsuario, Fecha_Alta];
+
   db.query(query, values, (err, result) => {
     if (err) {
       console.error("Error al agregar receta:", err);
       return res.status(500).send("Error al agregar receta");
     }
 
-    // Responder con el ID de la nueva receta
     res.json({ id: result.insertId, message: "Receta agregada con éxito" });
   });
 });
+
 
 // Obtener receta(s) (GET)
 router.get("/", (req, res) => {
@@ -42,6 +43,7 @@ router.get("/", (req, res) => {
               Tiempo, 
               Calorias, 
               Imagen_receta,
+              Id_Usuario_Alta,
               Activo
             FROM receta`;
 
@@ -50,6 +52,28 @@ router.get("/", (req, res) => {
  //calorias
  //imagen y activo :3
   
+  // Ejecutar la consulta
+  db.query(query, (err, result) => {
+   
+    if (err) {
+      console.error("Error al obtener recetas:", err);
+      return res.status(500).send("Error al obtener recetas");
+    }
+    console.log("si salio :3");
+    console.log(result);
+    res.json(result);
+  });
+});
+
+// Obtener nombres receta(s) (GET)
+router.get("/nombres", (req, res) => {
+
+  let query = `SELECT
+              Id_Receta, 
+              Nombre,
+              Activo
+            FROM receta`;
+
   // Ejecutar la consulta
   db.query(query, (err, result) => {
    

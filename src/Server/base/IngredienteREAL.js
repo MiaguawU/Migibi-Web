@@ -3,9 +3,77 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
+<<<<<<< HEAD
 const router = express.Router();
 
 
+=======
+const Joi = require("joi");
+const router = express.Router();
+
+// Esquema de validación con Joi
+const ingredienteSchema = Joi.object({
+  nombre: Joi.string().required(),
+  cantidad: Joi.number().required(),
+  id_unidad: Joi.number().required(),
+});
+
+// Crear una nuevo ingrediente
+router.post("/:id", async (req, res) => {
+  const { id } = req.params; // Id de la receta
+  const { nombre, cantidad, id_unidad, Id_Usuario_Alta } = req.body;
+
+  // Validar entrada
+  const { error } = ingredienteSchema.validate({ nombre, cantidad, id_unidad });
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  // Fecha actual
+  const hoy = new Date();
+  const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
+
+  try {
+    // Verificar si el alimento existe
+    const alimentoQuery = "SELECT Id_Alimento FROM cat_alimento WHERE Alimento = ?";
+    const [alimentoResult] = await db.promise().query(alimentoQuery, [nombre]);
+
+    let Id_Alimento;
+
+    if (alimentoResult.length === 0) {
+      // Crear un nuevo alimento si no existe
+      const alimentoInsertQuery = `
+        INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Activo, Id_Usuario_Alta, Fecha_Alta)
+        VALUES (?, 1, 0, '/imagenes/defIng.png', 0, ?, ?)
+      `;
+      const [insertResult] = await db.promise().query(alimentoInsertQuery, [nombre, Id_Usuario_Alta, Fecha_Alta]);
+      Id_Alimento = insertResult.insertId;
+
+      // Insertar en `stock_detalle`
+      const stockDetalleQuery = `
+        INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta)
+        VALUES (?, ?, ?, 0, ?, ?)
+      `;
+      await db.promise().query(stockDetalleQuery, [id_unidad, cantidad, Id_Alimento, Id_Usuario_Alta, Fecha_Alta]);
+    } else {
+      // Obtener el ID del alimento existente
+      Id_Alimento = alimentoResult[0].Id_Alimento;
+    }
+
+    // Agregar a `receta_detalle`
+    const recetaDetalleQuery = `
+      INSERT INTO receta_detalle (Id_Receta, Id_Alimento, Cantidad, Id_Unidad_Medida, Id_Usuario_Alta, Fecha_Alta)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    await db.promise().query(recetaDetalleQuery, [id, Id_Alimento, cantidad, id_unidad, Id_Usuario_Alta, Fecha_Alta]);
+
+    res.json({ message: "Ingrediente agregado exitosamente." });
+  } catch (err) {
+    console.error("Error en la operación:", err);
+    res.status(500).json({ error: "Error interno al procesar la solicitud." });
+  }
+});
+>>>>>>> 10b36fc31ea201e04b0c962a2d91ff30144b3cbc
 
 // Eliminar un ingrediente de la receta
 router.put("/", (req, res) => {
@@ -55,10 +123,14 @@ router.put("/", (req, res) => {
   procesarSiguiente();
 });
 
+<<<<<<< HEAD
 //agregar un ingrediente a la receta
 router.post("/", (req, res) => {
   
 });
+=======
+
+>>>>>>> 10b36fc31ea201e04b0c962a2d91ff30144b3cbc
 
 
 module.exports = router;

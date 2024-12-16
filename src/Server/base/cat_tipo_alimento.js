@@ -65,10 +65,8 @@ router.post("/", (req, res, next) => {
 router.get("/", (req, res) => {
 
   // Construir la consulta SQL
-  let query = `SELECT * FROM cat_tipo_alimento`;
+  let query = `SELECT Id_Tipo_Alimento, Tipo_Alimento FROM cat_tipo_alimento`;
 
-
-  // Ejecutar la consulta
   db.query(query, (err, result) => {
     if (err) {
       console.error("Error al obtener tipos de alimento:", err);

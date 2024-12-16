@@ -25,7 +25,7 @@ interface Tipo {
 }
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
-  console.log(value); // { value: "lucy", key: "lucy", label: "Lucy (101)" }
+  console.log(value);
 };
 
 function getBase64(file: File, callback: (url: string) => void) {
@@ -40,7 +40,6 @@ const props: UploadProps = {
   listType: 'picture',
   previewFile(file) {
     console.log('Your upload file:', file);
-    // Your process logic. Here we just mock to the same file
     return fetch('https://next.json-generator.com/api/json/get/4ytyBoLK8', {
       method: 'POST',
       body: file,
@@ -58,6 +57,8 @@ export default function EDreceta() {
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resetTrigger, setResetTrigger] = useState(false);
+  const [enviarDatos, setenviarDatos] = useState(false);
   const [formData, setFormData] = useState<{
     Nombre: string;
     Imagen: string;
@@ -65,6 +66,7 @@ export default function EDreceta() {
     id_Tipo: string | number;
     Porciones: number;
     Calorias: number;
+    FileImagen?: File;
   }>({
     Nombre: '',
     Imagen: def,
@@ -74,18 +76,30 @@ export default function EDreceta() {
     Calorias: 0,
   });
 
+  const [recetaInicial, setRecetaInicial] = useState({
+    Nombre: '',
+    Imagen: def,
+    Tiempo: dayjs('00:00:00', 'HH:mm:ss'),
+    id_Tipo: '',
+    Porciones: 1,
+    Calorias: 0,
+  });
+  
+
   const uploadProps = {
-    showUploadList: false, // No mostrar la lista de archivos
+    showUploadList: false,
     beforeUpload: (file: File) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
         message.error("Solo puedes subir archivos de imagen.");
         return false;
       }
-      getBase64(file, (url) => setFormData((prev) => ({ ...prev, Imagen: url })));
-      return false; // Evitar la subida automática
+      setFormData((prev) => ({ ...prev, Imagen: URL.createObjectURL(file), FileImagen: file })); // Previsualización y guardado del archivo
+      return false; // Evitar subida automática
     },
+    
   };
+  
 
   // Obtener tipos de consumo
   const obtenerTipos = async () => {
@@ -108,6 +122,8 @@ export default function EDreceta() {
     }
   };
 
+  
+
   // Obtener datos de la receta
   const datosReceta = async () => {
     setLoading(true);
@@ -116,25 +132,27 @@ export default function EDreceta() {
         message.warning("No se encontró el id de la receta.");
         return;
       }
+  
       const response = await axios.get(`${PUERTO}/recetaCRUD/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-
+  
       if (response.data && response.data.length > 0) {
         const receta = response.data[0];
-        setFormData({
+        const recetaCargada = {
           Nombre: receta.Nombre || '',
           Imagen: receta.Imagen?.startsWith("http")
             ? receta.Imagen
             : `${PUERTO}${receta.Imagen}`,
-          Tiempo: dayjs(receta.Tiempo, 'HH:mm:ss').isValid()
-            ? dayjs(receta.Tiempo, 'HH:mm:ss')
-            : dayjs('00:00:00', 'HH:mm:ss'),
+          Tiempo: receta.Tiempo ? dayjs(receta.Tiempo, 'HH:mm:ss') : dayjs(), // Valor por defecto
           id_Tipo: receta.id_Tipo || '',
           Porciones: receta.Porciones || 1,
           Calorias: receta.Calorias || 0,
-        });
-        message.success("Receta obtenida");
+        };
+        
+        setFormData(recetaCargada);        
+        setRecetaInicial(recetaCargada); // Guardar datos iniciales
+        message.success("Receta obtenida correctamente.");
       } else {
         message.warning("No se encontró información de la receta.");
       }
@@ -145,19 +163,23 @@ export default function EDreceta() {
       setLoading(false);
     }
   };
+  
 
   // Inicialización del componente
   useEffect(() => {
     datosReceta();
     obtenerTipos();
-  }, []);
+  }, [id]);
+  
 
   const handleSyncedChange = (value: string) => {
+    console.log("Nuevo valor para Nombre:", value);
     setFormData((prevData) => ({
       ...prevData,
       Nombre: value,
     }));
   };
+  
 
   // Manejar cambios en el Select
   const handleSelectChange = (value: string | number) => {
@@ -173,20 +195,43 @@ export default function EDreceta() {
     }
   };
 
-  // Manejar envío del formulario
-  const handleSubmit = async () => {
+ 
+  const actualizar = async () => {
     try {
-      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, formData);
+      if (!id) {
+        message.warning("No se encontró el id de la receta.");
+        return;
+      }
+  
+      // Crear un nuevo FormData
+      const datosForm = new FormData();
+      datosForm.append("nombre", formData.Nombre || ""); // Asegúrate de que formData.Nombre exista
+      datosForm.append("tiempo", formData.Tiempo?.format("HH:mm:ss") || "");
+      datosForm.append("porciones", String(formData.Porciones));
+      datosForm.append("calorias", String(formData.Calorias));
+      datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
+      datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
+
+  
+      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
       } else {
-        message.warning("No se pudo actualizar la receta.");
+        message.error("No se pudo actualizar la receta.");
       }
     } catch (error) {
       console.error("Error al actualizar receta:", error);
       message.error("Hubo un problema al enviar los datos.");
     }
   };
+  
+  
+
+  
 
   
   const { TextArea } = Input;
@@ -201,9 +246,16 @@ export default function EDreceta() {
   };
 
   const onReset = () => {
-    datosReceta();
-    obtenerTipos();
+    datosReceta(); // Recargar receta
+    obtenerTipos(); // Recargar tipos de consumo
+    setResetTrigger((prev) => !prev); // Cambiar trigger para componentes dependientes
   };
+
+  const onSubmit = async () => {
+    await actualizar();
+    setenviarDatos((prev) => !prev); 
+  };
+  
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
@@ -228,7 +280,7 @@ export default function EDreceta() {
 
     return (
       <div className='todo'>
-        <Form  form={form} onFinish={handleSubmit}>
+        <Form  form={form} >
           <div className='receta'>
               { (isMobile || isTablet) && (
               <div className='rect'>
@@ -242,12 +294,22 @@ export default function EDreceta() {
                       },
                     }}
                   >
-                    <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
+                    <SyncedInputs
+                        variant="borderless"
+                        className="nRec"
+                        placeholder1="receta"
+                        value={formData.Nombre}
+                        onChange={handleSyncedChange}
+                      />
+
                     <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                  <Button htmlType="submit" className='btEn'><p className='tx2'>Enviar</p></Button>
+                <Button htmlType="button" className='btEn' onClick={onSubmit}>
+                      <p className='tx2'>Enviar</p>
+                    </Button>
+
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
                 </div>
               </div>
@@ -255,13 +317,17 @@ export default function EDreceta() {
             
             <div className='f1'>
               <div className='imgDiv'>
-                <img src={formData.Imagen} alt='Receta'/> 
-                {/*style={{
-                  maxHeight: '400px',
-                  maxWidth: '300px',
-                  border: '1px solid #3E7E1E',
-                  borderRadius: '10px' 
-                }}/>de Isis*/}
+              <img
+                  src={formData.Imagen || def}
+                  alt="Receta"
+                  style={{
+                    maxHeight: '400px',
+                    maxWidth: '300px',
+                    border: '1px solid #3E7E1E',
+                    borderRadius: '10px',
+                  }}
+                />
+
                 <Upload {...uploadProps}>{/*...props de Nisa*/}
                   <Button className='btUp' icon={<UploadOutlined />}></Button>
                 </Upload>
@@ -317,25 +383,7 @@ export default function EDreceta() {
                     onChange={(value) =>
                       setFormData({ ...formData, Calorias: value || 0 })
                     }/>
-                    {/**
-                  <Select
-                    labelInValue
-                    defaultValue={{ value: 'lucy', label: 'Lucy (101)' }}
-                    style={{ width: 120 }}
-                    onChange={handleChange}
-                    options={[
-                      {
-                        value: 'jack',
-                        label: 'Jack (100)',
-                      },
-                      {
-                        value: 'lucy',
-                        label: 'Lucy (101)',
-                      },
-                    ]}
-                    className='sl2'
-                    
-                  /> Nisa */}
+                   
                 </div>
               </div>
             </div>
@@ -353,20 +401,21 @@ export default function EDreceta() {
                     }}
                   >
                     <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
-                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                    {/*<Button className='btImg' ><img src={btCom} className='imgCom'/></Button>*/}
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                  <Button htmlType="submit"  className='btEn'><p className='tx2'>Enviar</p></Button>
+                  <Button htmlType="submit"  className='btEn' onClick={onSubmit}><p className='tx2'>Enviar</p></Button>
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
                 </div>
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} />
+                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
-                  <Proceso  recetaId={Number(id)} />
+                  <Proceso recetaId={Number(id)} />
+
                 </div>
                 )}
               </div>
@@ -374,7 +423,7 @@ export default function EDreceta() {
             <div className='f3'>
               {!isMobile && !isTablet && (
               <div className='proceso'>
-                <Proceso recetaId={Number(id)} />
+                <Proceso recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger} />
               </div>
               )}
             </div>
