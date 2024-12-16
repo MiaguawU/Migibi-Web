@@ -12,6 +12,7 @@ interface IngredientesProps {
   onReset?: boolean; // Indica si se debe reiniciar el estado
 }
 
+
 interface Item {
   id: number; // Representa el Id_Stock_Detalle
   name: string;
@@ -23,10 +24,13 @@ interface Item {
 
 const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSubmit, onReset }) => {
   const [items, setItems] = useState<Item[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tempDeleted, setTempDeleted] = useState<Item[]>([]); // Ingredientes temporalmente eliminados
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [tempDeleted, setTempDeleted] = useState<Item[]>([]);
+
+  const id_receta = recetaId;
 
   // Función para obtener los ingredientes de la receta
   const datosAlimento = async () => {
@@ -56,7 +60,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
   // Cargar ingredientes al inicio y tras un reset
   useEffect(() => {
     datosAlimento();
-  }, []);
+  }, []); // Agregar resetTrigger como dependencia
 
   useEffect(() => {
     if (onReset) {
