@@ -2,10 +2,14 @@
 import React from 'react';
 import ReactDOMClient from 'react-dom/client';
 import ReactDOM from "react-dom";
+import ReactDOMClient from 'react-dom/client';
+import ReactDOM from "react-dom";
 import './index.css';
 import App from './App';
 import axios from 'axios';
 import reportWebVitals from './reportWebVitals';
+import "antd/dist/reset.css"; 
+import { ConfigProvider } from 'antd';
 import "antd/dist/reset.css"; 
 import { ConfigProvider } from 'antd';
 
@@ -71,7 +75,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <ConfigProvider>
+  <ConfigProvider>
     <App />
+  </ConfigProvider>
   </ConfigProvider>
 );
 

@@ -130,6 +130,8 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     });
   };
 
+  
+
   return (
     <ConfigProvider
       theme={{
@@ -151,7 +153,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
         title="Agregar Producto"
         visible={visible}
         onCancel={onClose}
-        footer={null}
+        footer={null} // Elimina los botones predeterminados del modal
       >
         <Form
           {...formItemLayout}
