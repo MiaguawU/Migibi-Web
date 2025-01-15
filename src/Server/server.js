@@ -134,7 +134,6 @@ app.use("/tipoC", tipo_consumo);
 app.use("/proceso", Procedimiento);
 app.use("/proED" , ProREAL);
 
-
 //modificar alimentos
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);

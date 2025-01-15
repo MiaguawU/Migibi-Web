@@ -65,6 +65,28 @@ router.get("/", (req, res) => {
   });
 });
 
+// Obtener nombres receta(s) (GET)
+router.get("/nombres", (req, res) => {
+
+  let query = `SELECT
+              Id_Receta, 
+              Nombre,
+              Activo
+            FROM receta`;
+
+  // Ejecutar la consulta
+  db.query(query, (err, result) => {
+   
+    if (err) {
+      console.error("Error al obtener recetas:", err);
+      return res.status(500).send("Error al obtener recetas");
+    }
+    console.log("si salio :3");
+    console.log(result);
+    res.json(result);
+  });
+});
+
 
 //eliminar receta
 router.put("/:id", (req, res) => {

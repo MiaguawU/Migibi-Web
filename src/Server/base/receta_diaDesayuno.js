@@ -3,25 +3,46 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
+const Joi = require("joi");
 const router = express.Router();
 
+// Esquema de validación con Joi
+const ingredienteSchema = Joi.object({
+  Id_Recetas_Dia: Joi.number().required(),
+  id_receta: Joi.number().required(),
+  Id_Usuario_Alta: Joi.number().required()
+});
+// Esquema de validación con Joi
+const eliminarSchema = Joi.object({
+  Id_Recetas_Dia: Joi.number().required(),
+  Id_Usuario_Modif: Joi.number().required()
+});
 // Actualizar receta de desayuno
-router.put("/desayuno/:id", (req, res) => {
-    const { id } = req.params;
-    const { fecha, idRecetaDesayuno, idUsuarioModif } = req.body;
-  
-    if (!fecha || !idRecetaDesayuno || !idUsuarioModif) {
-      return res.status(400).json({ message: "Faltan datos requeridos" });
-    }
-  
+router.put("/:Id_Recetas_Dia", (req, res) => {
+    const { Id_Recetas_Dia } = req.params;
+    const { id_receta, Id_Usuario_Alta } = req.body;
+
+  // Validar entrada (fusionando params y body)
+  const { error } = ingredienteSchema.validate({
+    Id_Recetas_Dia: Number(Id_Recetas_Dia), // Convertir a número
+    id_receta,
+    Id_Usuario_Alta
+  });
+
+  if (error) {
+    console.log("Error al validar:", error);
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
     const query = `
       UPDATE recetas_dia
-      SET Fecha = ?, Id_Receta_Desayuno = ?, Id_Usuario_Modif = ?, Fecha_Modif = NOW()
+      SET Id_Receta_Desayuno = ?, Id_Usuario_Modif = ?, Fecha_Modif = NOW()
       WHERE Id_Recetas_Dia = ?
     `;
   
-    db.query(query, [fecha, idRecetaDesayuno, idUsuarioModif, id], (err, result) => {
+    db.query(query, [id_receta, Id_Usuario_Alta, Id_Recetas_Dia], (err, result) => {
       if (err) {
+        
         console.error("Error al actualizar desayuno:", err);
         return res.status(500).json({ message: "Error interno del servidor" });
       }
@@ -31,21 +52,28 @@ router.put("/desayuno/:id", (req, res) => {
   });
   
 // Eliminar (borrar lógico) receta de desayuno
-router.delete("/desayuno/:id", (req, res) => {
-    const { id } = req.params;
-    const { idUsuarioBaja } = req.body;
+router.put("/borrar/:Id_Recetas_Dia", (req, res) => {
+  const { Id_Recetas_Dia } = req.params;
+  const { Id_Usuario_Modif } = req.body;
   
-    if (!idUsuarioBaja) {
-      return res.status(400).json({ message: "Faltan datos requeridos" });
-    }
+// Validar entrada (fusionando params y body)
+const { error } = eliminarSchema.validate({
+  Id_Recetas_Dia: Number(Id_Recetas_Dia), // Convertir a número
+  Id_Usuario_Modif
+});
+
+if (error) {
+  console.log("Error al validar:", error);
+  return res.status(400).json({ error: error.details[0].message });
+}
   
     const query = `
       UPDATE recetas_dia
-      SET Id_Receta_Desayuno = NULL, Id_Usuario_Baja = ?, Fecha_Baja = NOW()
+      SET Id_Receta_Desayuno = NULL, Id_Usuario_Modif = ?, Fecha_Modif = NOW()
       WHERE Id_Recetas_Dia = ?
     `;
   
-    db.query(query, [idUsuarioBaja, id], (err, result) => {
+    db.query(query, [Id_Usuario_Modif, Id_Recetas_Dia], (err, result) => {
       if (err) {
         console.error("Error al eliminar desayuno:", err);
         return res.status(500).json({ message: "Error interno del servidor" });

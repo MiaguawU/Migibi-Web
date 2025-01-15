@@ -17,15 +17,16 @@ import Plan2 from './Front/Plan2';
 import Recetas from './Front/Recetas';
 import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
-import Acceder from './Front/Acceder';  // Asegúrate de que esta importación sea correcta
+import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
 import Prueba from './Front/PruebaCam';
-import AuthForm from './Front/Componentes/AuthForm';  
+import AuthForm from './Front/Componentes/AuthForm';
 import IngRecetaEditar from './Front/Componentes/IngredientesRecetaEditar';
 import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
 import InstruccionModal from './Front/Componentes/InstruccionModal';
 import Ingrediente from './Front/Componentes/IngredienteModal';
+
 type ItemType = Required<MenuProps>['items'][number];
 
 const mainItems: ItemType[] = [
@@ -48,7 +49,7 @@ const accederItem: ItemType[] = [
 
 function App() {
   const [isDrawerVisible, setDrawerVisible] = useState(false);
-  const [Accedio, setAccedio] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const showDrawer = () => setDrawerVisible(true);
@@ -60,29 +61,22 @@ function App() {
 
   useEffect(() => {
     const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
-    const currentUser =  localStorage.getItem("currentUser");
-  
-    if (currentUser && ( usuariosLocal[currentUser])) {
-      setAccedio(true); // Si hay un usuario activo, marcar como autenticado
-    } else {
-      setAccedio(false);
-    }
-  
+    const currentUser = localStorage.getItem("currentUser");
+
+    setHasAccess(currentUser && usuariosLocal[currentUser] ? true : false);
+
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
 
-  // Lógica para manejar el login
   const onLogin = (userData: any) => {
     localStorage.setItem("usuarios", JSON.stringify({ [userData.id]: userData }));
     localStorage.setItem("currentUser", userData.id);
-    setAccedio(true);
-    console.log("Usuario logueado y datos almacenados en sessionStorage:", userData);
+    setHasAccess(true);
+    console.log("Usuario logueado y datos almacenados en localStorage:", userData);
   };
-  
 
   return (
     <Router>
@@ -98,17 +92,17 @@ function App() {
                   onClose={closeDrawer}
                   open={isDrawerVisible}
                 >
-                  <Menu mode="vertical" items={Accedio ? [...mainItems, ...profileItem] : [...mainItems.slice(0, 3), ...accederItem]} />
+                  <Menu mode="vertical" items={hasAccess ? [...mainItems, ...profileItem] : [...mainItems.slice(0, 3), ...accederItem]} />
                 </Drawer>
               </div>
             ) : (
               <div className="custom-menu">
                 <Menu
                   mode="horizontal"
-                  items={Accedio ? mainItems : mainItems.slice(0, 2)}
+                  items={hasAccess ? mainItems : mainItems.slice(0, 2)}
                   className="menu-links"
                 />
-                {Accedio ? (
+                {hasAccess ? (
                   <Menu
                     mode="horizontal"
                     items={profileItem}
@@ -136,23 +130,16 @@ function App() {
               <Route path="/recetas" element={<Recetas />} />
               <Route path="/refri" element={<Refri />} />
               <Route path="/edReceta" element={<EDreceta />} />
-              <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} /> {/* Aquí se pasa la función onLogin */}
+              <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} />
               <Route path="/verR" element={<VerR />} />
               <Route path="/modal" element={<Modal />} />
               <Route path="/terminosycondiciones" element={<VerR />} />
               <Route path="/avisodeprivacidad" element={<VerR />} />
               <Route path="/prueba" element={<Prueba />} />
               <Route path="/cad" element={<Caducar />} />
-              <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} 
-      onSubmit={true}
-      onReset={true}  />} />
-              <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} 
-              onSubmit={true}
-      onReset={true}  />} />
-      <Route path="/instruccion" element={<ProcRecetaEditar recetaId={0} 
-              onSubmit={true}
-      onReset={true}  />} />
-
+              <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} onSubmit={true} onReset={true} />} />
+              <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} onSubmit={true} onReset={true} />} />
+              <Route path="/instruccion" element={<ProcRecetaEditar recetaId={0} onSubmit={true} onReset={true} />} />
             </Routes>
           </main>
         </div>

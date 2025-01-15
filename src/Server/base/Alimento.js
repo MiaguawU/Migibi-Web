@@ -12,12 +12,13 @@ const BASE_IMAGE_URL = process.env.SERVER_PORT; // URL base del servidor
 // Validación de datos con Joi
 const alimentoSchema = Joi.object({
   nombre: Joi.string().required(),
-  tipo: Joi.number().required(),
+  tipo: Joi.number().required().messages({ "number.base": "El tipo debe ser un número." }),
   id_unidad: Joi.number().required(),
   cantidad: Joi.number().min(1).required(),
-  fecha_caducidad: Joi.date().optional(),
+  fecha_caducidad: Joi.date().allow(null, '').optional(), // Permite cadenas vacías o nulos
   Id_Usuario_Alta: Joi.number().required(),
 });
+
 
 // Asincronizar consultas de la base de datos
 const queryAsync = util.promisify(db.query).bind(db);
@@ -70,6 +71,7 @@ router.post("/", async (req, res) => {
     }
 
     const { nombre, tipo, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta } = req.body;
+    console.log(req.body);
 
     // Validación de datos
     const { error } = alimentoSchema.validate(req.body);
@@ -98,6 +100,15 @@ router.post("/", async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     const values1 = [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta];
+
+    const query = `
+      SELECT Alimento FROM cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
+      VALUES (?, ?, ?, ?, ?, ?) LIKE Alimento '%?%'
+    `;
+
+    //validadr si ya exite ese alimento
+    //si existe sumar todos en el total
+    //marcar que se puede comer para todos los usuarios 
 
     db.query(query1, values1, (err, result1) => {
       if (err) {

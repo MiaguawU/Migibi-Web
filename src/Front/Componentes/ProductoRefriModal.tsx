@@ -50,20 +50,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const [Tipos, setTipos] = useState<Tipo[]>([]);  
   const [Unidades, setUnidad] = useState<Unidad[]>([]); 
 
-  const props: UploadProps = {
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image/'); // Verifica que sea cualquier tipo de imagen
-      if (!isImage) {
-        message.error(`${file.name} no es un archivo de imagen válido`);
-      }
-      return isImage || Upload.LIST_IGNORE;
-    },
-    onChange: (info) => {
-      console.log(info.fileList);
-    },
-  };
-  
-
   useEffect(() => {
     if (visible) {
       obtenerTipos();
@@ -79,6 +65,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       message.error("No se pudieron cargar los tipos.");
     }
   };
+
   const obtenerUnidad = async () => {
     try {
       const response = await axios.get(`${PUERTO}/unidad`);
@@ -87,36 +74,34 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       message.error("No se pudieron cargar las unidades.");
     }
   };
+
   const handleSubmit = async (values: any) => {
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
       message.warning("No hay un usuario logueado actualmente.");
       return;
     }
-  
+
     const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
     const user = usuarios[currentUser];
-  
+
     if (!user) {
       message.warning("Usuario no encontrado en los datos locales.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append('nombre', values.name);
-    formData.append('fecha_caducidad', values.expirationDate || '');
-    formData.append('cantidad', values.quantity);
-    formData.append('id_unidad', values.unit);
     formData.append('tipo', values.type);
+    formData.append('id_unidad', values.unit);
+    formData.append('cantidad', values.quantity);
+    formData.append('fecha_caducidad', values.expirationDate || null);
     formData.append('Id_Usuario_Alta', currentUser);
-  
+
     if (values.imgsrc && values.imgsrc.file) {
       formData.append('image', values.imgsrc.file.originFileObj);
-    } else { 
-      
     }
-    
-  
+
     try {
       const response = await axios.post(`${PUERTO}/alimento`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -128,15 +113,22 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       message.error('Error al agregar producto');
     }
   };
-  
 
   const handleFinish = (values: any) => {
-    handleSubmit(values); // Llama a la función que maneja los datos
-    form.resetFields(); // Resetea el formulario después de enviar
-    handleSubmit(values);
+    Modal.confirm({
+      title: '¿Es perecedero?',
+      content: 'Por favor, confirma si el producto es perecedero.',
+      okText: 'Sí',
+      cancelText: 'No',
+      onOk: () => {
+        handleSubmit(values); // Incluye la fecha de caducidad
+      },
+      onCancel: () => {
+        values.expirationDate = null; // Asigna null a la fecha de caducidad
+        handleSubmit(values);
+      },
+    });
   };
-
-  
 
   return (
     <ConfigProvider
@@ -159,13 +151,13 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
         title="Agregar Producto"
         visible={visible}
         onCancel={onClose}
-        footer={null} // Elimina los botones predeterminados del modal
+        footer={null}
       >
         <Form
           {...formItemLayout}
           form={form}
           style={{ maxWidth: 600 }}
-          onFinish={handleFinish} // Se conecta al envío
+          onFinish={handleFinish}
         >
           <Form.Item
             name="name"
@@ -197,7 +189,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
               min={0}
               max={1000}
               step={0.01}
-              precision={2} // Dos decimales
+              precision={2}
             />
           </Form.Item>
 
@@ -235,12 +227,11 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
             </Upload>
           </Form.Item>
 
-
           <Form.Item
             wrapperCol={{
               xs: { span: 24 },
-              sm: { span: 24 }, // Ocupa todo el espacio
-              offset: 0, // Sin desplazamiento
+              sm: { span: 24 },
+              offset: 0,
             }}
           >
             <Button type="primary" htmlType="submit" block>

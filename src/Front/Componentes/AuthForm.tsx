@@ -71,8 +71,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
       localStorage.setItem("usuarios", JSON.stringify(usuarios));
       localStorage.setItem("currentUser", id);
-      sessionStorage.setItem("usuarios", JSON.stringify(usuarios));
-      sessionStorage.setItem("currentUser", id);
 
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
 
@@ -99,7 +97,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
       });
 
       localStorage.setItem('user', JSON.stringify(response.data));
-      sessionStorage.setItem('user', JSON.stringify(response.data));
 
       message.success("Registro exitoso");
     } catch (error) {
@@ -118,7 +115,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem("user", JSON.stringify(response.data));
 
       message.success('Registro exitoso');
     } catch (error) {
