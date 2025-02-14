@@ -2,8 +2,6 @@
 import React from 'react';
 import ReactDOMClient from 'react-dom/client';
 import ReactDOM from "react-dom";
-import ReactDOMClient from 'react-dom/client';
-import ReactDOM from "react-dom";
 import './index.css';
 import App from './App';
 import axios from 'axios';
@@ -11,7 +9,7 @@ import reportWebVitals from './reportWebVitals';
 import "antd/dist/reset.css"; 
 import { ConfigProvider } from 'antd';
 import "antd/dist/reset.css"; 
-import { ConfigProvider } from 'antd';
+import { createRoot } from 'react-dom/client';
 
 // Definición de la interfaz para los datos del usuario
 interface UserData {
@@ -69,9 +67,7 @@ if (Object.keys(userData).length > 0) {
 }
 
 // Configuración del punto de entrada de React
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
   <ConfigProvider>

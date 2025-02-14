@@ -106,9 +106,24 @@ router.post("/", async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?) LIKE Alimento '%?%'
     `;
 
-    //validadr si ya exite ese alimento
-    //si existe sumar todos en el total
     //marcar que se puede comer para todos los usuarios 
+    const query3 = `
+      SELECT COUNT(*) AS existe 
+        FROM cat_alimento 
+        WHERE Id_Usuario_Alta = ? AND Alimento = ? AND;`;
+
+    //validadr si ya exite ese alimento
+    //contar si hay coincidencias en los alimentos que tiene el usuario 
+    //si no es perecedero se aumenta la cantidad
+    const query2 = `
+      SELECT COUNT(*) AS existe 
+        FROM cat_alimento 
+        WHERE Id_Usuario_Alta = ? AND Alimento = ? ;`;
+    
+    const query2_1 = `
+      SELECT COUNT(*) AS existe 
+        FROM cat_alimento 
+        WHERE Id_Usuario_Alta = ? AND Alimento = ? ;`;
 
     db.query(query1, values1, (err, result1) => {
       if (err) {
