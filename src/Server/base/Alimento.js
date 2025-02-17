@@ -80,79 +80,50 @@ router.post("/", async (req, res) => {
     const hoy = new Date();
     const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
     const es_perecedero = fecha_caducidad ? 1 : 0;
-
-    let Fecha_Caducidad = null;
-    if (fecha_caducidad) {
-      try {
-        const date = new Date(fecha_caducidad);
-        Fecha_Caducidad = date.toISOString().slice(0, 19).replace("T", " ");
-      } catch (parseError) {
-        return res.status(400).json({ error: "Formato de fecha inválido" });
-      }
-    }
-
-    // Asegurar que el prefijo `/imagenes/` esté incluido
+    const Fecha_Caducidad = formatFechaCaducidad(fecha_caducidad);
     const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
 
-    // Inserción en `cat_alimento`
-    const query1 = `
-      INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const values1 = [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta];
+    try {
+      // Verificar si el alimento ya existe y no es perecedero
+      const [existencia] = await queryAsync(
+        `SELECT Id_Alimento FROM cat_alimento 
+        WHERE Id_Usuario_Alta = ? AND Alimento = ? AND Es_Perecedero = 0 AND Activo = 1`,
+        [Id_Usuario_Alta, nombre]
+      );
 
-    const query = `
-      SELECT Alimento FROM cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?, ?) LIKE Alimento '%?%'
-    `;
-
-    //marcar que se puede comer para todos los usuarios 
-    const query3 = `
-      SELECT COUNT(*) AS existe 
-        FROM cat_alimento 
-        WHERE Id_Usuario_Alta = ? AND Alimento = ? AND;`;
-
-    //validadr si ya exite ese alimento
-    //contar si hay coincidencias en los alimentos que tiene el usuario 
-    //si no es perecedero se aumenta la cantidad
-    const query2 = `
-      SELECT COUNT(*) AS existe 
-        FROM cat_alimento 
-        WHERE Id_Usuario_Alta = ? AND Alimento = ? ;`;
-    
-    const query2_1 = `
-      SELECT COUNT(*) AS existe 
-        FROM cat_alimento 
-        WHERE Id_Usuario_Alta = ? AND Alimento = ? ;`;
-
-    db.query(query1, values1, (err, result1) => {
-      if (err) {
-        console.error("Error al insertar en cat_alimento:", err);
-        return res.status(500).json({ error: "Error al agregar el alimento." });
+      if (existencia) {
+        // Si ya existe y no es perecedero, se actualiza la cantidad
+        await queryAsync(
+          `UPDATE stock_detalle SET Total = Total + ?, Cantidad = Cantidad + ? WHERE Id_Alimento = ?`,
+          [cantidad, cantidad ,existencia.Id_Alimento]
+        );
+        return res.status(201).json({ message: "Cantidad actualizada correctamente" });
       }
 
-      const Id_Alimento = result1.insertId; // Obtener el ID generado por la inserción
+      // Insertar nuevo alimento
+      const result1 = await queryAsync(
+        `INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?, ?)`,
+        [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta]
+      );
 
-      // Inserción en `stock_detalle`
-      const query2 = `
-        INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
-      const values2 = [id_unidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero, Id_Usuario_Alta, Fecha_Alta];
+      const Id_Alimento = result1.insertId;
 
-      db.query(query2, values2, (err2, result2) => {
-        if (err2) {
-          console.error("Error al insertar en stock_detalle:", err2);
-          return res.status(500).json({ error: "Error al agregar el detalle del stock." });
-        }
+      // Insertar en stock_detalle
+      await queryAsync(
+        `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id_unidad, cantidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero, Id_Usuario_Alta, Fecha_Alta]
+      );
 
-        res.status(201).json({
-          message: "Alimento y detalle del stock agregados exitosamente.",
-          alimento: { id: Id_Alimento, nombre, tipo, es_perecedero, imagen },
-          stock: { id: result2.insertId, id_unidad, cantidad, fecha_caducidad: Fecha_Caducidad },
-        });
+      res.status(201).json({
+        message: "Alimento agregado exitosamente",
+        alimento: { id: Id_Alimento, nombre, tipo, es_perecedero, imagen },
       });
-    });
+    } catch (error) {
+      console.error("Error al agregar el alimento:", error);
+      res.status(500).json({ error: "Error al agregar el alimento" });
+    }
   });
 });
 
