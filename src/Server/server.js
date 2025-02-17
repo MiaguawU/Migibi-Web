@@ -71,12 +71,12 @@ app.use(passport.session());
 
 
 // Rutas de usuarios
-app.use("/usuarios", upload, usuarioRouter);
-app.use("/usuarioGmail", usuarioGmailRouter);
-app.use("/login", loginRouter);
-app.use("/logout", logoutRouter);
-app.use("/manejo",call)
-app.use("/save", routerSave);
+app.use("/usuarios/", upload, usuarioRouter);
+app.use("/usuarioGmail/", usuarioGmailRouter);
+app.use("/login/", loginRouter);
+app.use("/logout/", logoutRouter);
+app.use("/manejo/",call)
+app.use("/save/", routerSave);
 
 // Ruta de autenticación con Google
 app.get(
@@ -122,36 +122,36 @@ app.get(
 );
 
 //modificar recetas
-app.use("/recetaGeneral", recetaGeneral);
-app.use("/recetaCRUD" , recetaCRUD);
-app.use("/agReceta", recetaSecreta);
+app.use("/recetaGeneral/", recetaGeneral);
+app.use("/recetaCRUD/" , recetaCRUD);
+app.use("/agReceta/", recetaSecreta);
 //ingredientes
-app.use("/ingED", IngredienteReal);
-app.use("/ingredientes", Ingredientes);
+app.use("/ingED/", IngredienteReal);
+app.use("/ingredientes/", Ingredientes);
 //tipo_consumo
-app.use("/tipoC", tipo_consumo);
+app.use("/tipoC/", tipo_consumo);
 //Procedimiento (Instrucciones)
-app.use("/proceso", Procedimiento);
-app.use("/proED" , ProREAL);
+app.use("/proceso/", Procedimiento);
+app.use("/proED/" , ProREAL);
 
 //modificar alimentos
-app.use("/alimento", alimento);
-app.use("/caducar", caducar);
-app.use("/alimentoInactivo", routerAlimentoInactivo);
+app.use("/alimento/", alimento);
+app.use("/caducar/", caducar);
+app.use("/alimentoInactivo/", routerAlimentoInactivo);
 //tipo_alimento
-app.use("/tipoA", tipo_alimento);
+app.use("/tipoA/", tipo_alimento);
 //unidad
-app.use("/unidad", unidad_medida);
+app.use("/unidad/", unidad_medida);
 
 
 //Recetas_Dia y plan
-app.use("/planGeneral", recetas_diaGeneral);
-app.use("/editarDesayuno", recetas_diaDesayuno);
-app.use("/editarComida", recetas_diaComida);
-app.use("/editarCena", recetas_diaCena);
+app.use("/planGeneral/", recetas_diaGeneral);
+app.use("/editarDesayuno/", recetas_diaDesayuno);
+app.use("/editarComida/", recetas_diaComida);
+app.use("/editarCena/", recetas_diaCena);
 
 //Hoy
-app.use("/hoyGeneral", hoyGeneral);
+app.use("/hoyGeneral/", hoyGeneral);
 
 app.disable('etag'); 
 

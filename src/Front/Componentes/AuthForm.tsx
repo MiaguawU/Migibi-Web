@@ -58,52 +58,55 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
   const sesionNormal = async () => {
     try {
-      const data = { username: email, password };
+        const response = await axios.post(`${PUERTO}/login/`, {
+            username: email,  // Asegurar que coincida con el campo en registro
+            password: password
+        }, {
+            headers: { "Content-Type": "application/json" }
+        });
 
-      const response = await axios.post(`${PUERTO}/login`, data, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+        const { token, id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
 
-      const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
+        // Unificación del almacenamiento local
+        const usuario = { id, username, email: Email, foto_perfil, Cohabitantes };
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("user", JSON.stringify(usuario));
 
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-      usuarios[id] = { username, foto_perfil, Cohabitantes, Email };
+        message.success(`Bienvenido, ${username}. ${serverMessage || ""}`);
 
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-      localStorage.setItem("currentUser", id);
-
-      message.success(`Bienvenido, ${username}. ${serverMessage}`);
-
-      onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
+        onLogin(usuario);
     } catch (error: unknown) {
-      console.error('Error al iniciar sesión:', error);
+        console.error('Error al iniciar sesión:', error);
 
-      if (axios.isAxiosError(error)) {
-        message.error(error.response?.data || 'Error al iniciar sesión. Por favor, intente nuevamente.');
-      } else {
-        message.error('Ocurrió un error inesperado.');
-      }
+        if (axios.isAxiosError(error)) {
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Error al iniciar sesión.';
+            message.error(errorMsg);
+        } else {
+            message.error('Ocurrió un error inesperado.');
+        }
     }
-  };
+};
 
-  const registro = async () => {
+const registro = async () => {
     try {
-      const formData = new FormData();
-      formData.append("username", email);
-      formData.append("password", password);
+        const response = await axios.post(`${PUERTO}/usuarios/`, {
+            username: email,  // Mantener consistencia con login
+            password: password
+        }, {
+            headers: { "Content-Type": "application/json" }
+        });
 
-      const response = await axios.post(`${PUERTO}/usuarios`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+        const usuario = response.data;
+        localStorage.setItem('user', JSON.stringify(usuario));
 
-      localStorage.setItem('user', JSON.stringify(response.data));
-
-      message.success("Registro exitoso");
+        message.success("Registro exitoso");
     } catch (error) {
-      console.error("Error:", error);
-      message.error("Error al registrar");
+        console.error("Error:", error);
+        message.error("Error al registrar");
     }
-  };
+};
+
+
 
   const registroGmail = async () => {
     try {
