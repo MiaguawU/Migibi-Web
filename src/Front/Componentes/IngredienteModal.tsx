@@ -33,6 +33,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
   const [searchTerm, setSearchTerm] = useState('');
   const [unidades, setUnidades] = useState<Unidad[]>([]);
   const [alimentos, setAlimentos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchUnidades = async () => {
     try {
@@ -45,7 +46,22 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
 
   const fetchAlimentos = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/alimento`);
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+  
+      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+  
+      const response = await axios.get(`${PUERTO}/alimento/${userId}`);
+
       const alimentosData = response.data;
       setAlimentos(alimentosData.Perecedero.concat(alimentosData.NoPerecedero));
     } catch (error) {
@@ -105,7 +121,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
     searchTerm &&
     !filteredOptions.some((option) => option.value === searchTerm)
   ) {
-    filteredOptions.unshift({ value: searchTerm, label: `Añadir "${searchTerm}"` });
+    filteredOptions.unshift({ value: searchTerm, label: `"${searchTerm}"` });
   }
 
   const handleFinish = (values: any) => {

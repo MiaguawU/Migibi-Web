@@ -35,7 +35,7 @@ const PorCaducar: React.FC = () => {
         return;
       }
   
-      const response = await axios.get(`${PUERTO}/caducar`);
+      const response = await axios.get(`${PUERTO}/caducar/${userId}`);
       console.log("Datos recibidos:", response.data);
   
       const perecederos = response.data.porcaducar

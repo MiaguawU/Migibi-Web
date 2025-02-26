@@ -81,7 +81,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
   const obtenerAlimento = async () => {
     if (!alimentoId) return;
     try {
-      const response = await axios.get(`${PUERTO}/alimento/${alimentoId}`);
+      const response = await axios.get(`${PUERTO}/alUn/${alimentoId}`);
       const alimento = response.data;
   
       // Configurar valores del formulario

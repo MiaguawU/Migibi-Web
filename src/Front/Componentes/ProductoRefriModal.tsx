@@ -37,18 +37,7 @@ const formItemLayout = {
   },
 };
 
-const props: UploadProps = {
-  beforeUpload: (file) => {
-    const isIMG = file.type === 'image/png';
-    if (!isIMG) {
-      message.error(`${file.name} no es un archivo de imagen`);
-    }
-    return isIMG || Upload.LIST_IGNORE;
-  },
-  onChange: (info) => {
-    console.log(info.fileList);
-  },
-};
+
 
 const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const [form] = Form.useForm();
@@ -58,6 +47,22 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const [productoGuardado, setProductoGuardado] = useState<number | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isPerecederoModalOpen, setIsPerecederoModalOpen] = useState(false);
+  const [imagen, setImagen] = useState<File | null>(null);
+
+  const props: UploadProps = {
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith('image/');
+      if (!isImage) {
+        message.error(`${file.name} no es un archivo de imagen válido.`);
+      }
+      return isImage || Upload.LIST_IGNORE;
+    },
+    onChange: (info) => {
+      if (info.file.status === "done" || info.file.status === "uploading") {
+        setImagen(info.file.originFileObj || null);
+      }
+    },
+  };
 
 
   useEffect(() => {
@@ -148,8 +153,8 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     formData.append('fecha_caducidad', values.expirationDate || "");
     formData.append('Id_Usuario_Alta', currentUser);
   
-    if (values.imgsrc && values.imgsrc.file) {
-      formData.append('image', values.imgsrc.file.originFileObj);
+    if (imagen) {
+      formData.append('image', imagen);
     }
   
     try {

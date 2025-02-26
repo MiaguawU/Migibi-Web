@@ -10,6 +10,8 @@ import "antd/dist/reset.css";
 import { ConfigProvider } from 'antd';
 import "antd/dist/reset.css"; 
 import { createRoot } from 'react-dom/client';
+import PUERTO from './config';
+
 
 // Definición de la interfaz para los datos del usuario
 interface UserData {
@@ -36,13 +38,11 @@ const getUserDataFromURL = (): UserData => {
 // Función para enviar datos al servidor y gestionar el almacenamiento local
 const processUserData = async (userData: UserData) => {
   try {
-    // Enviar los datos al servidor
-    const response = await axios.post("http://localhost:5000/save", userData, {
+    const response = await axios.post(`${PUERTO}/save`, userData, {
       headers: { "Content-Type": "application/json" },
     });
     console.log("Datos enviados al servidor:", response.data);
 
-    // Guardar los datos en localStorage si hay un ID proporcionado
     const { id, username, email, foto_perfil, Cohabitantes } = userData;
     if (id) {
       const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
@@ -52,6 +52,14 @@ const processUserData = async (userData: UserData) => {
       localStorage.setItem("currentUser", id);
 
       console.log("Datos guardados en localStorage.");
+
+      // Refrescar la página solo si no se ha hecho antes
+      if (!localStorage.getItem("hasReloaded")) {
+        localStorage.setItem("hasReloaded", "true");
+        setTimeout(() => {
+          window.location.reload();
+        }, 400); // Pequeño retraso para asegurar que los datos se guardan antes del refresh
+      }
     } else {
       console.warn("ID de usuario no proporcionado. No se guardaron los datos.");
     }

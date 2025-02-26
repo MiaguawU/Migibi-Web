@@ -96,7 +96,7 @@ export default function Inicio() {
         return;
       }
   
-      const response = await axios.get(`${PUERTO}/alimento`);
+      const response = await axios.get(`${PUERTO}/alimento/${userId}`);
       const { Perecedero, NoPerecedero } = response.data;
   
       if (Array.isArray(Perecedero) && Array.isArray(NoPerecedero)) {

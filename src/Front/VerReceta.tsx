@@ -15,6 +15,9 @@ import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
 import './Estilos/EDrec.css';
 import dayjs, { Dayjs } from 'dayjs';
+import usePreventExit from "./hook/Proteger";
+import useBlockNavigation from "./hook/Bloquear";
+import useBlockShortcuts from "./hook/BloquearC";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -90,6 +93,10 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     Porciones: 1,
     Calorias: 0,
   });
+
+  usePreventExit();
+  useBlockNavigation();
+  useBlockShortcuts();
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -171,23 +178,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       message.error("No se pudo conectar al servidor.");
     }
   };
-  
-  
-  
-  
-  useEffect(() => {
-    const handlePopState = () => {
-      // Redirigir a la misma página para prevenir retroceso
-      navigate(location.pathname, { replace: true });
-      message.warning("No puedes retroceder mientras creas una receta.");
-    };
-  
-    window.addEventListener("popstate", handlePopState);
-  
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [navigate, location]);
   
   
 
@@ -416,13 +406,13 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                   placeholder="Seleccione tiempo"
                   />
                 </div>
-                <div className="tipo">
+                <div className="tipo" style={{padding:'10px'}}>
                   <p className="txi">Tipo:</p>
                   <Select
                     placeholder="Seleccione un tipo"
                     value={formData.id_Tipo}
                     onChange={handleSelectChange}
-                    style={{ width: 200 }}
+                    style={{ width: 150 }}
                   >
                     {Tipos.map((tipo) => (
                       <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>

@@ -345,13 +345,13 @@ export default function EDreceta() {
                   placeholder="Seleccione tiempo"
                   />
                 </div>
-                <div className="tipo">
+                <div className="tipo" style={{padding:'10px'}}>
                   <p className="txi">Tipo:</p>
                   <Select
                     placeholder="Seleccione un tipo"
                     value={formData.id_Tipo}
                     onChange={handleSelectChange}
-                    style={{ width: 200 }}
+                    style={{ width: 150 }}
                   >
                     {Tipos.map((tipo) => (
                       <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>

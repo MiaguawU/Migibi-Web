@@ -57,7 +57,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, 
         <img
         alt={title}
         src={image}
-        style={{ width: '100%', height: 'auto' }}
+        style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }}
         />
     </div>
 
