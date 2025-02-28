@@ -1,2 +1,2 @@
-const PUERTO = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const PUERTO = process.env.SERVER_URL || "https://migibi-servidor.onrender.com";
 export default PUERTO;
