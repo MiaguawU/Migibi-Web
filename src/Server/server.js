@@ -72,7 +72,7 @@ app.use(passport.session());
 
 
 // Rutas de usuarios
-app.use("/usuarios", upload, usuarioRouter);
+app.use("/usuarios", usuarioRouter);
 app.use("/usuarioGmail", usuarioGmailRouter);
 app.use("/login", loginRouter);
 app.use("/logout", logoutRouter);

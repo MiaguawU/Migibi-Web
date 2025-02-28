@@ -6,35 +6,19 @@ import NumericInput from "./Componentes/NumberInput";
 import type { UploadProps } from 'antd';
 import PUERTO from "../config";
 import axios from "axios";
-import btPerfil from "../Img/btPerfil.png"; // Imagen predeterminada
+import btPerfil from "../Img/btPerfil.png";
 
 const UserProfile: React.FC = () => {
   const [formData, setFormData] = useState({
     Nombre_Usuario: '',
-    foto_perfil: '',
+    foto_perfil: btPerfil,
     Cohabitantes: '',
     Email: '',
-    FileImagen: null as File | null, // Para almacenar la imagen seleccionada
+    FileImagen: null as File | null,
   });
 
   const [loading, setLoading] = useState(true);
 
-  // Configuración para la subida de imágenes
-  const uploadProps: UploadProps = {
-    showUploadList: false,
-    beforeUpload: (file: File) => {
-      if (!file.type.startsWith("image/")) {
-        message.error("Solo puedes subir archivos de imagen.");
-        return false;
-      }
-      // Crear URL para previsualización
-      const objectUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, foto_perfil: objectUrl, FileImagen: file }));
-      return false; // Evita la subida automática
-    },
-  };
-
-  // Función para obtener los datos del perfil
   const datosPerfil = async () => {
     setLoading(true);
     try {
@@ -43,7 +27,7 @@ const UserProfile: React.FC = () => {
         message.warning("No hay un usuario logueado actualmente.");
         return;
       }
-
+      
       const response = await axios.get(`${PUERTO}/usuarios`, {
         params: { id_us: currentUser },
         headers: { "Content-Type": "application/json" },
@@ -51,15 +35,15 @@ const UserProfile: React.FC = () => {
 
       if (response.data.length > 0) {
         const userData = response.data[0];
-        setFormData({
+        setFormData((prev) => ({
+          ...prev,
           Nombre_Usuario: userData.Nombre_Usuario || "No info",
           foto_perfil: userData.foto_perfil?.startsWith("http")
             ? userData.foto_perfil
             : `${PUERTO}/${userData.foto_perfil}`,
-          Cohabitantes: userData.Cohabitantes || "No info",
+          Cohabitantes: userData.Cohabitantes || 0,
           Email: userData.Email || "No info",
-          FileImagen: null, // Resetea la imagen para evitar envíos innecesarios
-        });
+        }));
       } else {
         message.warning("No se encontró información del usuario.");
       }
@@ -75,12 +59,46 @@ const UserProfile: React.FC = () => {
     datosPerfil();
   }, []);
 
-  // Si la imagen falla al cargar, se asigna una imagen predeterminada
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = btPerfil;
+  const uploadProps: UploadProps = {
+    showUploadList: false,
+    beforeUpload: (file) => {
+      if (!file.type.startsWith("image/")) {
+        message.error("Solo puedes subir archivos de imagen.");
+        return false;
+      }
+      setFormData((prev) => ({ ...prev, foto_perfil: URL.createObjectURL(file), FileImagen: file }));
+      return false;
+    },
   };
 
-  // Función para guardar los cambios en el perfil
+  const logout = async () => {
+    try {
+      // Obtener el token de autenticación
+      const token = localStorage.getItem("authToken");
+      
+      // Realizar la solicitud de cierre de sesión al backend
+      await axios.post(`${PUERTO}/logout`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      // Eliminar datos relacionados con la sesión en localStorage y sessionStorage
+      sessionStorage.removeItem("usuarios");
+      sessionStorage.removeItem("currentUser");
+      localStorage.removeItem("usuarios");
+      localStorage.removeItem("currentUser");
+      // Notificar al usuario del éxito
+      message.success("Sesión cerrada correctamente.");
+      
+      // Opcional: Redirigir al usuario a la página de inicio o login
+      window.location.href = "/acceder";
+    } catch (error) {
+      // Manejo de errores
+      console.error("Error al cerrar sesión:", error);
+      message.error("No se pudo cerrar la sesión. Inténtalo de nuevo más tarde.");
+    }
+  };
+  
+
   const handleSaveChanges = async () => {
     try {
       const currentUser = localStorage.getItem("currentUser");
@@ -88,90 +106,66 @@ const UserProfile: React.FC = () => {
         message.error("No hay un usuario logueado.");
         return;
       }
-
+  
       const formDataToSend = new FormData();
-      formDataToSend.append("Nombre_Usuario", formData.Nombre_Usuario);
-      formDataToSend.append("Cohabitantes", formData.Cohabitantes);
-      formDataToSend.append("Email", formData.Email);
-
+      formDataToSend.append("Nombre_Usuario", formData.Nombre_Usuario?.trim() || "");
+      formDataToSend.append("Cohabitantes", String(formData.Cohabitantes || "0"));
+      formDataToSend.append("Email", formData.Email?.trim() || "");
+      
       if (formData.FileImagen) {
         formDataToSend.append("foto_perfil", formData.FileImagen);
       }
-
-      // Opcional: Mostrar en consola los datos que se enviarán
-      Array.from(formDataToSend.entries()).forEach(([key, value]) => {
-        console.log(key, value);
-      });
-
-      const response = await axios.put(`${PUERTO}/usuarios/${currentUser}`, formDataToSend, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
+  
+      console.log("📦 Enviando FormData:");
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(`${key}:`, value);
+      }
+  
+      const response = await axios.put(
+        `${PUERTO}/usuarios/${currentUser}`,
+        formDataToSend,
+        { headers: { Accept: "application/json" } }
+      );
+  
       if (response.status === 200) {
         message.success("Perfil actualizado correctamente.");
-        datosPerfil(); // Recargar los datos actualizados
+        datosPerfil();
       } else {
-        message.error("No se pudieron guardar los cambios.");
+        message.error("Error al actualizar el perfil.");
       }
     } catch (error) {
-      console.error("Error al guardar los cambios:", error);
-      message.error("Hubo un error al guardar los cambios.");
+      console.error("🚨 Error:", error);
+      message.error("No se pudieron guardar los cambios.");
     }
   };
-
-  // Puedes agregar aquí el handler para cerrar sesión si lo requieres
+  
+  
+  
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          fontFamily: "Jomhuria, Serif",
-          fontSize: 35,
-          colorText: "#8BA577",
-        },
-      }}
-    >
+    <ConfigProvider theme={{ token: { fontFamily: "Jomhuria, Serif", fontSize: 35, colorText: "#8BA577" } }}>
       <div className="profile-container">
-        {/* Botones para guardar cambios y cerrar sesión */}
         <div className="logout-button-container">
-          <button className="save-button" onClick={handleSaveChanges}>
-            Guardar cambios
-          </button>
-          <button className="logout-button" onClick={() => {/* Implementa aquí el logout */}}>
-            Cerrar sesión
-          </button>
+          <button className="save-button" onClick={handleSaveChanges}>Guardar cambios</button>
+          <button className="logout-button" onClick={logout}>Cerrar sesión</button>
         </div>
 
-        {/* Sección del avatar */}
         <div className="avatar-section">
           <div className="avatar">
-            <img
-              src={formData.foto_perfil || btPerfil}
-              alt="Perfil"
-              onError={handleImageError}
-              style={{
+            <img style={{
                 borderRadius: "50%",
                 width: "100px",
                 height: "100px",
                 objectFit: "cover",
-              }}
-            />
+              }} src={formData.foto_perfil || btPerfil} alt="Perfil" onError={(e) => e.currentTarget.src = btPerfil} className="profile-image" />
             <Upload {...uploadProps}>
               <Button className="btUp" icon={<UploadOutlined />} />
             </Upload>
           </div>
         </div>
 
-        {/* Información del usuario */}
         <div className="info-section">
-          <Input
-            variant="borderless"
-            value={formData.Nombre_Usuario}
-            onChange={(e) =>
-              setFormData({ ...formData, Nombre_Usuario: e.target.value })
-            }
-            className="user-title"
-          />
+          <Input variant="borderless" value={formData.Nombre_Usuario} onChange={(e) => setFormData({ ...formData, Nombre_Usuario: e.target.value })} className="user-title" />
 
           <div className="info-cards">
             <div className="info-card">
@@ -179,31 +173,13 @@ const UserProfile: React.FC = () => {
               <button className="view-button">Ver</button>
             </div>
             <div className="info-card">
-              <ConfigProvider
-                theme={{
-                  token: {
-                    fontFamily: "Jomhuria, Serif",
-                    fontSize: 25,
-                    colorText: "#8BA577",
-                    colorPrimaryActive: "#3E7E1E",
-                  },
-                  components: {
-                    Input: {
-                      activeBorderColor: "#3E7E1E",
-                      hoverBorderColor: "#52A528",
-                    },
-                  },
-                }}
-              >
-                <span>Cantidad de personas que viven conmigo:</span>
-                <NumericInput
-                  style={{ width: 50, textAlign: "center" }}
-                  value={formData.Cohabitantes}
-                  onChange={(value) =>
-                    setFormData({ ...formData, Cohabitantes: value })
-                  }
-                />
-              </ConfigProvider>
+              <span>Cantidad de personas que viven conmigo:</span>
+              <NumericInput
+              style={{ width: 50, textAlign: "center" }}
+              value={formData.Cohabitantes}
+              onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
+            />
+
             </div>
           </div>
         </div>

@@ -20,18 +20,8 @@ passport.use(
         if (results.length > 0) {
           // Usuario existente: actualizar datos solo si han cambiado
           const usuarioExistente = results[0];
-          if (usuarioExistente.Nombre_Usuario !== nombre || usuarioExistente.foto_perfil !== fotoPerfil) {
-            const query = "UPDATE usuario SET Nombre_Usuario = ?, foto_perfil = ? WHERE Email = ?";
-            db.query(query, [nombre, fotoPerfil, email], (updateErr) => {
-              if (updateErr) return done(updateErr);
-
-              usuarioExistente.Nombre_Usuario = nombre;
-              usuarioExistente.foto_perfil = fotoPerfil;
-              return done(null, usuarioExistente); // Usuario actualizado
-            });
-          } else {
+          
             return done(null, usuarioExistente); // Datos ya están actualizados
-          }
         } else {
           // Usuario nuevo: insertar datos
           const contrasenaPredeterminada = "sopaDEpollo22";
