@@ -1197,8 +1197,8 @@ CREATE TRIGGER recetas_basura
 AFTER UPDATE ON receta
 FOR EACH ROW
 BEGIN
-    IF EXISTS (SELECT 1 FROM receta WHERE `Nombre` = NEW.Nombre AND `Activo` = 0) THEN
-        DELETE FROM receta WHERE `Nombre` = NEW.Nombre AND `Activo` = 0;
+    IF EXISTS (SELECT 1 FROM receta WHERE `Nombre` = 'Receta_nueva' AND `Activo` = 0) THEN
+        DELETE FROM receta WHERE `Nombre` = 'Receta_nueva' AND `Activo` = 0;
     END IF;
 END;
 //
