@@ -44,13 +44,14 @@
     "xss": "^1.0.15"
   },
   "scripts": {
-    "start": "concurrently \"HOST=0.0.0.0 PORT=3000 npm run client\" \"npm run server\"",
-    "client": "HOST=0.0.0.0 PORT=3000 react-scripts start",
-    "server": "node src/Server/server.js",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+  "start": "concurrently \"npm run server\" \"npm run build && npm run serve\"",
+  "client": "react-scripts start",
+  "server": "node src/Server/server.js",
+  "build": "react-scripts build",
+  "serve": "serve -s build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
   "eslintConfig": {
     "extends": [
       "react-app",
