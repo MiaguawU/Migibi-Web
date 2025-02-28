@@ -44,8 +44,8 @@
     "xss": "^1.0.15"
   },
   "scripts": {
-    "start": "concurrently \"npm run client\" \"npm run server\"",
-    "client": "react-scripts start",
+    "start": "concurrently \"HOST=0.0.0.0 PORT=3000 npm run client\" \"npm run server\"",
+    "client": "HOST=0.0.0.0 PORT=3000 react-scripts start",
     "server": "node src/Server/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
