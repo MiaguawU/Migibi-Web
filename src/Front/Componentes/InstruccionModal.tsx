@@ -9,12 +9,15 @@ interface FormModalProps {
   visible: boolean;
   onClose: () => void;
   recetaId: number;
-  onSubmit?: boolean;
+  onSubmit: (newInstruction: Item) => void;  // Aseguramos que el tipo aquí sea Item
 }
 
 interface Item {
+  id: number;
   name: string;
   orden: number;
+  isChecked: boolean;  // Propiedad necesaria para la lista de instrucciones
+  Activo: number;      // Propiedad para marcar si la instrucción está activa
 }
 
 const formItemLayout = {
@@ -30,9 +33,8 @@ const formItemLayout = {
 
 const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubmit }) => {
   const [form] = Form.useForm();
-  const [items, setItems] = useState<Item[]>([]);
-  const [tempAdded, setTempAdded] = useState<Item[]>([]);
 
+  // Maneja el envío del formulario
   const handleSubmit = async (values: any) => {
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
@@ -51,12 +53,24 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
       const response = await axios.post(`${PUERTO}/proED/${recetaId}`, data, {
         headers: { "Content-Type": "application/json" }, // Enviar JSON
       });
+      
       if (response.status === 200) {
-        message.success("Instrucción agregada correctamente.");
+        message.success("Ingrediente agregado correctamente.");
         form.resetFields();
-        onClose();
+        
+        // Obtener el nuevo ingrediente desde la respuesta de la API
+        const nuevoIngrediente: Item = {
+          id: response.data.id, // Asegúrate de que la API devuelva el ID
+          orden: values.order,
+          name: values.name,
+          isChecked: false,
+          Activo: 1,
+        };
+        
+        onSubmit(nuevoIngrediente); // Pasar el nuevo ingrediente
+        onClose();  // Cerrar el modal
       } else {
-        message.error("Error al agregar la instrucción. Intenta de nuevo.");
+        message.error("Error al agregar el ingrediente.");
       }
     } catch (error) {
       console.error("Error en la solicitud:", error);
@@ -64,14 +78,8 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
     }
   };
 
-  const handleAddInstruction = (newInstruction: Item) => {
-    setTempAdded((prev) => [...prev, newInstruction]);
-    setItems((prev) => [...prev, newInstruction]);
-  };
-  
-
   const handleFinish = (values: any) => {
-    handleSubmit(values);
+    handleSubmit(values);  // Llama a handleSubmit con los valores del formulario
   };
 
   return (
@@ -101,27 +109,28 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
           {...formItemLayout}
           form={form}
           style={{ maxWidth: 600 }}
-          onFinish={handleFinish}
+          onFinish={handleFinish} // Envia los datos al hacer submit
         >
-          {/* Input de cantidad */}
+          {/* Input de orden */}
           <Form.Item
             name="order"
             label="Orden"
             rules={[
-              { required: true, message: "Por favor, introduce la cantidad" },
+              { required: true, message: "Por favor, introduce el orden" },
               { type: "number", min: 1, max: 1000, message: "Debe ser entre 1 y 1000" },
             ]}
           >
             <InputNumber
               style={{ width: "100%" }}
-              placeholder="Introduce la cantidad"
+              placeholder="Introduce el orden"
               min={1}
               max={1000}
               step={1}
               precision={0}
             />
           </Form.Item>
-          {/* Input de nombre */}
+          
+          {/* Input de instrucción */}
           <Form.Item
             name="name"
             label="Instrucción"
@@ -129,6 +138,7 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
           >
             <TextArea rows={4} />
           </Form.Item>
+          
           {/* Botón de enviar */}
           <Form.Item
             wrapperCol={{

@@ -171,11 +171,9 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
         setId(newId);  // Guarda el id en el estado
         console.log("ID de nueva receta:", newId);
       } else {
-        message.error("No se pudo obtener el ID de la receta.");
       }
     } catch (error) {
       console.error("Error al obtener el ID:", error);
-      message.error("No se pudo conectar al servidor.");
     }
   };
   
@@ -189,7 +187,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       });
       if(response){
         setTipos(response.data );
-        message.success("Tipos de consumo cargados correctamente.");
         console.log("Tipos recibidos:", response.data);
       }
       else{
@@ -271,7 +268,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       }
     } catch (error) {
       console.error("Error al actualizar receta:", error);
-      message.error("Hubo un problema al enviar los datos.");
     }
   };
   

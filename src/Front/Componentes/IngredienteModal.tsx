@@ -82,22 +82,34 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
       message.warning("No hay un usuario logueado actualmente.");
       return;
     }
-
+  
     const payload = {
       nombre: values.name,
       cantidad: values.quantity,
       id_unidad: values.unit,
       Id_Usuario_Alta: Number(currentUser),
     };
-
+  
     try {
       const response = await axios.post(`${PUERTO}/ingED/${recetaId}`, payload, {
         headers: { "Content-Type": "application/json" },
       });
-
+  
       if (response.status === 200) {
         message.success("Ingrediente agregado correctamente.");
         form.resetFields();
+  
+        // Obtener el nuevo ingrediente desde la respuesta de la API
+        const nuevoIngrediente = {
+          id: response.data.id, // Asegúrate de que la API devuelva el ID
+          name: values.name,
+          cantidad: values.quantity,
+          unidad: unidades.find((u) => u.Id_Unidad_Medida === values.unit)?.Unidad_Medida || "Unidad",
+          isChecked: false,
+          Activo: 1,
+        };
+  
+        onSubmit(nuevoIngrediente); // Pasar el nuevo ingrediente
         onClose();
       } else {
         message.error("Error al agregar el ingrediente.");
@@ -107,6 +119,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
       message.error("Error al procesar la solicitud.");
     }
   };
+  
 
   const filteredOptions = alimentos
     .filter((alimento) =>

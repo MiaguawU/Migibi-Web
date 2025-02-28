@@ -374,7 +374,7 @@ CREATE TABLE `receta` (
   `Tiempo` time NOT NULL,
   `Calorias` double NOT NULL,
   `Porciones` int NOT NULL default 1 ,
-  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defIng.png',
+  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defRec.png',
   PRIMARY KEY (`Id_Receta`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),

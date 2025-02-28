@@ -130,6 +130,7 @@ const UserProfile: React.FC = () => {
       if (response.status === 200) {
         message.success("Perfil actualizado correctamente.");
         datosPerfil();
+          window.location.reload(); 
       } else {
         message.error("Error al actualizar el perfil.");
       }

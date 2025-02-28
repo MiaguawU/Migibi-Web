@@ -207,7 +207,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {formMode === "login" && (
+          
             <div style={{ textAlign: "center", marginBottom: "16px" }}>
               <Button
                 shape="circle"
@@ -216,7 +216,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
                 onClick={handleGoogleLogin}
               />
             </div>
-          )}
+          
 
           <Button
             type="primary"
