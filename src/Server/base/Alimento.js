@@ -98,8 +98,8 @@ router.post("/", async (req, res) => {
 
         // Crear un nuevo registro en stock_detalle
         await queryAsync(
-          `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero,Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
           [
             id_unidad,
             cantidad,
@@ -107,6 +107,7 @@ router.post("/", async (req, res) => {
             esPerecederoExistente ? Fecha_Caducidad : null, // Si no es perecedero, Fecha_Caducidad será NULL
             Id_Alimento,
             esPerecederoExistente,
+            imagen,
             Id_Usuario_Alta,
             Fecha_Alta,
           ]
@@ -117,18 +118,25 @@ router.post("/", async (req, res) => {
 
       // Insertar nuevo alimento si no existe
       const result1 = await queryAsync(
-        `INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-        VALUES (?, ?, ?, ?, ?, ?)`,
-        [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta]
+        `INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?)`,
+        [nombre, tipo, es_perecedero, Id_Usuario_Alta, Fecha_Alta]
       );
 
       const Id_Alimento = result1.insertId;
 
       // Insertar en stock_detalle
       await queryAsync(
-        `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id_unidad, cantidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero, Id_Usuario_Alta, Fecha_Alta]
+        `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+        [id_unidad, cantidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero,imagen, Id_Usuario_Alta, Fecha_Alta]
+      );
+
+      //al crearse un nuevo alimento en el catalogo se marca como que el usuario puede comerlo
+      await queryAsync(
+        `INSERT INTO usuario_cat_alimento ( Id_Alimento, Id_Usuario, Puede_Comer) 
+        VALUES (?, ?, ?)`,
+        [ Id_Alimento,  Id_Usuario_Alta, 1 ]
       );
 
       res.status(201).json({

@@ -31,6 +31,7 @@ const recetas_diaComida = require("./base/receta_diaComida");
 const recetas_diaCena = require("./base/receta_diaCena");
 const hoyGeneral = require("./base/HoyGeneral");
 const alimUnico = require("./base/AlimentoUnico");
+const cat_alimento = require("./base/cat_alimento");
 
 dotenv.config();
 
@@ -140,6 +141,8 @@ app.use("/alimento", alimento);
 app.use("/caducar", caducar);
 app.use("/alimentoInactivo", routerAlimentoInactivo);
 app.use("/alUn", alimUnico);
+app.use("/cat_ali", cat_alimento);
+
 //tipo_alimento
 app.use("/tipoA", tipo_alimento);
 //unidad

@@ -374,7 +374,7 @@ CREATE TABLE `receta` (
   `Tiempo` time NOT NULL,
   `Calorias` double NOT NULL,
   `Porciones` int NOT NULL default 1 ,
-  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defRec.png',
+  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defIng.png',
   PRIMARY KEY (`Id_Receta`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -1198,7 +1198,7 @@ AFTER UPDATE ON receta
 FOR EACH ROW
 BEGIN
     IF EXISTS (SELECT 1 FROM receta WHERE `Nombre` = 'Receta_nueva' AND `Activo` = 0) THEN
-        DELETE FROM receta WHERE `Nombre` = 'Receta_nueva' AND `Activo` = 0;
+        DELETE FROM receta WHERE 'Receta_nueva' = NEW.Nombre AND `Activo` = 0;
     END IF;
 END;
 //

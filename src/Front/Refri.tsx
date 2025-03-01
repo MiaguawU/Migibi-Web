@@ -259,11 +259,17 @@ export default function Inicio() {
             {/* Modal externo para agregar producto */}
             <ProductModal
               visible={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+              onClose={() => {
+                setIsModalOpen(false);
+                datosAlimento(); // Llamar para refrescar los datos después de agregar
+              }}
             />
             <ModalEd
               visible={edAlimento !== null}
-              onClose={() => setEdAlimento(null)}
+              onClose={() => {
+                setEdAlimento(null);
+                datosAlimento(); // Llamar para refrescar los datos después de editar
+              }}
               alimentoId={edAlimento}
             />
           </div>
