@@ -122,15 +122,25 @@ router.put('/:id', upload.single('foto_perfil'), async (req, res) => {
 // Endpoint para agregar un usuario
 router.post("/", sanitizeInput, (req, res) => {
   const { username, password } = req.body;
+  console.log(req.body);
+
   if (!username || !password) {
     return res.status(400).send("Faltan datos requeridos: username y password");
   }
+
   const foto_perfil = `/imagenes/defaultPerfil.png`;
+
+
   const query = `
     INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil) 
     VALUES (?, ?, ?)
   `;
+  //al crear usuario se crea un stock y un recetario
+  //al crearse el recetario se le agrega las recetas default
+
   const values = [username, password, foto_perfil];
+
+
   db.query(query, values, (err, result) => {
     if (err) {
       console.error("Error al insertar en la base de datos:", err);

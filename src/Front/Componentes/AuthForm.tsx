@@ -88,22 +88,28 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
   const registro = async () => {
     try {
-      const formData = new FormData();
-      formData.append("username", email);
-      formData.append("password", password);
-
-      const response = await axios.post(`${PUERTO}/usuarios`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const data = {
+        username: email,
+        password: password,
+      };
+  
+      console.log("📤 Datos enviados en registro():", data);
+  
+      const response = await axios.post(`${PUERTO}/usuarios`, data, {
+        headers: { "Content-Type": "application/json" },
       });
-
-      localStorage.setItem('user', JSON.stringify(response.data));
-
+  
+      console.log("✅ Respuesta del backend:", response.data);
+  
+      localStorage.setItem("user", JSON.stringify(response.data));
+  
       message.success("Registro exitoso");
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error en registro():", error);
       message.error("Error al registrar");
     }
   };
+  
 
   const registroGmail = async () => {
     try {
