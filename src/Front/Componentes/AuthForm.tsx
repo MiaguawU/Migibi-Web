@@ -10,50 +10,26 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   const [formMode, setFormMode] = useState<"register" | "login">("register");
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [mostrarNotificacionEmail, setMostrarNotificacionEmail] = useState(false);
-
-  const handleAgregarEmail = () => {
-    if (email.trim() === '') {
-      alert('Por favor, ingresa un email.');
-      return;
-    }
-
-    setMostrarNotificacionEmail(true);
-    setTimeout(() => {
-      setMostrarNotificacionEmail(false);
-    }, 3000);
-
-    setEmail('');
-  };
 
   const handleModeChange = (e: any) => {
     setFormMode(e.target.value);
   };
 
   const handleGoogleLogin = async (): Promise<void> => {
-    // Redirigir al flujo de Google OAuth
     window.location.href = `${PUERTO}/auth/google`;
   };
 
-  const saveGoogleUserData = async () => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-    const username = params.get("username");
-    const email = params.get("email");
-    const foto_perfil = params.get("foto_perfil");
-    const cohabitantes = params.get("Cohabitantes");
+  const validatePassword = (password: string): boolean => {
+    const minLength = password.length >= 7;
+    const hasUpperCase = (password.match(/[A-Z]/g) || []).length >= 2;
+    const hasLowerCase = (password.match(/[a-z]/g) || []).length >= 2;
+    const hasNumbers = (password.match(/[0-9]/g) || []).length >= 2;
 
-    if (id && username && email) {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-      usuarios[id] = { username, email, foto_perfil, cohabitantes };
+    return minLength && hasUpperCase && hasLowerCase && hasNumbers;
+  };
 
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-      localStorage.setItem("currentUser", id);
-
-      message.success(`Sesión iniciada como ${username}`);
-      
-      onLogin({ id, username, email, foto_perfil, cohabitantes });
-    }
+  const validateUsername = (username: string): boolean => {
+    return username.length >= 4;
   };
 
   const sesionNormal = async () => {
@@ -66,10 +42,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
       const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
 
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-      usuarios[id] = { username, foto_perfil, Cohabitantes, Email };
-
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
       localStorage.setItem("currentUser", id);
 
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
@@ -87,65 +59,40 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   };
 
   const registro = async () => {
+    if (!validateUsername(email)) {
+      message.error("El nombre de usuario debe tener al menos 4 caracteres.");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      message.error("La contraseña debe tener al menos 7 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
+      return;
+    }
+
     try {
-      const data = {
-        username: email,
-        password: password,
-      };
-  
-      console.log("📤 Datos enviados en registro():", data);
-  
+      const data = { username: email, password };
+
       const response = await axios.post(`${PUERTO}/usuarios`, data, {
         headers: { "Content-Type": "application/json" },
       });
-  
-      console.log("✅ Respuesta del backend:", response.data);
-  
+
       localStorage.setItem("user", JSON.stringify(response.data));
-  
+
       message.success("Registro exitoso");
     } catch (error) {
       console.error("❌ Error en registro():", error);
       message.error("Error al registrar");
     }
   };
-  
-
-  const registroGmail = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('username', email);
-      formData.append('password', password);
-
-      const response = await axios.post(`${PUERTO}/usuarioGmail`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      localStorage.setItem("user", JSON.stringify(response.data));
-
-      message.success('Registro exitoso');
-    } catch (error) {
-      console.error(error);
-      message.error('Error al registrar email');
-    }
-  };
 
   const handleSubmit = () => {
     if (formMode === "register") {
-      if (email.endsWith("@gmail.com")) {
-        registroGmail();
-      } else {
-        registro();
-      }
+      registro();
     } else {
       sesionNormal();
     }
   };
 
-  useEffect(() => {
-    saveGoogleUserData();
-  }, []);
-  
   return (
     <ConfigProvider
       theme={{
@@ -171,11 +118,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
           <Radio.Group
             onChange={handleModeChange}
             value={formMode}
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              marginBottom: "16px",
-            }}
+            style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}
           >
             <Radio.Button value="register" style={{ minWidth: "100px", maxWidth: "200px" }}>Registrarse</Radio.Button>
             <Radio.Button value="login" style={{ minWidth: "100px", maxWidth: "200px" }}>Iniciar Sesión</Radio.Button>
@@ -191,10 +134,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
           <Input
             placeholder={formMode === "register" ? "Nombre/Correo" : "Correo"}
-            style={{
-              marginBottom: "0px",
-              borderRadius: "8px",
-            }}
+            style={{ marginBottom: "0px", borderRadius: "8px" }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -205,24 +145,19 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
           <Input.Password
             placeholder="Contraseña"
-            style={{
-              marginBottom: "16px",
-              borderRadius: "8px",
-            }}
+            style={{ marginBottom: "16px", borderRadius: "8px" }}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          
-            <div style={{ textAlign: "center", marginBottom: "16px" }}>
-              <Button
-                shape="circle"
-                icon={<GoogleOutlined />}
-                style={{ backgroundColor: "#E1EBCD", border: "1px solid #3E7E1E" }}
-                onClick={handleGoogleLogin}
-              />
-            </div>
-          
+          <div style={{ textAlign: "center", marginBottom: "16px" }}>
+            <Button
+              shape="circle"
+              icon={<GoogleOutlined />}
+              style={{ backgroundColor: "#E1EBCD", border: "1px solid #3E7E1E" }}
+              onClick={handleGoogleLogin}
+            />
+          </div>
 
           <Button
             type="primary"

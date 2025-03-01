@@ -6,6 +6,7 @@ const db = require('./connection');
 const router = express.Router();
 const validator = require('validator');
 const xss = require('xss');  
+const bcrypt = require('bcrypt');
 
 const uploadDir = path.join(__dirname, "../imagenes");
 if (!fs.existsSync(uploadDir)) {
@@ -30,8 +31,6 @@ const upload = multer({
   },
 });
 
-
-// Middleware para sanitizar entradas y prevenir inyecciones
 const sanitizeInput = (req, res, next) => {
   Object.keys(req.body).forEach(key => {
     if (typeof req.body[key] === 'string') {
@@ -43,7 +42,14 @@ const sanitizeInput = (req, res, next) => {
   next();
 };
 
-// Endpoint para obtener el usuario
+const validatePassword = (password) => {
+  if (password.length < 7) return false;
+  const uppercase = (password.match(/[A-Z]/g) || []).length;
+  const lowercase = (password.match(/[a-z]/g) || []).length;
+  const numbers = (password.match(/[0-9]/g) || []).length;
+  return uppercase >= 2 && lowercase >= 2 && numbers >= 2;
+};
+
 router.get("/", (req, res) => {
   const { id_us } = req.query;
   if (!id_us || !validator.isNumeric(id_us)) {
@@ -62,9 +68,8 @@ router.get("/", (req, res) => {
   );
 });
 
-// Endpoint para actualizar el usuario (incluyendo la imagen de perfil)
 router.put('/:id', upload.single('foto_perfil'), async (req, res) => {
-  console.log('🔹 req.body:', req.body); // Verifica que llegan los datos
+  console.log('🔹 req.body:', req.body);
   console.log('🔹 req.file:', req.file || 'No se subió imagen');
 
   const { id } = req.params;
@@ -116,11 +121,7 @@ router.put('/:id', upload.single('foto_perfil'), async (req, res) => {
   }
 });
 
-
-
-
-// Endpoint para agregar un usuario
-router.post("/", sanitizeInput, (req, res) => {
+router.post("/", sanitizeInput, async (req, res) => {
   const { username, password } = req.body;
   console.log(req.body);
 
@@ -128,18 +129,18 @@ router.post("/", sanitizeInput, (req, res) => {
     return res.status(400).send("Faltan datos requeridos: username y password");
   }
 
+  if (!validatePassword(password)) {
+    return res.status(400).send("La contraseña debe tener al menos 7 caracteres, con mínimo 2 mayúsculas, 2 minúsculas y 2 números");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
   const foto_perfil = `/imagenes/defaultPerfil.png`;
 
-
   const query = `
-    INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil) 
-    VALUES (?, ?, ?)
+    INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil, Id_Rol) 
+    VALUES (?, ?, ?, 1)
   `;
-  //al crear usuario se crea un stock y un recetario
-  //al crearse el recetario se le agrega las recetas default
-
-  const values = [username, password, foto_perfil];
-
+  const values = [username, hashedPassword, foto_perfil];
 
   db.query(query, values, (err, result) => {
     if (err) {
@@ -150,7 +151,6 @@ router.post("/", sanitizeInput, (req, res) => {
   });
 });
 
-// Endpoint para eliminar un usuario
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
   if (!validator.isNumeric(id)) {

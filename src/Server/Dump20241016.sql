@@ -868,7 +868,10 @@ CREATE TABLE `usuario` (
   `Cohabitantes` int NOT NULL DEFAULT (1),
   `Email` varchar(250) DEFAULT NULL UNIQUE,
   `Es_Gmail` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`Id_Usuario`)
+  `Id_Rol` int NOT NULL,
+  PRIMARY KEY (`Id_Usuario`),
+  KEY `Id_Rol` (`Id_Rol`),
+  CONSTRAINT `Id_Rol` FOREIGN KEY (`Id_Rol`) REFERENCES `roles` (`Id_Rol`)
 ) ENGINE=InnoDB auto_increment=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -892,7 +895,17 @@ DELIMITER ;
 -- Dumping data for table `usuario`
 --
 
+DROP TABLE IF EXISTS `roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `roles` (
+  `Id_Rol` int NOT NULL AUTO_INCREMENT,
+  `Rol` varchar(250) NOT NULL unique,
+  PRIMARY KEY (`Id_Rol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+INSERT INTO `roles` (`Rol`) VALUES ('Cliente') , ('Administrador');
 
 --
 -- Table structure for table `usuario_cat_alimento`

@@ -5,13 +5,25 @@ const path = require('path');
 const db = require('./connection');
 const router = express.Router();
 
-// Ruta para crear el directorio de imágenes si no existe
+const verificarPermisos = (id_usuario, res, callback) => {
+  const query = 'SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?';
+  db.query(query, [id_usuario], (err, result) => {
+    if (err) {
+      console.error("Error al evaluar permisos", err);
+      return res.status(500).json({ error: "Error al verificar permisos" });
+    }
+    if (!result.length || result[0].Id_Rol == 1) {
+      return res.status(403).json({ error: "Acceso prohibido: No tienes permiso para realizar esta acción" });
+    }
+    callback();
+  });
+};
+
 const uploadDir = path.join(__dirname, '../imagenes');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configuración de multer para manejar la subida de imágenes
 const storage = multer.diskStorage({
   destination: uploadDir,
   filename: (req, file, cb) => {
@@ -23,7 +35,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024,  // Limite de tamaño de archivo 5MB
+    fileSize: 5 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
@@ -33,111 +45,57 @@ const upload = multer({
   },
 });
 
-// Crear una nueva unidad de medida (POST)
-router.post("/", (req, res, next) => {
-  const { unidad_medida, abreviatura, id_usuario_alta, fecha_alta } = req.body;
-
-  // Validar que los campos requeridos estén presentes
-  if (!unidad_medida || !abreviatura || !id_usuario_alta || !fecha_alta) {
+router.post("/", (req, res) => {
+  const { unidad_medida, abreviatura, id_usuario_alta } = req.body;
+  if (!unidad_medida || !abreviatura || !id_usuario_alta) {
     return res.status(400).send("Faltan datos requeridos");
   }
-
-  // Consulta para insertar una nueva unidad de medida
-  const query1 = `
-    INSERT INTO cat_unidad_medida (Unidad_Medida, Abreviatura, Id_Usuario_Alta, Fecha_Alta) 
-    VALUES (?, ?, ?, ?)
-  `;
-  const values1 = [unidad_medida, abreviatura, id_usuario_alta, fecha_alta];
-
-  // Ejecutar la consulta
-  db.query(query1, values1, (err1, result1) => {
-    if (err1) {
-      console.error("Error al insertar unidad de medida:", err1);
-      return res.status(500).send("Error al agregar unidad de medida");
-    }
-
-    // Responder con el ID de la nueva unidad de medida
-    res.json({ id: result1.insertId, message: "Unidad de medida agregada con éxito" });
+  verificarPermisos(id_usuario_alta, res, () => {
+    const fecha_alta = new Date();
+    const query = `INSERT INTO cat_unidad_medida (Unidad_Medida, Abreviatura, Id_Usuario_Alta, Fecha_Alta) VALUES (?, ?, ?, ?)`;
+    db.query(query, [unidad_medida, abreviatura, id_usuario_alta, fecha_alta], (err, result) => {
+      if (err) return res.status(500).send("Error al agregar unidad de medida");
+      res.json({ id: result.insertId, message: "Unidad de medida agregada con éxito" });
+    });
   });
 });
 
-// Obtener unidades de medida (GET)
 router.get("/", (req, res) => {
-  const { activo } = req.query;
-
-  // Construir la consulta SQL
-  let query = `SELECT Id_Unidad_Medida, Unidad_Medida FROM cat_unidad_medida`;
-
-
-  // Ejecutar la consulta
-  db.query(query, (err, result) => {
-    if (err) {
-      console.error("Error al obtener unidades de medida:", err);
-      return res.status(500).send("Error al obtener unidades de medida");
-    }
-
-    // Devolver las unidades de medida encontradas
+  db.query("SELECT * FROM cat_unidad_medida", (err, result) => {
+    if (err) return res.status(500).send("Error al obtener unidades de medida");
     res.json(result);
   });
 });
 
-// Actualizar una unidad de medida (PUT)
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { unidad_medida, abreviatura, id_usuario_modif, fecha_modif, activo } = req.body;
-
-  // Validar que los campos requeridos estén presentes
-  if (!unidad_medida || !abreviatura || !id_usuario_modif || !fecha_modif || activo === undefined) {
+  const { unidad_medida, abreviatura, id_usuario_modif } = req.body;
+  if (!unidad_medida || !abreviatura || !id_usuario_modif) {
     return res.status(400).send("Faltan datos requeridos");
   }
-
-  // Consulta para actualizar la unidad de medida
-  const query1 = `
-    UPDATE cat_unidad_medida 
-    SET Unidad_Medida = ?, Abreviatura = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = ?
-    WHERE Id_Unidad_Medida = ?
-  `;
-  const values1 = [unidad_medida, abreviatura, id_usuario_modif, fecha_modif, activo, id];
-
-  // Ejecutar la consulta
-  db.query(query1, values1, (err1, result1) => {
-    if (err1) {
-      console.error("Error al actualizar unidad de medida:", err1);
-      return res.status(500).send("Error al actualizar unidad de medida");
-    }
-
-    // Responder con un mensaje de éxito
-    res.json({ message: "Unidad de medida actualizada con éxito" });
+  verificarPermisos(id_usuario_modif, res, () => {
+    const fecha_modif = new Date();
+    const query = `UPDATE cat_unidad_medida SET Unidad_Medida = ?, Abreviatura = ?, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Unidad_Medida = ?`;
+    db.query(query, [unidad_medida, abreviatura, id_usuario_modif, fecha_modif, id], (err) => {
+      if (err) return res.status(500).send("Error al actualizar unidad de medida");
+      res.json({ message: "Unidad de medida actualizada con éxito" });
+    });
   });
 });
 
-// Eliminar una unidad de medida (marcarla como inactiva) (DELETE)
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  const { id_usuario_baja, fecha_baja } = req.body;
-
-  // Validar que los campos requeridos estén presentes
-  if (!id_usuario_baja || !fecha_baja) {
+  const { id_usuario_baja } = req.body;
+  if (!id_usuario_baja) {
     return res.status(400).send("Faltan datos requeridos para la baja");
   }
-
-  // Consulta para marcar la unidad de medida como inactiva (baja lógica)
-  const query1 = `
-    UPDATE cat_unidad_medida 
-    SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? 
-    WHERE Id_Unidad_Medida = ?
-  `;
-  const values1 = [id_usuario_baja, fecha_baja, id];
-
-  // Ejecutar la consulta
-  db.query(query1, values1, (err1, result1) => {
-    if (err1) {
-      console.error("Error al eliminar unidad de medida:", err1);
-      return res.status(500).send("Error al eliminar unidad de medida");
-    }
-
-    // Responder con un mensaje de éxito
-    res.json({ message: "Unidad de medida eliminada con éxito" });
+  verificarPermisos(id_usuario_baja, res, () => {
+    const fecha_baja = new Date();
+    const query = `UPDATE cat_unidad_medida SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? WHERE Id_Unidad_Medida = ?`;
+    db.query(query, [id_usuario_baja, fecha_baja, id], (err) => {
+      if (err) return res.status(500).send("Error al eliminar unidad de medida");
+      res.json({ message: "Unidad de medida eliminada con éxito" });
+    });
   });
 });
 

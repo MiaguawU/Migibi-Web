@@ -60,7 +60,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
         return;
       }
   
-      const response = await axios.get(`${PUERTO}/alimento/${userId}`);
+      const response = await axios.get(`${PUERTO}/alimento`);
 
       const alimentosData = response.data;
       setAlimentos(alimentosData.Perecedero.concat(alimentosData.NoPerecedero));

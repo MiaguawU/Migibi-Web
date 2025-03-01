@@ -150,7 +150,60 @@ router.post("/", async (req, res) => {
   });
 });
 
+router.get("/", (req, res) => {
+  
 
+  const query1 = `
+    SELECT 
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Activo AS Activo,
+      sd.Cantidad AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      sd.Imagen_alimento AS Imagen,
+      sd.Fecha_Caducidad,
+      ca.Id_Usuario_Alta,
+      cta.Tipo_Alimento AS Tipo_Alimento
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    ORDER BY sd.Fecha_Caducidad ASC;
+  `;
+
+  const query2 = `
+    SELECT 
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Activo AS Activo,
+      sd.Cantidad AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      sd.Imagen_alimento AS Imagen,
+      ca.Id_Usuario_Alta,
+      cta.Tipo_Alimento AS Tipo_Alimento
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    ORDER BY sd.Fecha_Caducidad ASC;
+  `;
+
+  db.query(query1,  (err, result1) => {
+    if (err) {
+      console.error("Error en query1:", err);
+      return res.status(500).json({ error: "Error al obtener alimentos perecederos" });
+    }
+
+    db.query(query2, (err2, result2) => { // ✅ Pasar id como parámetro en query2
+      if (err2) {
+        console.error("Error en query2:", err2);
+        return res.status(500).json({ error: "Error al obtener alimentos no perecederos" });
+      }
+
+      res.json({ Perecedero: result1, NoPerecedero: result2 });
+    });
+  });
+});
 
 //obtener alimentos del refri
 router.get("/:id", (req, res) => {

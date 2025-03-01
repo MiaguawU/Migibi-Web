@@ -1,5 +1,6 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const bcrypt = require("bcrypt");
 const db = require("./connection");
 
 passport.use(
@@ -9,25 +10,28 @@ passport.use(
       clientSecret: process.env.SESSION_SECRET,
       callbackURL: `${process.env.BASE_URL || "http://localhost:5000"}/auth/google/callback`,
     },
-    (accessToken, refreshToken, profile, done) => {
+    async (accessToken, refreshToken, profile, done) => {
       const email = profile.emails[0].value;
       const nombre = profile.displayName;
       const fotoPerfil = profile.photos[0].value;
 
-      db.query("SELECT * FROM usuario WHERE Email = ?", [email], (err, results) => {
+      db.query("SELECT * FROM usuario WHERE Email = ?", [email], async (err, results) => {
         if (err) return done(err);
 
         if (results.length > 0) {
-          // Usuario existente: actualizar datos solo si han cambiado
-          const usuarioExistente = results[0];
-          
-            return done(null, usuarioExistente); // Datos ya están actualizados
+          // Usuario existente: devolver los datos
+          return done(null, results[0]);
         } else {
-          // Usuario nuevo: insertar datos
+          // Usuario nuevo: cifrar la contraseña predeterminada antes de insertarla
           const contrasenaPredeterminada = "sopaDEpollo22";
-          const query =
-            "INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena) VALUES (?, ?, ?, ?, ?)";
-          db.query(query, [nombre, email, fotoPerfil, 1, contrasenaPredeterminada], (insertErr, result) => {
+          const saltRounds = 10;
+          const hashedPassword = await bcrypt.hash(contrasenaPredeterminada, saltRounds);
+
+          const query = `
+            INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena, Id_Rol) 
+            VALUES (?, ?, ?, ?, ?, 1)
+          `;
+          db.query(query, [nombre, email, fotoPerfil, 1, hashedPassword], (insertErr, result) => {
             if (insertErr) return done(insertErr);
 
             const newUser = {

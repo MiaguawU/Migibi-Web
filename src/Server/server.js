@@ -32,6 +32,8 @@ const recetas_diaCena = require("./base/receta_diaCena");
 const hoyGeneral = require("./base/HoyGeneral");
 const alimUnico = require("./base/AlimentoUnico");
 const cat_alimento = require("./base/cat_alimento");
+const usuario_adm = require("./base/usuario_admin");
+const rol = require("./base/rol");
 
 dotenv.config();
 
@@ -79,6 +81,8 @@ app.use("/login", loginRouter);
 app.use("/logout", logoutRouter);
 app.use("/manejo",call)
 app.use("/save", routerSave);
+app.use("/us_adm", usuario_adm);
+app.use("/rol", rol);
 
 // Ruta de autenticación con Google
 app.get(

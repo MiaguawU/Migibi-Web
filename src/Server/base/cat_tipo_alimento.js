@@ -1,71 +1,58 @@
-const express = require('express');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const db = require('./connection');
+const express = require("express");
+const db = require("./connection");
 const router = express.Router();
 
-// Ruta para crear el directorio de imágenes si no existe
-const uploadDir = path.join(__dirname, '../imagenes');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Middleware para verificar permisos
+const verificarPermisos = (req, res, next) => {
+  const { id_usuario } = req.body || req.params;
 
-// Configuración de multer para manejar la subida de imágenes
-const storage = multer.diskStorage({
-  destination: uploadDir,
-  filename: (req, file, cb) => {
-    console.log("Archivo recibido:", file);
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+  if (!id_usuario) {
+    return res.status(400).send("ID de usuario requerido para la validación");
+  }
 
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024,  // Limite de tamaño de archivo 5MB
-  },
-  fileFilter: (req, file, cb) => {
-    if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
-      return cb(new Error("Solo se permiten imágenes PNG, JPG o JPEG"));
+  const evaluar = `SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`;
+
+  db.query(evaluar, [id_usuario], (err, result) => {
+    if (err) {
+      console.error("Error al evaluar permisos:", err);
+      return res.status(500).send("Error al validar permisos");
     }
-    cb(null, true);
-  },
-});
+
+    if (result.length === 0 || result[0].Id_Rol == 1) {
+      return res.status(403).send("Acceso prohibido: No tienes permiso para realizar esta acción");
+    }
+
+    next(); // Si pasa la validación, continúa
+  });
+};
 
 // Crear un nuevo tipo de alimento (POST)
-router.post("/", (req, res, next) => {
-  const { tipo_alimento, id_usuario_alta, fecha_alta } = req.body;
+router.post("/", verificarPermisos, (req, res) => {
+  const { tipo_alimento, id_usuario } = req.body;
+  const fecha_alta = new Date();
 
-  // Validar que los campos requeridos estén presentes
-  if (!tipo_alimento || !id_usuario_alta || !fecha_alta) {
+  if (!tipo_alimento || !id_usuario) {
     return res.status(400).send("Faltan datos requeridos");
   }
 
-  // Consulta para insertar un nuevo tipo de alimento
-  const query1 = `
+  const query = `
     INSERT INTO cat_tipo_alimento (Tipo_Alimento, Id_Usuario_Alta, Fecha_Alta) 
     VALUES (?, ?, ?)
   `;
-  const values1 = [tipo_alimento, id_usuario_alta, fecha_alta];
+  const values = [tipo_alimento, id_usuario, fecha_alta];
 
-  // Ejecutar la consulta
-  db.query(query1, values1, (err1, result1) => {
-    if (err1) {
-      console.error("Error al insertar tipo de alimento:", err1);
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error al insertar tipo de alimento:", err);
       return res.status(500).send("Error al agregar tipo de alimento");
     }
-
-    // Responder con el ID del nuevo tipo de alimento
-    res.json({ id: result1.insertId, message: "Tipo de alimento agregado con éxito" });
+    res.json({ id: result.insertId, message: "Tipo de alimento agregado con éxito" });
   });
 });
 
 // Obtener tipos de alimento (GET)
 router.get("/", (req, res) => {
-
-  // Construir la consulta SQL
-  let query = `SELECT Id_Tipo_Alimento, Tipo_Alimento FROM cat_tipo_alimento`;
+  const query = `SELECT * FROM cat_tipo_alimento`;
 
   db.query(query, (err, result) => {
     if (err) {
@@ -77,61 +64,53 @@ router.get("/", (req, res) => {
 });
 
 // Actualizar un tipo de alimento (PUT)
-router.put("/:id", (req, res) => {
+router.put("/:id", verificarPermisos, (req, res) => {
   const { id } = req.params;
-  const { tipo_alimento, id_usuario_modif, fecha_modif, activo } = req.body;
+  const { tipo_alimento, id_usuario } = req.body;
+  const fecha_modif = new Date();
 
-  // Validar que los campos requeridos estén presentes
-  if (!tipo_alimento || !id_usuario_modif || !fecha_modif || activo === undefined) {
+  if (!tipo_alimento || !id_usuario) {
     return res.status(400).send("Faltan datos requeridos");
   }
 
-  // Consulta para actualizar el tipo de alimento
-  const query1 = `
+  const query = `
     UPDATE cat_tipo_alimento 
-    SET Tipo_Alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = ?
+    SET Tipo_Alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?
     WHERE Id_Tipo_Alimento = ?
   `;
-  const values1 = [tipo_alimento, id_usuario_modif, fecha_modif, activo, id];
+  const values = [tipo_alimento, id_usuario, fecha_modif, id];
 
-  // Ejecutar la consulta
-  db.query(query1, values1, (err1, result1) => {
-    if (err1) {
-      console.error("Error al actualizar tipo de alimento:", err1);
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error al actualizar tipo de alimento:", err);
       return res.status(500).send("Error al actualizar tipo de alimento");
     }
-
-    // Responder con un mensaje de éxito
     res.json({ message: "Tipo de alimento actualizado con éxito" });
   });
 });
 
-// Eliminar un tipo de alimento (marcarlo como inactivo) (DELETE)
-router.delete("/:id", (req, res) => {
+// Eliminar un tipo de alimento (baja lógica) (DELETE)
+router.delete("/:id", verificarPermisos, (req, res) => {
   const { id } = req.params;
-  const { id_usuario_baja, fecha_baja } = req.body;
+  const { id_usuario } = req.body;
+  const fecha_baja = new Date();
 
-  // Validar que los campos requeridos estén presentes
-  if (!id_usuario_baja || !fecha_baja) {
+  if (!id_usuario) {
     return res.status(400).send("Faltan datos requeridos para la baja");
   }
 
-  // Consulta para marcar el tipo de alimento como inactivo (baja lógica)
-  const query1 = `
+  const query = `
     UPDATE cat_tipo_alimento 
     SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? 
     WHERE Id_Tipo_Alimento = ?
   `;
-  const values1 = [id_usuario_baja, fecha_baja, id];
+  const values = [id_usuario, fecha_baja, id];
 
-  // Ejecutar la consulta
-  db.query(query1, values1, (err1, result1) => {
-    if (err1) {
-      console.error("Error al eliminar tipo de alimento:", err1);
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error al eliminar tipo de alimento:", err);
       return res.status(500).send("Error al eliminar tipo de alimento");
     }
-
-    // Responder con un mensaje de éxito
     res.json({ message: "Tipo de alimento eliminado con éxito" });
   });
 });
