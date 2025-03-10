@@ -166,6 +166,10 @@ app.disable('etag');
 
 const filePath = path.join(__dirname, 'images', 'defaultPerfil.png');
 
+app.get('/', (req, res) => {
+  res.send('🚀 Servidor funcionando en Render con MySQL en Railway!');
+});
+
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () =>
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
