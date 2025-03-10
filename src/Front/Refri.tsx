@@ -218,7 +218,7 @@ export default function Inicio() {
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
-            <PorCaducar />
+          <PorCaducar onUpdate={datosAlimento} />
             {filteredAlimentos.map((card, index) => (
               <Card
                 key={index}

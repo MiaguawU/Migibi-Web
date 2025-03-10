@@ -147,13 +147,12 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       });
   
       if (response.status === 200) {
-        message.success("Receta creada correctamente.");
+        console.log("Receta creada correctamente.");
       } else {
         message.error("Error al crear la receta.");
       }
     } catch (error) {
       console.error("Error al crear la receta:", error);
-      message.error("No se pudo conectar al servidor.");
     }
   };
   
@@ -308,7 +307,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       // Aquí ya puedes llamar a la función actualizar
       actualizar();
     } else {
-      message.error("No se ha obtenido el ID.");
+      console.log("No se ha obtenido el ID.");
     }
   }, [id]);  // Asegúrate de que se ejecute solo cuando id cambie.
   

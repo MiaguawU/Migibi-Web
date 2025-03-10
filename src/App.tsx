@@ -136,7 +136,7 @@ function App() {
               <Route path="/terminosycondiciones" element={<VerR />} />
               <Route path="/avisodeprivacidad" element={<VerR />} />
               <Route path="/prueba" element={<Prueba />} />
-              <Route path="/cad" element={<Caducar />} />
+              <Route path="/cad" element={<Caducar onUpdate={() => {}} />} />
               <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} onSubmit={true} onReset={true} />} />
               <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} onSubmit={true} onReset={true} />} />
               <Route path="/instruccion" element={<ProcRecetaEditar recetaId={0} onSubmit={true} onReset={true} />} />

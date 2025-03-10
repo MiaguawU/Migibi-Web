@@ -51,7 +51,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
       message.success("Ingredientes obtenidos exitosamente");
     } catch (error) {
       console.error("Error al obtener ingredientes:", error);
-      message.error("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
     }

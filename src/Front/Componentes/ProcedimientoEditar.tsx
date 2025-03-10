@@ -46,7 +46,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
       setItems(proceso);
       setTempDeleted([]);
       setTempAdded([]);
-      message.success("Instrucciones obtenidas exitosamente.");
+      console.log("Instrucciones obtenidas exitosamente.");
     } catch (error) {
       console.error("Error al obtener instrucciones:", error);
       message.error("No se pudo conectar con el servidor.");

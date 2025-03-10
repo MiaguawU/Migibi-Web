@@ -22,8 +22,33 @@ passport.use(
           // Usuario existente: devolver los datos
           return done(null, results[0]);
         } else {
+          function generatePassword() {
+            const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const lowercase = "abcdefghijklmnopqrstuvwxyz";
+            const numbers = "0123456789";
+        
+            function getRandomChar(set) {
+                return set.charAt(Math.floor(Math.random() * set.length));
+            }
+        
+            let password = [
+                getRandomChar(uppercase), getRandomChar(uppercase), // 2 mayúsculas
+                getRandomChar(lowercase), getRandomChar(lowercase), // 2 minúsculas
+                getRandomChar(numbers), getRandomChar(numbers),     // 2 números
+                getRandomChar(uppercase + lowercase + numbers)      // Último carácter libre
+            ];
+        
+            // Mezclamos los caracteres aleatoriamente
+            password = password.sort(() => Math.random() - 0.5).join('');
+            
+            return password;
+        }
+        
+        
+
           // Usuario nuevo: cifrar la contraseña predeterminada antes de insertarla
-          const contrasenaPredeterminada = "sopaDEpollo22";
+          const contrasenaPredeterminada = generatePassword();
+          console.log(contrasenaPredeterminada);
           const saltRounds = 10;
           const hashedPassword = await bcrypt.hash(contrasenaPredeterminada, saltRounds);
 
