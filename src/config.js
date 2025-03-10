@@ -1,2 +1,2 @@
-const PUERTO = process.env.SERVER_URL || "http://localhost:5000";
+const PUERTO = process.env.SERVER_URL ;
 export default PUERTO;
