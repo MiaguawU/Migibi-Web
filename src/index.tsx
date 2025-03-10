@@ -1,17 +1,14 @@
 // Importar dependencias
 import React from 'react';
-import ReactDOMClient from 'react-dom/client';
-import ReactDOM from "react-dom";
+import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import axios from 'axios';
 import reportWebVitals from './reportWebVitals';
-import "antd/dist/reset.css"; 
 import { ConfigProvider } from 'antd';
-import "antd/dist/reset.css"; 
-import { createRoot } from 'react-dom/client';
+import 'antd/dist/reset.css';
+import { BrowserRouter } from 'react-router-dom';
 import PUERTO from './config';
-
 
 // Definición de la interfaz para los datos del usuario
 interface UserData {
@@ -39,32 +36,27 @@ const getUserDataFromURL = (): UserData => {
 const processUserData = async (userData: UserData) => {
   try {
     const response = await axios.post(`${PUERTO}/save`, userData, {
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
-    console.log("Datos enviados al servidor:", response.data);
+    console.log('Datos enviados al servidor:', response.data);
 
     const { id, username, email, foto_perfil, Cohabitantes } = userData;
     if (id) {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '{}');
       usuarios[id] = { username, email, foto_perfil, Cohabitantes };
 
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-      localStorage.setItem("currentUser", id);
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      localStorage.setItem('currentUser', id);
 
-      console.log("Datos guardados en localStorage.");
-
-      // Refrescar la página solo si no se ha hecho antes
-      if (!localStorage.getItem("hasReloaded")) {
-        localStorage.setItem("hasReloaded", "true");
-        setTimeout(() => {
-          window.location.reload();
-        }, 400); // Pequeño retraso para asegurar que los datos se guardan antes del refresh
+      if (!localStorage.getItem('hasReloaded')) {
+        localStorage.setItem('hasReloaded', 'true');
+        setTimeout(() => window.location.reload(), 400);
       }
     } else {
-      console.warn("ID de usuario no proporcionado. No se guardaron los datos.");
+      console.warn('ID de usuario no proporcionado. No se guardaron los datos.');
     }
   } catch (error) {
-    console.error("Error al enviar los datos al servidor:", error);
+    console.error('Error al enviar los datos al servidor:', error);
   }
 };
 
@@ -74,15 +66,17 @@ if (Object.keys(userData).length > 0) {
   processUserData(userData);
 }
 
-// Configuración del punto de entrada de React
-const root = createRoot(document.getElementById('root') as HTMLElement);
+// Renderizar la aplicación
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
-  <ConfigProvider>
-  <ConfigProvider>
-    <App />
-  </ConfigProvider>
-  </ConfigProvider>
+  <React.StrictMode>
+    <ConfigProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ConfigProvider>
+  </React.StrictMode>
 );
 
 // Reporte de métricas de rendimiento
