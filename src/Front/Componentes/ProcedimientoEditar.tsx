@@ -12,14 +12,6 @@ interface ProcedimientoProps {
   onReset?: boolean;
 }
 
-interface Instruction {
-  id: string; // Como InsModal usa id en string, lo convertimos
-  content: string; // InsModal usa 'content' en lugar de 'name'
-  orden: number;
-  name: string;
-}
-
-// ✅ Definimos cómo son los datos en ProcedimientoRecetaEditar
 interface Item {
   id: number;
   name: string;
@@ -189,43 +181,14 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
       </ConfigProvider>
 
       <InsModal
-  visible={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  recetaId={recetaId}
-  instructions={items.map((item) => ({
-    id: item.id.toString(), // Convertir ID a string para Instruction
-    content: item.name, // Instruction usa 'content', que viene de 'name'
-    orden: item.orden,
-    name: item.name, // 'name' sigue igual
-  }))} 
-  setInstructions={(updateFunctionOrArray) => {
-    setItems((prevItems) => {
-      const newInstructions =
-        typeof updateFunctionOrArray === "function"
-          ? updateFunctionOrArray(prevItems.map((item) => ({
-              id: item.id.toString(),
-              content: item.name,
-              orden: item.orden,
-              name: item.name,
-            }))) // Convertimos prevItems a formato Instruction antes de pasar a la función
-          : updateFunctionOrArray;
-
-      return newInstructions.map((inst) => ({
-        id: Number(inst.id), // Convertir ID de string a número
-        name: inst.content, // 'content' de Instruction se convierte a 'name' en Item
-        isChecked: false, // Valor por defecto
-        orden: inst.orden,
-        Activo: 1, // Suponemos que es activo
-      }));
-    });
-  }}
-/>
-
-
-
-
-
-
+          visible={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={(newItem) => {
+            setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
+            setIsModalOpen(false);
+          }}
+          recetaId={recetaId}
+        />
 
     </>
   );
