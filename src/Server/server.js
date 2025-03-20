@@ -30,6 +30,7 @@ const recetas_diaDesayuno = require("./base/receta_diaDesayuno");
 const recetas_diaComida = require("./base/receta_diaComida");
 const recetas_diaCena = require("./base/receta_diaCena");
 const hoyGeneral = require("./base/HoyGeneral");
+const planMetodos = require("./base/PlanMetodos");
 
 dotenv.config();
 
@@ -151,6 +152,9 @@ app.use("/editarCena", recetas_diaCena);
 
 //Hoy
 app.use("/hoyGeneral", hoyGeneral);
+
+//Metodos para hacer un nuevo plan
+app.use("/planMet", planMetodos)
 
 app.disable('etag'); 
 
