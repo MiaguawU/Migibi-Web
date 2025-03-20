@@ -48,7 +48,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
         }));
       setItems(ingredientes);
       setTempDeleted([]); // Reinicia los ingredientes eliminados temporalmente
-      message.success("Ingredientes obtenidos exitosamente");
     } catch (error) {
       console.error("Error al obtener ingredientes:", error);
     } finally {

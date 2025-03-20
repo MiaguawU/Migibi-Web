@@ -109,7 +109,6 @@ export default function EDreceta() {
       });
       if(response){
         setTipos(response.data );
-        message.success("Tipos de consumo cargados correctamente.");
         console.log("Tipos recibidos:", response.data);
       }
       else{
@@ -152,7 +151,6 @@ export default function EDreceta() {
         
         setFormData(recetaCargada);        
         setRecetaInicial(recetaCargada); // Guardar datos iniciales
-        message.success("Receta obtenida correctamente.");
       } else {
         message.warning("No se encontró información de la receta.");
       }
