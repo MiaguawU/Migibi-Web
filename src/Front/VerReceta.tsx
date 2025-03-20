@@ -15,6 +15,9 @@ import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
 import './Estilos/EDrec.css';
 import dayjs, { Dayjs } from 'dayjs';
+import usePreventExit from "./hook/Proteger";
+import useBlockNavigation from "./hook/Bloquear";
+import useBlockShortcuts from "./hook/BloquearC";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -91,6 +94,10 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     Calorias: 0,
   });
 
+  usePreventExit();
+  useBlockNavigation();
+  useBlockShortcuts();
+
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
@@ -140,13 +147,12 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       });
   
       if (response.status === 200) {
-        message.success("Receta creada correctamente.");
+        console.log("Receta creada correctamente.");
       } else {
         message.error("Error al crear la receta.");
       }
     } catch (error) {
       console.error("Error al crear la receta:", error);
-      message.error("No se pudo conectar al servidor.");
     }
   };
   
@@ -164,30 +170,11 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
         setId(newId);  // Guarda el id en el estado
         console.log("ID de nueva receta:", newId);
       } else {
-        message.error("No se pudo obtener el ID de la receta.");
       }
     } catch (error) {
       console.error("Error al obtener el ID:", error);
-      message.error("No se pudo conectar al servidor.");
     }
   };
-  
-  
-  
-  
-  useEffect(() => {
-    const handlePopState = () => {
-      // Redirigir a la misma página para prevenir retroceso
-      navigate(location.pathname, { replace: true });
-      message.warning("No puedes retroceder mientras creas una receta.");
-    };
-  
-    window.addEventListener("popstate", handlePopState);
-  
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [navigate, location]);
   
   
 
@@ -199,7 +186,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       });
       if(response){
         setTipos(response.data );
-        message.success("Tipos de consumo cargados correctamente.");
         console.log("Tipos recibidos:", response.data);
       }
       else{
@@ -251,7 +237,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     try {
       if (id === null) {
         message.warning("No se encontró el ID de la receta.");
-        return; // Salir si no hay id
+        return; 
       }
   
       const datosForm = new FormData();
@@ -260,30 +246,33 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       datosForm.append("porciones", String(formData.Porciones));
       datosForm.append("calorias", String(formData.Calorias));
       datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
+  
       if (formData.FileImagen) {
-        datosForm.append("imagen", formData.FileImagen); // Solo añade la imagen si existe
+        datosForm.append("imagen", formData.FileImagen); 
       }
   
-      // Enviar la solicitud PUT con el id en la URL
-      const response = await axios.put(
-        `${PUERTO}/recetaCRUD/${id}`, // Usa el ID directamente en la URL
-        datosForm,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
   
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
-        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualiza la receta inicial si es necesario
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen }));
       } else {
-        message.error("No se pudo actualizar la receta.");
+        message.error(`Error al actualizar la receta: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error al actualizar receta:", error);
-      message.error("Hubo un problema al enviar los datos.");
+  
+      // Verifica si es un error de Axios con respuesta del servidor
+      if (axios.isAxiosError(error) && error.response) {
+        message.error(`Error del servidor: ${error.response.data.message || "No se pudo actualizar la receta."}`);
+      } else {
+        message.error("Error inesperado al actualizar la receta.");
+      }
     }
   };
+  
   
   
   
@@ -322,7 +311,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       // Aquí ya puedes llamar a la función actualizar
       actualizar();
     } else {
-      message.error("No se ha obtenido el ID.");
+      console.log("No se ha obtenido el ID.");
     }
   }, [id]);  // Asegúrate de que se ejecute solo cuando id cambie.
   
@@ -416,13 +405,13 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                   placeholder="Seleccione tiempo"
                   />
                 </div>
-                <div className="tipo">
+                <div className="tipo" style={{padding:'10px'}}>
                   <p className="txi">Tipo:</p>
                   <Select
                     placeholder="Seleccione un tipo"
                     value={formData.id_Tipo}
                     onChange={handleSelectChange}
-                    style={{ width: 200 }}
+                    style={{ width: 150 }}
                   >
                     {Tipos.map((tipo) => (
                       <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>

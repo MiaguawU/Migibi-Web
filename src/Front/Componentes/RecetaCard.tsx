@@ -57,7 +57,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, 
         <img
         alt={title}
         src={image}
-        style={{ width: '100%', height: 'auto' }}
+        style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }}
         />
     </div>
 
@@ -90,9 +90,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ id ,title, portions, calories, 
           <span>
             <ClockCircleOutlined /> {time}
           </span>
-            <Tooltip title="Compartir">
-            <Button type="text" icon={<ShareAltOutlined style={{color: "#86A071"}}/>} />
-            </Tooltip>
+            
+            {
+              //<Tooltip title="Compartir">
+              //<Button type="text" icon={<ShareAltOutlined style={{color: "#86A071"}}/>} />
+              //</Tooltip>
+            }
         </div>
        </div>
     </Card>

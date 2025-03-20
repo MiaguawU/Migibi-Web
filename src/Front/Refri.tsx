@@ -96,7 +96,7 @@ export default function Inicio() {
         return;
       }
   
-      const response = await axios.get(`${PUERTO}/alimento`);
+      const response = await axios.get(`${PUERTO}/alimento/${userId}`);
       const { Perecedero, NoPerecedero } = response.data;
   
       if (Array.isArray(Perecedero) && Array.isArray(NoPerecedero)) {
@@ -148,7 +148,7 @@ export default function Inicio() {
   
         setAlimentosPerecederos(perecederos);
         setAlimentosNoPerecederos(noPerecederos);
-        message.success("Alimentos obtenidos exitosamente");
+        console.log("Alimentos obtenidos exitosamente");
       } else {
         throw new Error("Formato de datos inválido");
       }
@@ -218,7 +218,7 @@ export default function Inicio() {
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
-            <PorCaducar />
+          <PorCaducar onUpdate={datosAlimento} />
             {filteredAlimentos.map((card, index) => (
               <Card
                 key={index}
@@ -259,11 +259,17 @@ export default function Inicio() {
             {/* Modal externo para agregar producto */}
             <ProductModal
               visible={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+              onClose={() => {
+                setIsModalOpen(false);
+                datosAlimento(); // Llamar para refrescar los datos después de agregar
+              }}
             />
             <ModalEd
               visible={edAlimento !== null}
-              onClose={() => setEdAlimento(null)}
+              onClose={() => {
+                setEdAlimento(null);
+                datosAlimento(); // Llamar para refrescar los datos después de editar
+              }}
               alimentoId={edAlimento}
             />
           </div>

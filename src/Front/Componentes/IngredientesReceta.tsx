@@ -53,10 +53,12 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
     }
   };
 
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
   // Cargar ingredientes al inicio y tras un reset
   useEffect(() => {
-    datosAlimento();
-  }, []);
+    datosAlimento(); // Vuelve a cargar los datos cuando cambie refreshTrigger
+  }, [refreshTrigger]);
 
   useEffect(() => {
     if (onReset) {
@@ -175,11 +177,14 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
 
       {/* Modal para agregar ingredientes */}
       <IngModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        recetaId={recetaId}
-        onSubmit={(newItem: Item) => setItems((prev) => [...prev, newItem])}
-      />
+  visible={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  recetaId={recetaId}
+  onSubmit={(newItem) => {
+    setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
+    setIsModalOpen(false);
+  }}
+/>
     </>
   );
 };

@@ -38,7 +38,6 @@ CREATE TABLE `cat_alimento` (
   `Id_Usuario_Baja` int DEFAULT NULL,
   `Fecha_Baja` datetime DEFAULT NULL,
   `Es_Perecedero` tinyint(1) NOT NULL DEFAULT 1,
-  `Imagen_alimento` varchar(255) NOT NULL DEFAULT '/imagenes/defIng.png',
   PRIMARY KEY (`Id_Alimento`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -58,56 +57,56 @@ CREATE TABLE `cat_alimento` (
 LOCK TABLES `cat_alimento` WRITE;
 /*!40000 ALTER TABLE `cat_alimento` DISABLE KEYS */;
 
-INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Es_Perecedero, Imagen_alimento) VALUES
-(1, 5, 'Huevos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(2, 7, 'Frijoles bayos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(3, 1, 'Calabacita', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(4, 9, 'Sal con ajo en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(5, 9, 'Sal', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(6, 9, 'Pimienta negra molida', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(7, 6, 'Harina de trigo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(8, 5, 'Huevos batidos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(9, 6, 'Pan molido', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(10, 1, 'Jitomate', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(11, 1, 'Cebolla asada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(12, 9, 'Diente de ajo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(13, 9, 'Concentrado de tomate con pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(14, 9, 'Cilantro', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(15, 3, 'Filete de pescado', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(16, 10, 'Aceite vegetal', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(17, 3, 'Pechuga de pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(18, 1, 'Espinaca', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(19, 1, 'Champiñones', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(20, 10, 'Mantequilla', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(21, 5, 'Caldo de pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(22, 4, 'Crema de leche', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(24, 9, 'Pimienta', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(25, 4, 'Media crema', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(26, 5, 'Mayonesa', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(27, 1, 'Cebolla morada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(28, 2, 'Pepino', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(29, 3, 'Atun', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(31, 9, 'Chile cerrano', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(32, 6, 'Paquete de galletas saladas', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(33, 8, 'Agua', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(34, 9, 'Ajo en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(35, 10, 'Aceite de maiz', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(36, 3, 'Carne de res molida', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(37, 4, 'Leche evaporada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(38, 6, 'Paquete de pasta de espaguetti', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(39, 9, 'Sal con cebolla en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0, '/imagenes/defIng.png'),
-(40, 1, 'Cebolla', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(41, 5, 'Manteca de cerdo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(42, 10, 'Jugo de naranja', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(43, 3, 'Res', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(44, 3, 'Pechuga de pollo empanizada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(45, 1, 'Zanahoria', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(46, 7, 'Pechuga de pavo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(47, 6, 'Masa de maiz', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(48, 2, 'Tomates', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(49, 3, 'Pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(50, 4, 'Crema', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png'),
-(98, 1, 'Papas fritas', 1, 4, '2024-06-05 16:29:34', NULL, NULL, NULL, NULL, 1, '/imagenes/defIng.png');
+INSERT INTO `cat_alimento` (Id_Alimento, Id_Tipo_Alimento, Alimento, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Es_Perecedero) VALUES
+(1, 5, 'Huevos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1),
+(2, 7, 'Frijoles bayos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(3, 1, 'Calabacita', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(4, 9, 'Sal con ajo en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(5, 9, 'Sal', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(6, 9, 'Pimienta negra molida', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(7, 6, 'Harina de trigo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(8, 5, 'Huevos batidos', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(9, 6, 'Pan molido', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(10, 1, 'Jitomate', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(11, 1, 'Cebolla asada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(12, 9, 'Diente de ajo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(13, 9, 'Concentrado de tomate con pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(14, 9, 'Cilantro', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(15, 3, 'Filete de pescado', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(16, 10, 'Aceite vegetal', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(17, 3, 'Pechuga de pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(18, 1, 'Espinaca', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(19, 1, 'Champiñones', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(20, 10, 'Mantequilla', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(21, 5, 'Caldo de pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(22, 4, 'Crema de leche', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(24, 9, 'Pimienta', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(25, 4, 'Media crema', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(26, 5, 'Mayonesa', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(27, 1, 'Cebolla morada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(28, 2, 'Pepino', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(29, 3, 'Atun', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(31, 9, 'Chile cerrano', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(32, 6, 'Paquete de galletas saladas', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(33, 8, 'Agua', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(34, 9, 'Ajo en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(35, 10, 'Aceite de maiz', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(36, 3, 'Carne de res molida', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(37, 4, 'Leche evaporada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(38, 6, 'Paquete de pasta de espaguetti', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(39, 9, 'Sal con cebolla en polvo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 0      ),
+(40, 1, 'Cebolla', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(41, 5, 'Manteca de cerdo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(42, 10, 'Jugo de naranja', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(43, 3, 'Res', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(44, 3, 'Pechuga de pollo empanizada', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(45, 1, 'Zanahoria', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(46, 7, 'Pechuga de pavo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(47, 6, 'Masa de maiz', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(48, 2, 'Tomates', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(49, 3, 'Pollo', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(50, 4, 'Crema', 1, 2, '2024-04-28 02:34:41', NULL, NULL, NULL, NULL, 1      ),
+(98, 1, 'Papas fritas', 1, 4, '2024-06-05 16:29:34', NULL, NULL, NULL, NULL, 1      );
 
 UNLOCK TABLES;
 
@@ -375,7 +374,7 @@ CREATE TABLE `receta` (
   `Tiempo` time NOT NULL,
   `Calorias` double NOT NULL,
   `Porciones` int NOT NULL default 1 ,
-  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defRec.png',
+  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defIng.png',
   PRIMARY KEY (`Id_Receta`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -391,7 +390,6 @@ CREATE TABLE `receta` (
 --
 -- Dumping data for table `receta`
 --
-
 LOCK TABLES `receta` WRITE;
 /*!40000 ALTER TABLE `receta` DISABLE KEYS */;
 
@@ -413,7 +411,6 @@ INSERT INTO `receta` (`Nombre`, `Activo`, `Id_Usuario_Alta`, `Fecha_Alta`, `Id_T
 ('Huevos con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:30:00', 350),
 ('Papas con chorizo y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:35:00', 400),
 ('Papas con queso y Frijoles', 1, 1, '2024-04-28 01:30:24', 1, '/imagenes/defRec.png', '00:40:00', 450);
-
 
 /*!40000 ALTER TABLE `receta` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -781,6 +778,7 @@ CREATE TABLE `stock_detalle` (
   `Es_Perecedero` tinyint(1) NOT NULL DEFAULT (true),
   `Id_Alimento` int NOT NULL,
   `Id_Stock` int DEFAULT NULL,
+  `Imagen_alimento` varchar(255) NOT NULL DEFAULT '/imagenes/defIng.png',
   PRIMARY KEY (`Id_Stock_Detalle`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -801,7 +799,58 @@ CREATE TABLE `stock_detalle` (
 
 LOCK TABLES `stock_detalle` WRITE;
 /*!40000 ALTER TABLE `stock_detalle` DISABLE KEYS */;
-INSERT INTO `stock_detalle` VALUES (3,9,200,1,1,'2024-04-30 08:52:52',4,'2024-06-03 17:37:43',NULL,NULL,200,0,'2025-01-01 00:00:00',1,76,1),(4,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,2,1),(5,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,3,1),(6,6,2230,1,1,'2024-04-30 08:52:52',4,'2024-06-06 10:20:47',4,'2024-06-03 14:23:35',2230,0,'2025-01-01 00:00:00',0,4,1),(7,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 19:57:04',2000,0,'2025-01-01 00:00:00',0,5,1),(8,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 14:24:53',2000,0,'2025-01-01 00:00:00',0,5,1),(9,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,6,1),(10,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,7,1),(11,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,8,1),(12,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,9,1),(13,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 15:40:25',2000,0,'2025-01-01 00:00:00',1,10,1),(14,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 15:51:11',2000,0,'2025-01-01 00:00:00',1,10,1),(15,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 15:43:09',2000,0,'2025-01-01 00:00:00',1,10,1),(16,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 14:36:50',2000,0,'2025-01-01 00:00:00',1,10,1),(17,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,11,1),(18,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,12,1),(19,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 14:32:45',2000,0,'2025-01-01 00:00:00',1,12,1),(20,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 14:26:58',2000,0,'2025-01-01 00:00:00',1,12,1),(21,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 15:40:48',2000,0,'2025-01-01 00:00:00',1,13,1),(22,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 15:40:59',2000,0,'2025-01-01 00:00:00',1,13,1),(23,4,2000,1,1,'2024-04-30 08:52:52',4,'2024-06-03 18:13:32',NULL,NULL,2000,0,'2025-01-01 00:00:00',1,13,1),(24,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,14,1),(25,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,15,1),(26,2,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,16,1),(27,6,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 14:46:14',2000,0,'2025-01-01 00:00:00',0,16,1),(28,6,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 14:43:11',2000,0,'2025-01-01 00:00:00',0,16,1),(29,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,17,1),(30,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,18,1),(31,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,19,1),(32,6,2100,1,1,'2024-04-30 08:52:52',4,'2024-06-03 19:26:57',NULL,NULL,2100,0,'2025-01-01 00:00:00',1,20,1),(33,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,21,1),(34,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 19:25:14',2000,0,'2025-01-01 00:00:00',1,21,1),(35,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,22,1),(36,6,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,5,1),(37,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,5,1),(38,6,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,24,1),(39,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,25,1),(40,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,25,1),(41,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,25,1),(42,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,26,1),(43,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,27,1),(44,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,28,1),(45,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,29,1),(46,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 19:25:39',2000,0,'2025-01-01 00:00:00',1,14,1),(47,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,31,1),(48,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,32,1),(49,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,33,1),(50,3,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:54:32',2000,0,'2025-01-01 00:00:00',0,33,1),(51,3,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:54:42',2000,0,'2025-01-01 00:00:00',0,33,1),(53,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,34,1),(54,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,34,1),(55,6,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,35,1),(56,9,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,36,1),(57,9,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 19:25:02',2000,0,'2025-01-01 00:00:00',1,36,1),(58,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,37,1),(59,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,37,1),(60,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,37,1),(61,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,37,1),(62,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,37,1),(63,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,38,1),(64,6,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,39,1),(65,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,39,1),(66,5,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,40,1),(67,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,40,1),(68,5,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,41,1),(69,11,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,42,1),(70,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,43,1),(71,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,44,1),(72,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,45,1),(73,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,24,1),(74,5,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,47,1),(75,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,48,1),(76,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,49,1),(77,9,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,50,1),(78,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,51,1),(79,9,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,52,1),(80,8,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,53,1),(81,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,54,1),(82,10,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:07:54',2000,0,'2025-01-01 00:00:00',1,55,1),(83,10,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,55,1),(84,10,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:08:02',2000,0,'2025-01-01 00:00:00',1,55,1),(85,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,56,1),(86,3,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:07:48',2000,0,'2025-01-01 00:00:00',1,56,1),(87,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,57,1),(88,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,58,1),(89,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,59,1),(90,3,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:07:34',2000,0,'2025-01-01 00:00:00',1,60,1),(91,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,60,1),(92,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,61,1),(93,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,62,1),(94,11,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,63,1),(95,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,64,1),(96,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,65,1),(97,4,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,66,1),(98,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',0,67,1),(99,3,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:07:10',2000,0,'2025-01-01 00:00:00',0,67,1),(100,6,2000,0,1,'2024-04-30 08:52:52',NULL,NULL,4,'2024-06-03 18:07:21',2000,0,'2025-01-01 00:00:00',1,68,1),(101,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,69,1),(102,3,2000,1,1,'2024-04-30 08:52:52',NULL,NULL,NULL,NULL,2000,0,'2025-01-01 00:00:00',1,70,1),(129,4,2000,1,1,'2024-04-28 02:20:20',NULL,NULL,NULL,NULL,2000,0,'2030-04-28 02:20:20',1,71,1),(130,4,2000,1,1,'2024-04-28 02:20:20',NULL,NULL,NULL,NULL,2000,0,'2030-04-28 02:20:20',1,72,1),(131,4,2000,1,1,'2024-04-28 02:20:20',NULL,NULL,NULL,NULL,2000,0,'2030-04-28 02:20:20',1,73,1),(132,4,2000,1,1,'2024-04-28 02:20:20',NULL,NULL,NULL,NULL,2000,0,'2030-04-28 02:20:20',1,74,1),(133,12,11,0,4,'2024-06-02 18:53:15',4,'2024-06-03 18:03:52',4,'2024-06-03 18:06:47',11,0,'2024-06-03 00:00:00',0,2,NULL),(134,12,2,1,4,'2024-06-02 18:56:04',4,'2024-06-04 01:40:36',NULL,NULL,-1,3,'2024-06-06 00:00:00',0,75,NULL),(135,12,1,0,4,'2024-06-03 16:38:06',NULL,NULL,4,'2024-06-03 19:24:48',1,0,'2025-01-01 00:00:00',0,3,NULL),(136,4,1,1,4,'2024-06-03 19:29:04',NULL,NULL,NULL,NULL,1,0,'2025-01-01 00:00:00',0,78,NULL),(137,12,3,1,4,'2024-06-03 19:29:45',11,'2024-06-06 20:35:11',NULL,NULL,3,0,'2024-07-10 00:00:00',0,11,NULL),(138,12,3,1,4,'2024-06-03 19:36:53',4,'2024-06-03 19:58:14',NULL,NULL,3,0,'2025-02-03 00:00:00',0,65,NULL),(139,1,1,1,4,'2024-06-04 18:39:47',NULL,NULL,NULL,NULL,1,0,'2024-08-08 00:00:00',0,35,NULL),(140,4,2,1,4,'2024-06-06 10:15:55',NULL,NULL,NULL,NULL,2,0,'2025-06-01 00:00:00',0,1,NULL),(141,6,200,1,4,'2024-06-06 10:23:28',NULL,NULL,NULL,NULL,200,0,NULL,1,4,NULL),(142,12,2,1,4,'2024-06-07 17:27:33',NULL,NULL,NULL,NULL,2,0,'2024-07-05 00:00:00',0,10,NULL);
+INSERT INTO stock_detalle 
+(Id_Stock_Detalle, Id_Unidad_Medida, Cantidad, Activo, Id_Usuario_Alta, Fecha_Alta, Id_Usuario_Modif, Fecha_Modif, Id_Usuario_Baja, Fecha_Baja, Total, Cantidad_Consumida, Fecha_Caducidad, Es_Perecedero, Id_Alimento, Id_Stock, Imagen_alimento) 
+VALUES 
+(1, 1, 100, 1, 2, NOW(), NULL, NULL, NULL, NULL, 100, 0, '2025-01-01', 1, 1, 1, '/imagenes/defIng.png'), -- Huevos
+(2, 1, 150, 1, 2, NOW(), NULL, NULL, NULL, NULL, 150, 0, '2025-03-01', 1, 2, 1, '/imagenes/defIng.png'), -- Frijoles bayos
+(3, 1, 80, 1, 2, NOW(), NULL, NULL, NULL, NULL, 80, 0, '2025-02-15', 1, 3, 1, '/imagenes/defIng.png'), -- Calabacita
+(4, 1, 50, 1, 2, NOW(), NULL, NULL, NULL, NULL, 50, 0, NULL, 0, 4, 1, '/imagenes/defIng.png'), -- Sal con ajo en polvo
+(5, 1, 200, 1, 2, NOW(), NULL, NULL, NULL, NULL, 200, 0, NULL, 0, 5, 1, '/imagenes/defIng.png'), -- Sal
+(6, 1, 75, 1, 2, NOW(), NULL, NULL, NULL, NULL, 75, 0, NULL, 0, 6, 1, '/imagenes/defIng.png'), -- Pimienta negra molida
+(7, 1, 120, 1, 2, NOW(), NULL, NULL, NULL, NULL, 120, 0, NULL, 0, 7, 1, '/imagenes/defIng.png'), -- Harina de trigo
+(8, 1, 90, 1, 2, NOW(), NULL, NULL, NULL, NULL, 90, 0, '2025-04-10', 1, 8, 1, '/imagenes/defIng.png'), -- Huevos batidos
+(9, 1, 60, 1, 2, NOW(), NULL, NULL, NULL, NULL, 60, 0, NULL, 0, 9, 1, '/imagenes/defIng.png'), -- Pan molido
+(10, 1, 130, 1, 2, NOW(), NULL, NULL, NULL, NULL, 130, 0, '2025-03-20', 1, 10, 1, '/imagenes/defIng.png'), -- Jitomate
+(11, 1, 90, 1, 2, NOW(), NULL, NULL, NULL, NULL, 90, 0, '2025-02-05', 1, 11, 1, '/imagenes/defIng.png'), -- Cebolla asada
+(12, 1, 70, 1, 2, NOW(), NULL, NULL, NULL, NULL, 70, 0, '2025-01-15', 1, 12, 1, '/imagenes/defIng.png'), -- Diente de ajo
+(13, 1, 110, 1, 2, NOW(), NULL, NULL, NULL, NULL, 110, 0, '2025-03-10', 1, 13, 1, '/imagenes/defIng.png'), -- Concentrado de tomate con pollo
+(14, 1, 85, 1, 2, NOW(), NULL, NULL, NULL, NULL, 85, 0, '2025-04-01', 1, 14, 1, '/imagenes/defIng.png'), -- Cilantro
+(15, 1, 95, 1, 2, NOW(), NULL, NULL, NULL, NULL, 95, 0, '2025-02-28', 1, 15, 1, '/imagenes/defIng.png'), -- Filete de pescado
+(16, 1, 150, 1, 2, NOW(), NULL, NULL, NULL, NULL, 150, 0, NULL, 0, 16, 1, '/imagenes/defIng.png'), -- Aceite vegetal
+(17, 1, 120, 1, 2, NOW(), NULL, NULL, NULL, NULL, 120, 0, '2025-03-05', 1, 17, 1, '/imagenes/defIng.png'), -- Pechuga de pollo
+(18, 1, 110, 1, 2, NOW(), NULL, NULL, NULL, NULL, 110, 0, '2025-02-18', 1, 18, 1, '/imagenes/defIng.png'), -- Espinaca
+(19, 1, 100, 1, 2, NOW(), NULL, NULL, NULL, NULL, 100, 0, '2025-01-30', 1, 19, 1, '/imagenes/defIng.png'), -- Champiñones
+(20, 1, 80, 1, 2, NOW(), NULL, NULL, NULL, NULL, 80, 0, '2025-04-15', 1, 20, 1, '/imagenes/defIng.png'),
+(21, 1, 60, 1, 2, NOW(), NULL, NULL, NULL, NULL, 60, 0, '2025-05-30', 1, 21, 1, '/imagenes/defIng.png'), -- Caldo de pollo
+(22, 1, 40, 1, 2, NOW(), NULL, NULL, NULL, NULL, 40, 0, '2025-05-25', 1, 22, 1, '/imagenes/defIng.png'), -- Crema de leche
+(23, 1, 35, 1, 2, NOW(), NULL, NULL, NULL, NULL, 35, 0, NULL, 0, 24, 1, '/imagenes/defIng.png'), -- Pimienta
+(24, 1, 50, 1, 2, NOW(), NULL, NULL, NULL, NULL, 50, 0, '2025-06-10', 1, 25, 1, '/imagenes/defIng.png'), -- Media crema
+(25, 1, 45, 1, 2, NOW(), NULL, NULL, NULL, NULL, 45, 0, '2025-06-12', 1, 26, 1, '/imagenes/defIng.png'), -- Mayonesa
+(26, 1, 70, 1, 2, NOW(), NULL, NULL, NULL, NULL, 70, 0, '2025-05-29', 1, 27, 1, '/imagenes/defIng.png'), -- Cebolla morada
+(27, 1, 55, 1, 2, NOW(), NULL, NULL, NULL, NULL, 55, 0, '2025-05-28', 1, 28, 1, '/imagenes/defIng.png'), -- Pepino
+(28, 1, 65, 1, 2, NOW(), NULL, NULL, NULL, NULL, 65, 0, '2025-05-24', 1, 29, 1, '/imagenes/defIng.png'), -- Atún
+(29, 1, 30, 1, 2, NOW(), NULL, NULL, NULL, NULL, 30, 0, '2025-05-26', 1, 31, 1, '/imagenes/defIng.png'), -- Chile serrano
+(30, 1, 80, 1, 2, NOW(), NULL, NULL, NULL, NULL, 80, 0, '2025-06-01', 1, 32, 1, '/imagenes/defIng.png'), -- Paquete de galletas saladas
+(31, 1, 100, 1, 2, NOW(), NULL, NULL, NULL, NULL, 100, 0, NULL, 0, 33, 1, '/imagenes/defIng.png'), -- Agua
+(32, 1, 45, 1, 2, NOW(), NULL, NULL, NULL, NULL, 45, 0, NULL, 0, 34, 1, '/imagenes/defIng.png'), -- Ajo en polvo
+(33, 1, 50, 1, 2, NOW(), NULL, NULL, NULL, NULL, 50, 0, '2025-06-15', 1, 35, 1, '/imagenes/defIng.png'), -- Aceite de maíz
+(34, 1, 35, 1, 2, NOW(), NULL, NULL, NULL, NULL, 35, 0, '2025-05-27', 1, 36, 1, '/imagenes/defIng.png'), -- Carne de res molida
+(35, 1, 60, 1, 2, NOW(), NULL, NULL, NULL, NULL, 60, 0, '2025-06-05', 1, 37, 1, '/imagenes/defIng.png'), -- Leche evaporada
+(36, 1, 70, 1, 2, NOW(), NULL, NULL, NULL, NULL, 70, 0, '2025-06-20', 1, 38, 1, '/imagenes/defIng.png'), -- Paquete de pasta de espagueti
+(37, 1, 40, 1, 2, NOW(), NULL, NULL, NULL, NULL, 40, 0, NULL, 0, 39, 1, '/imagenes/defIng.png'), -- Sal con cebolla en polvo
+(38, 1, 85, 1, 2, NOW(), NULL, NULL, NULL, NULL, 85, 0, '2025-06-10', 1, 40, 1, '/imagenes/defIng.png'), -- Cebolla
+(39, 1, 75, 1, 2, NOW(), NULL, NULL, NULL, NULL, 75, 0, '2025-06-12', 1, 41, 1, '/imagenes/defIng.png'), -- Manteca de cerdo
+(40, 1, 90, 1, 2, NOW(), NULL, NULL, NULL, NULL, 90, 0, '2025-05-25', 1, 42, 1, '/imagenes/defIng.png'), -- Jugo de naranja
+(41, 1, 95, 1, 2, NOW(), NULL, NULL, NULL, NULL, 95, 0, '2025-06-01', 1, 43, 1, '/imagenes/defIng.png'), -- Res
+(42, 1, 110, 1, 2, NOW(), NULL, NULL, NULL, NULL, 110, 0, '2025-06-05', 1, 44, 1, '/imagenes/defIng.png'), -- Pechuga de pollo empanizada
+(43, 1, 120, 1, 2, NOW(), NULL, NULL, NULL, NULL, 120, 0, '2025-06-15', 1, 45, 1, '/imagenes/defIng.png'), -- Zanahoria
+(44, 1, 80, 1, 2, NOW(), NULL, NULL, NULL, NULL, 80, 0, '2025-05-29', 1, 46, 1, '/imagenes/defIng.png'), -- Pechuga de pavo
+(45, 1, 60, 1, 2, NOW(), NULL, NULL, NULL, NULL, 60, 0, '2025-06-20', 1, 47, 1, '/imagenes/defIng.png'), -- Masa de maíz
+(46, 1, 100, 1, 2, NOW(), NULL, NULL, NULL, NULL, 100, 0, '2025-06-25', 1, 48, 1, '/imagenes/defIng.png'), -- Tomates
+(47, 1, 85, 1, 2, NOW(), NULL, NULL, NULL, NULL, 85, 0, '2025-06-30', 1, 49, 1, '/imagenes/defIng.png'), -- Pollo
+(48, 1, 95, 1, 2, NOW(), NULL, NULL, NULL, NULL, 95, 0, '2025-06-18', 1, 50, 1, '/imagenes/defIng.png'), -- Crema
+(49, 1, 70, 1, 2, NOW(), NULL, NULL, NULL, NULL, 70, 0, '2025-06-28', 1, 98, 1, '/imagenes/defIng.png'); -- Papas fritas
 /*!40000 ALTER TABLE `stock_detalle` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -813,29 +862,19 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `Id_Usuario` int NOT NULL AUTO_INCREMENT,
-  `Nombre_Usuario` varchar(250) NOT NULL unique,
+  `Nombre_Usuario` varchar(250) NOT NULL ,
   `Contrasena` varchar(250) NOT NULL ,
   `foto_perfil` VARCHAR(255),
   `Cohabitantes` int NOT NULL DEFAULT (1),
   `Email` varchar(250) DEFAULT NULL UNIQUE,
   `Es_Gmail` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`Id_Usuario`)
+  `Id_Rol` int NOT NULL,
+  PRIMARY KEY (`Id_Usuario`),
+  KEY `Id_Rol` (`Id_Rol`),
+  CONSTRAINT `Id_Rol` FOREIGN KEY (`Id_Rol`) REFERENCES `roles` (`Id_Rol`)
 ) ENGINE=InnoDB auto_increment=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-DELIMITER //
-CREATE TRIGGER before_insert_usuario
-BEFORE INSERT ON `usuario`
-FOR EACH ROW
-BEGIN
-  IF NEW.Email LIKE '%@gmail.com' THEN
-    SET NEW.Es_Gmail = 1;
-  ELSE
-    SET NEW.Es_Gmail = 0;
-  END IF;
-END;
-//
-DELIMITER ;
 
 
 
@@ -843,7 +882,17 @@ DELIMITER ;
 -- Dumping data for table `usuario`
 --
 
+DROP TABLE IF EXISTS `roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `roles` (
+  `Id_Rol` int NOT NULL AUTO_INCREMENT,
+  `Rol` varchar(250) NOT NULL unique,
+  PRIMARY KEY (`Id_Rol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+INSERT INTO `roles` (`Rol`) VALUES ('Cliente') , ('Administrador'),('Premium');
 
 --
 -- Table structure for table `usuario_cat_alimento`
@@ -1141,5 +1190,9 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+
+
 
 -- Dump completed on 2024-10-16 10:28:47

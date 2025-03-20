@@ -48,19 +48,19 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
         }));
       setItems(ingredientes);
       setTempDeleted([]); // Reinicia los ingredientes eliminados temporalmente
-      message.success("Ingredientes obtenidos exitosamente");
     } catch (error) {
       console.error("Error al obtener ingredientes:", error);
-      message.error("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar ingredientes al inicio y tras un reset
-  useEffect(() => {
-    datosAlimento();
-  }, []); // Agregar resetTrigger como dependencia
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+  
+    // Cargar ingredientes al inicio y tras un reset
+    useEffect(() => {
+      datosAlimento(); // Vuelve a cargar los datos cuando cambie refreshTrigger
+    }, [refreshTrigger]);
 
   useEffect(() => {
     if (onReset) {
@@ -179,11 +179,15 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
 
       {/* Modal para agregar ingredientes */}
       <IngModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        recetaId={recetaId}
-        onSubmit={(newItem: Item) => setItems((prev) => [...prev, newItem])}
-      />
+  visible={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  recetaId={recetaId}
+  onSubmit={(newItem) => {
+    setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
+    setIsModalOpen(false);
+  }}
+/>
+
     </>
   );
 };

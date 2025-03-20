@@ -5,32 +5,44 @@ const path = require('path');
 const db = require('./connection');
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/:id", (req, res) => {
   console.log("Llamando a caducar");
 
   const query1 = `
     SELECT 
-    sd.Id_Stock_Detalle AS id,
-    ca.Alimento AS Nombre,
-    sd.Cantidad AS Cantidad,
-    sd.Fecha_Caducidad AS Fecha,
-    ca.Id_Usuario_Alta
-  FROM stock_detalle sd
-  LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
-  WHERE ca.Es_Perecedero = 1 and sd.Activo = 1
-  ORDER BY sd.Fecha_Caducidad ASC 
-  limit 10;`;
-  db.query(query1, (err, result1) => {
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Cantidad AS Cantidad,
+      sd.Fecha_Caducidad AS Fecha,
+      ca.Id_Usuario_Alta
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    WHERE ca.Es_Perecedero = 1 
+      AND sd.Activo = 1 
+      AND ca.Id_Usuario_Alta = ?
+    ORDER BY sd.Fecha_Caducidad ASC 
+    LIMIT 10;
+  `;
+
+  const id = req.params.id; // Se obtiene correctamente el ID desde los parámetros
+
+  db.query(query1, [id], (err, result1) => {
     if (err) {
-      console.log("Error:", err);  // Loguea el error
-      return res.status(404).send("Alimento no encontrado");
+      console.error("Error:", err);  // Usa console.error para errores
+      return res.status(500).json({ error: "Error en el servidor" });
     }
-    console.log("Enviando alimentos por caducar");
+    
+    if (result1.length === 0) {
+      return res.status(404).json({ message: "No se encontraron alimentos por caducar" });
+    }
+
+    console.log("Enviando alimentos por caducar:", result1);
     
     // Enviar la respuesta correctamente
     return res.json({ porcaducar: result1 });
   });
 });
+
 
 
 router.put("/", (req, res) => {

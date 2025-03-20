@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { Menu, Button, Drawer } from 'antd';
 import type { MenuProps } from 'antd';
 import './Front/Estilos/Nav.css';
@@ -17,15 +17,17 @@ import Plan2 from './Front/Plan2';
 import Recetas from './Front/Recetas';
 import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
-import Acceder from './Front/Acceder';  // Asegúrate de que esta importación sea correcta
+import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
 import Prueba from './Front/PruebaCam';
-import AuthForm from './Front/Componentes/AuthForm';  
+import AuthForm from './Front/Componentes/AuthForm';
 import IngRecetaEditar from './Front/Componentes/IngredientesRecetaEditar';
 import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
 import InstruccionModal from './Front/Componentes/InstruccionModal';
 import Ingrediente from './Front/Componentes/IngredienteModal';
+import { useSession } from "./Front/hook/useSession";
+
 type ItemType = Required<MenuProps>['items'][number];
 
 const mainItems: ItemType[] = [
@@ -47,117 +49,80 @@ const accederItem: ItemType[] = [
 ];
 
 function App() {
+  const { session, setSession, clearSession } = useSession<{ userId: number; name: string }>();
   const [isDrawerVisible, setDrawerVisible] = useState(false);
-  const [Accedio, setAccedio] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  const showDrawer = () => setDrawerVisible(true);
-  const closeDrawer = () => setDrawerVisible(false);
-
-  const handleResize = () => {
-    setIsMobile(window.innerWidth < 768);
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
     const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
-    const currentUser =  localStorage.getItem("currentUser");
-  
-    if (currentUser && ( usuariosLocal[currentUser])) {
-      setAccedio(true); // Si hay un usuario activo, marcar como autenticado
-    } else {
-      setAccedio(false);
-    }
-  
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-  
+    const currentUser = localStorage.getItem("currentUser");
 
-  // Lógica para manejar el login
+    setHasAccess(currentUser && usuariosLocal[currentUser] ? true : false);
+
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
   const onLogin = (userData: any) => {
     localStorage.setItem("usuarios", JSON.stringify({ [userData.id]: userData }));
     localStorage.setItem("currentUser", userData.id);
-    setAccedio(true);
-    console.log("Usuario logueado y datos almacenados en sessionStorage:", userData);
+    setHasAccess(true);
   };
+  
   
 
   return (
-    <Router>
-      <MainLayout>
-        <div>
-          <header>
-            {isMobile ? (
-              <div className="mobile-menu">
-                <Button className="btA" onClick={showDrawer}>Menú</Button>
-                <Drawer
-                  title="Opciones"
-                  placement="right"
-                  onClose={closeDrawer}
-                  open={isDrawerVisible}
-                >
-                  <Menu mode="vertical" items={Accedio ? [...mainItems, ...profileItem] : [...mainItems.slice(0, 3), ...accederItem]} />
-                </Drawer>
-              </div>
-            ) : (
-              <div className="custom-menu">
-                <Menu
-                  mode="horizontal"
-                  items={Accedio ? mainItems : mainItems.slice(0, 2)}
-                  className="menu-links"
-                />
-                {Accedio ? (
-                  <Menu
-                    mode="horizontal"
-                    items={profileItem}
-                    className="profile-link"
-                  />
-                ) : (
-                  <Menu
-                    mode="horizontal"
-                    items={accederItem}
-                    className="profile-link"
-                  />
-                )}
-              </div>
-            )}
-          </header>
+    <MainLayout>
+      <header>
+        {isMobile ? (
+          <div className="mobile-menu">
+            <Button className="btA" onClick={() => setDrawerVisible(true)}>Menú</Button>
+            <Drawer
+              title="Opciones"
+              placement="right"
+              onClose={() => setDrawerVisible(false)}
+              visible={isDrawerVisible}
+            >
+              <Menu mode="vertical" items={hasAccess ? [...mainItems, ...profileItem] : [...mainItems.slice(0, 3), ...accederItem]} />
+            </Drawer>
+          </div>
+        ) : (
+          <div className="custom-menu">
+            <Menu
+              mode="horizontal"
+              items={hasAccess ? mainItems : mainItems.slice(0, 2)}
+              className="menu-links"
+            />
+            <Menu
+              mode="horizontal"
+              items={hasAccess ? profileItem : accederItem}
+              className="profile-link"
+            />
+          </div>
+        )}
+      </header>
 
-          <main>
-            <Routes>
-              <Route path="/" element={<Inicio />} />
-              <Route path="/perfil" element={<Perfil />} />
-              <Route path="/conocenos" element={<Conocenos />} />
-              <Route path="/contactanos" element={<Contactanos />} />
-              <Route path="/hoy" element={<Plan2 />} />
-              <Route path="/plan" element={<Plan1 />} />
-              <Route path="/recetas" element={<Recetas />} />
-              <Route path="/refri" element={<Refri />} />
-              <Route path="/edReceta" element={<EDreceta />} />
-              <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} /> {/* Aquí se pasa la función onLogin */}
-              <Route path="/verR" element={<VerR />} />
-              <Route path="/modal" element={<Modal />} />
-              <Route path="/terminosycondiciones" element={<VerR />} />
-              <Route path="/avisodeprivacidad" element={<VerR />} />
-              <Route path="/prueba" element={<Prueba />} />
-              <Route path="/cad" element={<Caducar />} />
-              <Route path="/insEditar" element={<IngRecetaEditar recetaId={0} 
-      onSubmit={true}
-      onReset={true}  />} />
-              <Route path="/proEditar" element={<ProcRecetaEditar recetaId={0} 
-              onSubmit={true}
-      onReset={true}  />} />
-      <Route path="/instruccion" element={<ProcRecetaEditar recetaId={0} 
-              onSubmit={true}
-      onReset={true}  />} />
-
-            </Routes>
-          </main>
-        </div>
-      </MainLayout>
-    </Router>
+      <main>
+        <Routes>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/conocenos" element={<Conocenos />} />
+          <Route path="/contactanos" element={<Contactanos />} />
+          <Route path="/hoy" element={<Plan2 />} />
+          <Route path="/plan" element={<Plan1 />} />
+          <Route path="/recetas" element={<Recetas />} />
+          <Route path="/refri" element={<Refri />} />
+          <Route path="/edReceta" element={<EDreceta />} />
+          <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} />
+          <Route path="/verR" element={<VerR />} />
+          <Route path="/modal" element={<Modal />} />
+        </Routes>
+      </main>
+    </MainLayout>
   );
 }
 

@@ -77,7 +77,7 @@ const Recetas: React.FC = (): JSX.Element => {
   
         // Actualizar el estado con las recetas filtradas
         setRecipes(recData);
-        message.success("Recetas obtenidas exitosamente");
+        console.log("Recetas obtenidas exitosamente");
       }
     } catch (error) {
       console.error("Error al obtener recetas", error);

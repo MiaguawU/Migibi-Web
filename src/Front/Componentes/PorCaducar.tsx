@@ -12,7 +12,11 @@ interface Item {
   Id_Usuario_Alta: number;
 }
 
-const PorCaducar: React.FC = () => {
+interface PorCaducarProps {
+  onUpdate: () => void; // Función pasada desde el componente padre
+}
+
+const PorCaducar: React.FC<PorCaducarProps> = ({ onUpdate }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]); // Nuevo estado para almacenar los IDs seleccionados
   const [loading, setLoading] = useState(true);
@@ -35,7 +39,7 @@ const PorCaducar: React.FC = () => {
         return;
       }
   
-      const response = await axios.get(`${PUERTO}/caducar`);
+      const response = await axios.get(`${PUERTO}/caducar/${userId}`);
       console.log("Datos recibidos:", response.data);
   
       const perecederos = response.data.porcaducar
@@ -69,10 +73,9 @@ const PorCaducar: React.FC = () => {
         });
   
       setItems(perecederos);
-      message.success("Alimentos obtenidos exitosamente");
+      console.log("Alimentos obtenidos exitosamente");
     } catch (error) {
       console.error("Error al obtener alimentos", error);
-      message.error("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
     }
@@ -131,6 +134,9 @@ const PorCaducar: React.FC = () => {
         }))
       );
       setSelectedIds([]); // Limpiar la lista de seleccionados
+      datosAlimento();
+      onUpdate();
+      
     } catch (error) {
       console.error("Error al actualizar alimentos", error);
       message.error("No se pudo actualizar el estado de los alimentos.");

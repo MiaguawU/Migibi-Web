@@ -30,7 +30,10 @@ const recetas_diaDesayuno = require("./base/receta_diaDesayuno");
 const recetas_diaComida = require("./base/receta_diaComida");
 const recetas_diaCena = require("./base/receta_diaCena");
 const hoyGeneral = require("./base/HoyGeneral");
-const planMetodos = require("./base/PlanMetodos");
+const alimUnico = require("./base/AlimentoUnico");
+const cat_alimento = require("./base/cat_alimento");
+const usuario_adm = require("./base/usuario_admin");
+const rol = require("./base/rol");
 
 dotenv.config();
 
@@ -72,12 +75,14 @@ app.use(passport.session());
 
 
 // Rutas de usuarios
-app.use("/usuarios", upload, usuarioRouter);
+app.use("/usuarios", usuarioRouter);
 app.use("/usuarioGmail", usuarioGmailRouter);
 app.use("/login", loginRouter);
 app.use("/logout", logoutRouter);
 app.use("/manejo",call)
 app.use("/save", routerSave);
+app.use("/us_adm", usuario_adm);
+app.use("/rol", rol);
 
 // Ruta de autenticación con Google
 app.get(
@@ -139,10 +144,14 @@ app.use("/proED" , ProREAL);
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);
 app.use("/alimentoInactivo", routerAlimentoInactivo);
+app.use("/alUn", alimUnico);
+app.use("/cat_ali", cat_alimento);
+
 //tipo_alimento
 app.use("/tipoA", tipo_alimento);
 //unidad
 app.use("/unidad", unidad_medida);
+
 
 //Recetas_Dia y plan
 app.use("/planGeneral", recetas_diaGeneral);
@@ -153,12 +162,13 @@ app.use("/editarCena", recetas_diaCena);
 //Hoy
 app.use("/hoyGeneral", hoyGeneral);
 
-//Metodos para hacer un nuevo plan
-app.use("/planMet", planMetodos)
-
 app.disable('etag'); 
 
 const filePath = path.join(__dirname, 'images', 'defaultPerfil.png');
+
+app.get('/', (req, res) => {
+  res.send('🚀 Servidor funcionando en Render con MySQL en Railway!');
+});
 
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () =>

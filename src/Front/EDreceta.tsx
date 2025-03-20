@@ -109,7 +109,6 @@ export default function EDreceta() {
       });
       if(response){
         setTipos(response.data );
-        message.success("Tipos de consumo cargados correctamente.");
         console.log("Tipos recibidos:", response.data);
       }
       else{
@@ -123,6 +122,7 @@ export default function EDreceta() {
   };
 
   
+
   // Obtener datos de la receta
   const datosReceta = async () => {
     setLoading(true);
@@ -151,7 +151,6 @@ export default function EDreceta() {
         
         setFormData(recetaCargada);        
         setRecetaInicial(recetaCargada); // Guardar datos iniciales
-        message.success("Receta obtenida correctamente.");
       } else {
         message.warning("No se encontró información de la receta.");
       }
@@ -255,6 +254,7 @@ export default function EDreceta() {
     setenviarDatos((prev) => !prev); 
   };
   
+  
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
   
@@ -315,13 +315,17 @@ export default function EDreceta() {
             
             <div className='f1'>
               <div className='imgDiv'>
-                <img src={formData.Imagen || def} alt='Receta'/>
-                {/*style={{
-                  maxHeight: '400px',
-                  maxWidth: '300px',
-                  border: '1px solid #3E7E1E',
-                  borderRadius: '10px' 
-                }} de Isis*/}
+              <img
+                  src={formData.Imagen || def}
+                  alt="Receta"
+                  style={{
+                    maxHeight: '400px',
+                    maxWidth: '300px',
+                    border: '1px solid #3E7E1E',
+                    borderRadius: '10px',
+                  }}
+                />
+
                 <Upload {...uploadProps}>{/*...props de Nisa*/}
                   <Button className='btUp' icon={<UploadOutlined />}></Button>
                 </Upload>
@@ -339,13 +343,13 @@ export default function EDreceta() {
                   placeholder="Seleccione tiempo"
                   />
                 </div>
-                <div className="tipo">
+                <div className="tipo" style={{padding:'10px'}}>
                   <p className="txi">Tipo:</p>
                   <Select
                     placeholder="Seleccione un tipo"
                     value={formData.id_Tipo}
                     onChange={handleSelectChange}
-                    style={{ width: 200 }}
+                    style={{ width: 150 }}
                   >
                     {Tipos.map((tipo) => (
                       <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>
@@ -405,10 +409,11 @@ export default function EDreceta() {
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} />
+                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
-                  <Proceso  recetaId={Number(id)} />
+                  <Proceso recetaId={Number(id)} />
+
                 </div>
                 )}
               </div>

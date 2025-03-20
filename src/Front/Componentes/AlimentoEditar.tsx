@@ -81,7 +81,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
   const obtenerAlimento = async () => {
     if (!alimentoId) return;
     try {
-      const response = await axios.get(`${PUERTO}/alimento/${alimentoId}`);
+      const response = await axios.get(`${PUERTO}/alUn/${alimentoId}`);
       const alimento = response.data;
   
       // Configurar valores del formulario
@@ -151,10 +151,19 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
       });
       message.success('Producto actualizado');
       form.resetFields();
-    } catch (error) {
-      console.error(error);
-      message.error('Error al actualizar');
-    }
+    } catch (error: any)  {
+          console.error("Error en la solicitud:", error);
+    
+        if (error.response) {
+              if (error.response.data && error.response.data.error) {
+                message.error(error.response.data.error); // Muestra el mensaje de error del backend
+              } else {
+                message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
+              }
+            } else {
+              message.error('Error de conexión con el servidor.');
+            }
+        }
   };
   
 

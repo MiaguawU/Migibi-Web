@@ -12,12 +12,13 @@ const BASE_IMAGE_URL = process.env.SERVER_PORT; // URL base del servidor
 // Validación de datos con Joi
 const alimentoSchema = Joi.object({
   nombre: Joi.string().required(),
-  tipo: Joi.number().required(),
+  tipo: Joi.number().required().messages({ "number.base": "El tipo debe ser un número." }),
   id_unidad: Joi.number().required(),
   cantidad: Joi.number().min(1).required(),
-  fecha_caducidad: Joi.date().optional(),
+  fecha_caducidad: Joi.date().allow(null, '').optional(), // Permite cadenas vacías o nulos
   Id_Usuario_Alta: Joi.number().required(),
 });
+
 
 // Asincronizar consultas de la base de datos
 const queryAsync = util.promisify(db.query).bind(db);
@@ -70,6 +71,7 @@ router.post("/", async (req, res) => {
     }
 
     const { nombre, tipo, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta } = req.body;
+    console.log(req.body);
 
     // Validación de datos
     const { error } = alimentoSchema.validate(req.body);
@@ -78,103 +80,191 @@ router.post("/", async (req, res) => {
     const hoy = new Date();
     const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
     const es_perecedero = fecha_caducidad ? 1 : 0;
-
-    let Fecha_Caducidad = null;
-    if (fecha_caducidad) {
-      try {
-        const date = new Date(fecha_caducidad);
-        Fecha_Caducidad = date.toISOString().slice(0, 19).replace("T", " ");
-      } catch (parseError) {
-        return res.status(400).json({ error: "Formato de fecha inválido" });
+    const Fecha_Caducidad = fecha_caducidad ? formatFechaCaducidad(fecha_caducidad) : null;
+    const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
+    
+    if (Fecha_Caducidad) {
+      const fechaCaducidadDate = new Date(Fecha_Caducidad);
+      if (fechaCaducidadDate < new Date()) {
+        return res.status(400).json({ error: "No puedes agregar un alimento con fecha de caducidad vencida." });
       }
     }
+    
 
-    // Asegurar que el prefijo `/imagenes/` esté incluido
-    const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
+    try {
+      // Verificar si el alimento ya existe
+      const existencia = await queryAsync(
+        `SELECT Id_Alimento, Es_Perecedero FROM cat_alimento 
+        WHERE Id_Usuario_Alta = ? AND Alimento LIKE ? AND Activo = 1`,
+        [Id_Usuario_Alta, `%${nombre}%`]
+      );
 
-    // Inserción en `cat_alimento`
-    const query1 = `
-      INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const values1 = [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta];
+      if (existencia.length > 0) {
+        // Si el alimento ya existe, se obtiene su ID
+        const Id_Alimento = existencia[0].Id_Alimento;
+        const esPerecederoExistente = existencia[0].Es_Perecedero;
 
-    db.query(query1, values1, (err, result1) => {
-      if (err) {
-        console.error("Error al insertar en cat_alimento:", err);
-        return res.status(500).json({ error: "Error al agregar el alimento." });
+        // Crear un nuevo registro en stock_detalle
+        await queryAsync(
+          `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero,Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+          [
+            id_unidad,
+            cantidad,
+            cantidad,
+            esPerecederoExistente ? Fecha_Caducidad : null, // Si no es perecedero, Fecha_Caducidad será NULL
+            Id_Alimento,
+            esPerecederoExistente,
+            imagen,
+            Id_Usuario_Alta,
+            Fecha_Alta,
+          ]
+        );
+
+        return res.status(200).json({ message: "Nuevo stock agregado para alimento existente" });
       }
 
-      const Id_Alimento = result1.insertId; // Obtener el ID generado por la inserción
+      // Insertar nuevo alimento si no existe
+      const result1 = await queryAsync(
+        `INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?)`,
+        [nombre, tipo, es_perecedero, Id_Usuario_Alta, Fecha_Alta]
+      );
 
-      // Inserción en `stock_detalle`
-      const query2 = `
-        INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Id_Usuario_Alta, Fecha_Alta) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
-      const values2 = [id_unidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero, Id_Usuario_Alta, Fecha_Alta];
+      const Id_Alimento = result1.insertId;
 
-      db.query(query2, values2, (err2, result2) => {
-        if (err2) {
-          console.error("Error al insertar en stock_detalle:", err2);
-          return res.status(500).json({ error: "Error al agregar el detalle del stock." });
-        }
+      // Insertar en stock_detalle
+      await queryAsync(
+        `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Es_Perecedero, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+        [id_unidad, cantidad, cantidad, Fecha_Caducidad, Id_Alimento, es_perecedero,imagen, Id_Usuario_Alta, Fecha_Alta]
+      );
 
-        res.status(201).json({
-          message: "Alimento y detalle del stock agregados exitosamente.",
-          alimento: { id: Id_Alimento, nombre, tipo, es_perecedero, imagen },
-          stock: { id: result2.insertId, id_unidad, cantidad, fecha_caducidad: Fecha_Caducidad },
-        });
+      //al crearse un nuevo alimento en el catalogo se marca como que el usuario puede comerlo
+      await queryAsync(
+        `INSERT INTO usuario_cat_alimento ( Id_Alimento, Id_Usuario, Puede_Comer) 
+        VALUES (?, ?, ?)`,
+        [ Id_Alimento,  Id_Usuario_Alta, 1 ]
+      );
+
+      res.status(201).json({
+        message: "Alimento agregado exitosamente",
+        alimento: { id: Id_Alimento, nombre, tipo, es_perecedero, imagen },
       });
-    });
+    } catch (error) {
+      console.error("Error al agregar el alimento:", error);
+      res.status(500).json({ error: "Error al agregar el alimento" });
+    }
   });
 });
 
-
-//obtener alimentos del refri
 router.get("/", (req, res) => {
+  
+
   const query1 = `
-  SELECT 
-  ca.Id_Alimento AS id,
-  ca.Alimento AS Nombre,
-  ca.Activo As Activo,
-  sd.Cantidad AS Cantidad,
-  cum.Abreviatura AS Unidad,
-  ca.Imagen_alimento AS Imagen,
-  sd.Fecha_Caducidad,
-  sd.Id_Usuario_Alta,
-  cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
-FROM stock_detalle sd
-LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
-LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
-LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento -- Agregado JOIN para obtener el tipo de alimento
-WHERE ca.Es_Perecedero = 1
-ORDER BY sd.Fecha_Caducidad ASC;`;
+    SELECT 
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Activo AS Activo,
+      sd.Cantidad AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      sd.Imagen_alimento AS Imagen,
+      sd.Fecha_Caducidad,
+      ca.Id_Usuario_Alta,
+      cta.Tipo_Alimento AS Tipo_Alimento
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    ORDER BY sd.Fecha_Caducidad ASC;
+  `;
 
   const query2 = `
     SELECT 
-    ca.Id_Alimento AS id,
-  ca.Alimento AS Nombre,
-  ca.Activo As Activo,
-  sd.Cantidad AS Cantidad,
-  cum.Abreviatura AS Unidad,
-  ca.Imagen_alimento AS Imagen,
-  ca.Id_Usuario_Alta,
-  cta.Tipo_Alimento AS Tipo_Alimento -- Agregado el tipo de alimento
-FROM stock_detalle sd
-LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
-LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
-LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento -- Agregado JOIN para obtener el tipo de alimento
-WHERE ca.Es_Perecedero = 0
-ORDER BY sd.Fecha_Caducidad ASC;`;
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Activo AS Activo,
+      sd.Cantidad AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      sd.Imagen_alimento AS Imagen,
+      ca.Id_Usuario_Alta,
+      cta.Tipo_Alimento AS Tipo_Alimento
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    ORDER BY sd.Fecha_Caducidad ASC;
+  `;
 
-  db.query(query1, (err, result1) => {
+  db.query(query1,  (err, result1) => {
     if (err) {
       console.error("Error en query1:", err);
       return res.status(500).json({ error: "Error al obtener alimentos perecederos" });
     }
 
-    db.query(query2, (err2, result2) => {
+    db.query(query2, (err2, result2) => { // ✅ Pasar id como parámetro en query2
+      if (err2) {
+        console.error("Error en query2:", err2);
+        return res.status(500).json({ error: "Error al obtener alimentos no perecederos" });
+      }
+
+      res.json({ Perecedero: result1, NoPerecedero: result2 });
+    });
+  });
+});
+
+//obtener alimentos del refri
+router.get("/:id", (req, res) => {
+  const id = parseInt(req.params.id, 10); // Convertir id a número
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "ID inválido" });
+  }
+
+  const query1 = `
+    SELECT 
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Activo AS Activo,
+      sd.Cantidad AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      sd.Imagen_alimento AS Imagen,
+      sd.Fecha_Caducidad,
+      ca.Id_Usuario_Alta,
+      cta.Tipo_Alimento AS Tipo_Alimento
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    WHERE sd.Es_Perecedero = 1 AND sd.Id_Usuario_Alta = ?
+    ORDER BY sd.Fecha_Caducidad ASC;
+  `;
+
+  const query2 = `
+    SELECT 
+      sd.Id_Stock_Detalle AS id,
+      ca.Alimento AS Nombre,
+      sd.Activo AS Activo,
+      sd.Cantidad AS Cantidad,
+      cum.Abreviatura AS Unidad,
+      sd.Imagen_alimento AS Imagen,
+      ca.Id_Usuario_Alta,
+      cta.Tipo_Alimento AS Tipo_Alimento
+    FROM stock_detalle sd
+    LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
+    LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
+    LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    WHERE sd.Es_Perecedero = 0 AND sd.Id_Usuario_Alta = ?
+    ORDER BY sd.Fecha_Caducidad ASC;
+  `;
+
+  db.query(query1, [id], (err, result1) => {
+    if (err) {
+      console.error("Error en query1:", err);
+      return res.status(500).json({ error: "Error al obtener alimentos perecederos" });
+    }
+
+    db.query(query2, [id], (err2, result2) => { // ✅ Pasar id como parámetro en query2
       if (err2) {
         console.error("Error en query2:", err2);
         return res.status(500).json({ error: "Error al obtener alimentos no perecederos" });
@@ -187,39 +277,9 @@ ORDER BY sd.Fecha_Caducidad ASC;`;
 
 
 
+
 // Obtener un alimento por ID
-router.get("/:id", async (req, res) => {
-  const id = req.params.id;
 
-  const query = `
-    SELECT 
-      ca.Alimento AS Nombre,
-      sd.Cantidad AS Cantidad,
-      sd.Id_Unidad_Medida AS id_unidad,
-      ca.Id_Tipo_Alimento AS id_tipo,
-      sd.Fecha_Caducidad AS Fecha
-    FROM 
-      stock_detalle sd
-    JOIN 
-      cat_alimento ca
-    ON 
-      sd.Id_Alimento = ca.Id_Alimento
-    WHERE 
-      ca.Id_Alimento = ?;
-  `;
-
-  try {
-    const result = await queryAsync(query, [id]);
-    if (result.length > 0) {
-      res.json(result[0]);
-    } else {
-      res.status(404).json({ error: "No se encontró el alimento" });
-    }
-  } catch (error) {
-    console.error("Error al obtener alimento:", error);
-    res.status(500).json({ error: "Error al obtener alimento" });
-  }
-});
 
 // Actualizar un alimento
 router.put("/:id", upload.single("image"), async (req, res) => {
@@ -248,6 +308,12 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       }
     }
 
+    if (Fecha_Caducidad) {
+      const fechaCaducidadDate = new Date(Fecha_Caducidad);
+      if (fechaCaducidadDate < new Date()) {
+        return res.status(400).json({ error: "No puedes agregar un alimento con fecha de caducidad vencida." });
+      }
+    }
     // Obtener la imagen existente si no se proporciona una nueva
     let imagen;
     if (req.file) {
@@ -255,9 +321,10 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       imagen = `/imagenes/${req.file.filename}`;
     } else {
       // Si no, obtenemos la imagen actual desde la base de datos
-      const queryImagen = `SELECT Imagen_alimento FROM cat_alimento WHERE Id_Alimento = ?`;
+      const queryImagen = `SELECT Imagen_alimento FROM stock_detalle WHERE Id_Stock_Detalle = ?`;
       const [result] = await queryAsync(queryImagen, [id]);
       if (!result) {
+        console.log("imagen alimento no encontrado");
         return res.status(404).json({ error: "Alimento no encontrado" });
       }
       imagen = result.Imagen_alimento;
@@ -265,21 +332,31 @@ router.put("/:id", upload.single("image"), async (req, res) => {
 
     // Actualizar los datos del alimento
     const query1 = `
-      UPDATE cat_alimento 
-      SET Alimento = ?, Id_Tipo_Alimento = ?, Es_Perecedero = ?, Imagen_alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = 1
-      WHERE Id_Alimento = ?
-    `;
-    const values1 = [nombre, tipo, es_perecedero, imagen, Id_Usuario_Alta, Fecha_Alta, id];
+    UPDATE cat_alimento 
+    SET Alimento = ?, Id_Tipo_Alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = 1 
+    WHERE Id_Alimento = ?;`;
+
+    const query = `SELECT Id_Alimento FROM stock_detalle WHERE Id_Stock_Detalle = ?;`;
+
+    // Obtener id_Alimento a partir de la consulta
+    const [resultId] = await queryAsync(query, [id]); // Asegúrate de que el id esté siendo pasado correctamente
+
+    if (!resultId) {
+      return res.status(404).json({ error: "Stock no encontrado" });
+    }
+
+    const idAlimento = Number(resultId.Id_Alimento);  // Convertir correctamente a número
+
+    const values1 = [nombre, tipo, Id_Usuario_Alta, Fecha_Alta, idAlimento];
 
     await queryAsync(query1, values1);
 
     // Actualizar los detalles del stock
-    const query2 = `
-      UPDATE stock_detalle 
-      SET Id_Unidad_Medida = ?, Cantidad = ?, Fecha_Caducidad = ?, Es_Perecedero = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = 1
-      WHERE Id_Alimento = ?
-    `;
-    const values2 = [id_unidad, cantidad, Fecha_Caducidad, es_perecedero, Id_Usuario_Alta, Fecha_Alta, id];
+    const query2 = `UPDATE stock_detalle 
+      SET Id_Unidad_Medida = ?, Cantidad = ?, Fecha_Caducidad = ?, Imagen_alimento = ?, Id_Usuario_Modif = ?, Fecha_Modif = ?, Activo = 1
+      WHERE Id_Stock_Detalle = ?`;
+
+    const values2 = [id_unidad, cantidad, Fecha_Caducidad, imagen, Id_Usuario_Alta, Fecha_Alta, id];
 
     await queryAsync(query2, values2);
 

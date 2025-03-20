@@ -33,6 +33,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
   const [searchTerm, setSearchTerm] = useState('');
   const [unidades, setUnidades] = useState<Unidad[]>([]);
   const [alimentos, setAlimentos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchUnidades = async () => {
     try {
@@ -45,7 +46,22 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
 
   const fetchAlimentos = async () => {
     try {
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+  
+      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+  
       const response = await axios.get(`${PUERTO}/alimento`);
+
       const alimentosData = response.data;
       setAlimentos(alimentosData.Perecedero.concat(alimentosData.NoPerecedero));
     } catch (error) {
@@ -66,22 +82,34 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
       message.warning("No hay un usuario logueado actualmente.");
       return;
     }
-
+  
     const payload = {
       nombre: values.name,
       cantidad: values.quantity,
       id_unidad: values.unit,
       Id_Usuario_Alta: Number(currentUser),
     };
-
+  
     try {
       const response = await axios.post(`${PUERTO}/ingED/${recetaId}`, payload, {
         headers: { "Content-Type": "application/json" },
       });
-
+  
       if (response.status === 200) {
         message.success("Ingrediente agregado correctamente.");
         form.resetFields();
+  
+        // Obtener el nuevo ingrediente desde la respuesta de la API
+        const nuevoIngrediente = {
+          id: response.data.id, // Asegúrate de que la API devuelva el ID
+          name: values.name,
+          cantidad: values.quantity,
+          unidad: unidades.find((u) => u.Id_Unidad_Medida === values.unit)?.Unidad_Medida || "Unidad",
+          isChecked: false,
+          Activo: 1,
+        };
+  
+        onSubmit(nuevoIngrediente); // Pasar el nuevo ingrediente
         onClose();
       } else {
         message.error("Error al agregar el ingrediente.");
@@ -91,6 +119,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
       message.error("Error al procesar la solicitud.");
     }
   };
+  
 
   const filteredOptions = alimentos
     .filter((alimento) =>
@@ -105,7 +134,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
     searchTerm &&
     !filteredOptions.some((option) => option.value === searchTerm)
   ) {
-    filteredOptions.unshift({ value: searchTerm, label: `Añadir "${searchTerm}"` });
+    filteredOptions.unshift({ value: searchTerm, label: `"${searchTerm}"` });
   }
 
   const handleFinish = (values: any) => {

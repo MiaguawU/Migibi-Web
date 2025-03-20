@@ -60,7 +60,6 @@ router.get("/", (req, res) => {
       return res.status(500).send("Error al obtener recetas");
     }
     console.log("si salio :3");
-    console.log(result);
     res.json(result);
   });
 });

@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const db = require('./connection');
 
 const router = express.Router();
@@ -8,16 +9,18 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 router.post("/", (req, res) => {
-  const { username, password } = req.body;
+  const { identifier, password } = req.body; // Usamos "identifier" en lugar de "email"
 
-
-  if (!username || !password) {
-    console.log("Faltan datos requeridos: username y password");
-    return res.status(400).send("Faltan datos requeridos: username y password");
+  if (!identifier || !password) {
+    console.log("Faltan datos requeridos: identifier y password");
+    return res.status(400).send("Faltan datos requeridos: identifier y password");
   }
 
-  // Ajustar la consulta para coincidir con la estructura de la tabla
-  db.query('SELECT * FROM usuario WHERE Nombre_Usuario = ?', [username], (err, result) => {
+  let query = identifier.endsWith("@gmail.com") 
+    ? 'SELECT * FROM usuario WHERE Email = ?' 
+    : 'SELECT * FROM usuario WHERE Nombre_Usuario = ?';
+
+  db.query(query, [identifier], async (err, result) => {
     if (err) {
       console.error("Error al obtener el usuario:", err);
       return res.status(500).send('Error al obtener el usuario');
@@ -30,14 +33,14 @@ router.post("/", (req, res) => {
 
     const user = result[0];
 
-    // Validar la contraseña
-    if (user.Contrasena !== password) {
+    // Comparar la contraseña ingresada con la cifrada en la base de datos
+    const passwordMatch = await bcrypt.compare(password, user.Contrasena);
+
+    if (!passwordMatch) {
       console.log("Contraseña incorrecta");
       return res.status(401).send('Contraseña incorrecta');
     }
-    
-    console.log(";(((");
-    // Responder con los datos requeridos
+
     res.json({
       id: user.Id_Usuario,
       username: user.Nombre_Usuario,
@@ -48,7 +51,6 @@ router.post("/", (req, res) => {
     });
   });
 });
-
 
 
 module.exports = router;
