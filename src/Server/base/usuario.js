@@ -43,7 +43,7 @@ const sanitizeInput = (req, res, next) => {
 };
 
 const validatePassword = (password) => {
-  if (password.length < 7) return false;
+  if (password.length < 8) return false;
   const uppercase = (password.match(/[A-Z]/g) || []).length;
   const lowercase = (password.match(/[a-z]/g) || []).length;
   const numbers = (password.match(/[0-9]/g) || []).length;
@@ -122,25 +122,25 @@ router.put('/:id', upload.single('foto_perfil'), async (req, res) => {
 });
 
 router.post("/", sanitizeInput, async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   console.log(req.body);
 
-  if (!username || !password) {
+  if (!username || !password || !email) {
     return res.status(400).send("Faltan datos requeridos: username y password");
   }
 
   if (!validatePassword(password)) {
-    return res.status(400).send("La contraseña debe tener al menos 7 caracteres, con mínimo 2 mayúsculas, 2 minúsculas y 2 números");
+    return res.status(400).send("La contraseña debe tener al menos 8 caracteres, con mínimo 2 mayúsculas, 2 minúsculas y 2 números");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
   const foto_perfil = `/imagenes/defaultPerfil.png`;
 
   const query = `
-    INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil, Id_Rol) 
-    VALUES (?, ?, ?, 1)
+    INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil, Id_Rol, Email) 
+    VALUES (?, ?, ?, 1, ?)
   `;
-  const values = [username, hashedPassword, foto_perfil];
+  const values = [username, hashedPassword, foto_perfil, email];
 
   db.query(query, values, (err, result) => {
     if (err) {

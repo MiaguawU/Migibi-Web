@@ -79,7 +79,6 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
         const idsToDelete = tempDeleted.map((item) => item.id);
         await axios.put(`${PUERTO}/proED`, { ids: idsToDelete });
       }
-      message.success("Cambios enviados correctamente.");
       setTempAdded([]);
       setTempDeleted([]);
     } catch (error) {

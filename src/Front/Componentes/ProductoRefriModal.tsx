@@ -166,9 +166,19 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       setProductoGuardado(response.data.id); // Guarda el ID del producto agregado
   
       form.resetFields();
-    } catch (error) {
-      console.error(error);
-      message.error('Error al agregar producto');
+    } catch (error: any)  {
+      console.error("Error en la solicitud:", error);
+
+    // Verificar si el backend envió un mensaje de error
+    if (error.response) {
+      if (error.response.data && error.response.data.error) {
+        message.error(error.response.data.error); // Muestra el mensaje de error del backend
+      } else {
+        message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
+      }
+    } else {
+      message.error('Error de conexión con el servidor.');
+    }
     }
   };
   

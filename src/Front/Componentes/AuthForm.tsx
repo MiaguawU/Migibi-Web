@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Input, Button, Radio, Typography, ConfigProvider, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import axios from 'axios';
@@ -8,8 +8,10 @@ const { Title } = Typography;
 
 const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) => {
   const [formMode, setFormMode] = useState<"register" | "login">("register");
+  const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
 
   const handleModeChange = (e: any) => {
     setFormMode(e.target.value);
@@ -20,12 +22,32 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   };
 
   const validatePassword = (password: string): boolean => {
-    const minLength = password.length >= 7;
-    const hasUpperCase = (password.match(/[A-Z]/g) || []).length >= 2;
-    const hasLowerCase = (password.match(/[a-z]/g) || []).length >= 2;
-    const hasNumbers = (password.match(/[0-9]/g) || []).length >= 2;
+    return (
+      password.length >= 8 &&
+      (password.match(/[A-Z]/g) || []).length >= 2 &&
+      (password.match(/[a-z]/g) || []).length >= 2 &&
+      (password.match(/[0-9]/g) || []).length >= 2
+    );
+  };
 
-    return minLength && hasUpperCase && hasLowerCase && hasNumbers;
+  const validateEmailFormat = (email: string): boolean => {
+    // Expresión regular para validar correos de Gmail correctamente formateados
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return gmailRegex.test(email);
+  };
+  
+  const correctEmailFormat = (email: string): string => {
+    // Elimina espacios en blanco, corrige errores menores como "@gmial.com" → "@gmail.com"
+    return email
+      .trim()
+      .replace(/\s+/g, '') // Elimina espacios
+      .replace(/@gmai\.com$/, '@gmail.com') // Corrige errores comunes
+      .toLowerCase(); // Normaliza a minúsculas
+  };
+  
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const correctedEmail = correctEmailFormat(e.target.value);
+    setEmail(correctedEmail);
   };
 
   const validateUsername = (username: string): boolean => {
@@ -34,7 +56,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
   const sesionNormal = async () => {
     try {
-      const data = { username: email, password };
+      const data = { identifier: email, password }; // Se usa "identifier" para permitir usuario o correo
 
       const response = await axios.post(`${PUERTO}/login`, data, {
         headers: { 'Content-Type': 'application/json' },
@@ -43,7 +65,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
       const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
 
       localStorage.setItem("currentUser", id);
-
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
 
       onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
@@ -58,26 +79,36 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
     }
   };
 
+
   const registro = async () => {
-    if (!validateUsername(email)) {
+    if (!validateUsername(username)) {
       message.error("El nombre de usuario debe tener al menos 4 caracteres.");
       return;
     }
 
+    if (!email.includes("@")) {
+      message.error("Ingrese un correo electrónico válido.");
+      return;
+    }
+
     if (!validatePassword(password)) {
-      message.error("La contraseña debe tener al menos 7 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
+      message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      message.error("Las contraseñas no coinciden.");
       return;
     }
 
     try {
-      const data = { username: email, password };
+      const data = { username, email, password };
 
       const response = await axios.post(`${PUERTO}/usuarios`, data, {
         headers: { "Content-Type": "application/json" },
       });
 
       localStorage.setItem("user", JSON.stringify(response.data));
-
       message.success("Registro exitoso");
     } catch (error) {
       console.error("❌ Error en registro():", error);
@@ -87,9 +118,19 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
   const handleSubmit = () => {
     if (formMode === "register") {
+      if (!validateEmailFormat(email)) {
+        message.error("El correo debe ser un Gmail válido (ejemplo@gmail.com).");
+        return;
+      }
       registro();
     } else {
-      sesionNormal();
+      if (!email.includes("@")) {
+        // Si el usuario ingresa solo un nombre, asumimos que es un nombre de usuario
+        sesionNormal();
+      } else {
+        setEmail(correctEmailFormat(email)); // Corrige posibles errores en el email
+        sesionNormal();
+      }
     }
   };
 
@@ -128,13 +169,28 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
             {formMode === "register" ? "Registrarse" : "Iniciar Sesión"}
           </Title>
 
+          {formMode === "register" && (
+            <>
+              <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
+                Nombre de Usuario
+              </Title>
+              <Input
+                placeholder="Nombre de Usuario"
+                style={{ marginBottom: "8px", borderRadius: "8px" }}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+
+            </>
+          )}
+
           <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-            {formMode === "register" ? "Nombre/Correo" : "Correo"}
+            {formMode === "register" ? "Correo Electrónico" : "Nombre de Usuario o Correo"}
           </Title>
 
           <Input
-            placeholder={formMode === "register" ? "Nombre/Correo" : "Correo"}
-            style={{ marginBottom: "0px", borderRadius: "8px" }}
+            placeholder={formMode === "register" ? "Correo Electrónico" : "Nombre de Usuario o Correo"}
+            style={{ marginBottom: "8px", borderRadius: "8px" }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -149,6 +205,21 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          {formMode === "register" && (
+            <>
+              <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
+                Confirmar Contraseña
+              </Title>
+
+              <Input.Password
+                placeholder="Confirmar Contraseña"
+                style={{ marginBottom: "16px", borderRadius: "8px" }}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </>
+          )}
 
           <div style={{ textAlign: "center", marginBottom: "16px" }}>
             <Button

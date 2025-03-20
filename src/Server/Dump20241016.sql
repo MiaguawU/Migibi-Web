@@ -862,7 +862,7 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `Id_Usuario` int NOT NULL AUTO_INCREMENT,
-  `Nombre_Usuario` varchar(250) NOT NULL unique,
+  `Nombre_Usuario` varchar(250) NOT NULL ,
   `Contrasena` varchar(250) NOT NULL ,
   `foto_perfil` VARCHAR(255),
   `Cohabitantes` int NOT NULL DEFAULT (1),
@@ -875,19 +875,6 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB auto_increment=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-DELIMITER //
-CREATE TRIGGER before_insert_usuario
-BEFORE INSERT ON `usuario`
-FOR EACH ROW
-BEGIN
-  IF NEW.Email LIKE '%@gmail.com' THEN
-    SET NEW.Es_Gmail = 1;
-  ELSE
-    SET NEW.Es_Gmail = 0;
-  END IF;
-END;
-//
-DELIMITER ;
 
 
 
@@ -905,7 +892,7 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `roles` (`Rol`) VALUES ('Cliente') , ('Administrador');
+INSERT INTO `roles` (`Rol`) VALUES ('Cliente') , ('Administrador'),('Premium');
 
 --
 -- Table structure for table `usuario_cat_alimento`
@@ -1204,19 +1191,7 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-DELIMITER //
 
-CREATE TRIGGER recetas_basura
-AFTER UPDATE ON receta
-FOR EACH ROW
-BEGIN
-    IF EXISTS (SELECT 1 FROM receta WHERE `Nombre` = 'Receta_nueva' AND `Activo` = 0) THEN
-        DELETE FROM receta WHERE 'Receta_nueva' = NEW.Nombre AND `Activo` = 0;
-    END IF;
-END;
-//
-
-DELIMITER ;
 
 
 

@@ -60,6 +60,27 @@ const validatePassword = (password) => {
   return /^(?=(.*[a-z]){2,})(?=(.*[A-Z]){2,})(?=(.*\d){2,}).{7,}$/.test(password);
 };
 
+router.get('/', (req, res) => {
+  const { id_usuario_admin } = req.query; // ID del usuario que solicita los datos
+
+  if (!id_usuario_admin) {
+    return res.status(400).json({ error: 'Se requiere el ID del usuario administrador' });
+  }
+
+  verificarPermisos(id_usuario_admin, res, () => {
+    const query = 'SELECT Id_Usuario, Nombre_Usuario, Email, foto_perfil, Cohabitantes, Id_Rol FROM usuario WHERE Activo = 1';
+
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error al obtener usuarios:', err);
+        return res.status(500).json({ error: 'Error al obtener usuarios' });
+      }
+      res.json(results);
+    });
+  });
+});
+
+
 router.post('/', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
   const { Nombre_Usuario, Contrasena, Cohabitantes, Email, Id_Rol, id_usuario_admin } = req.body;
   verificarPermisos(id_usuario_admin, res, async () => {

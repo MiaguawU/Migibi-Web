@@ -9,18 +9,18 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 router.post("/", (req, res) => {
-  const { username, password } = req.body;
+  const { identifier, password } = req.body; // Usamos "identifier" en lugar de "email"
 
-  if (!username || !password) {
-    console.log("Faltan datos requeridos: username y password");
-    return res.status(400).send("Faltan datos requeridos: username y password");
+  if (!identifier || !password) {
+    console.log("Faltan datos requeridos: identifier y password");
+    return res.status(400).send("Faltan datos requeridos: identifier y password");
   }
 
-  let query = username.endsWith("@gmail.com") 
+  let query = identifier.endsWith("@gmail.com") 
     ? 'SELECT * FROM usuario WHERE Email = ?' 
     : 'SELECT * FROM usuario WHERE Nombre_Usuario = ?';
 
-  db.query(query, [username], async (err, result) => {
+  db.query(query, [identifier], async (err, result) => {
     if (err) {
       console.error("Error al obtener el usuario:", err);
       return res.status(500).send('Error al obtener el usuario');
@@ -51,5 +51,6 @@ router.post("/", (req, res) => {
     });
   });
 });
+
 
 module.exports = router;

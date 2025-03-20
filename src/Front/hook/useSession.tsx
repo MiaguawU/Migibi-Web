@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const SESSION_KEY = "user_session";
-const EXPIRATION_TIME = 30 * 60 * 1000; // 30 minutos
+const EXPIRATION_TIME = 60 * 60 * 1000; // 30 minutos
 
 export function useSession<T>(initialValue: T | null = null) {
   const [session, setSessionState] = useState<T | null>(() => {

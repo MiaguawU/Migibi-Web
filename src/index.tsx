@@ -9,6 +9,37 @@ import { ConfigProvider } from 'antd';
 import 'antd/dist/reset.css';
 import { BrowserRouter } from 'react-router-dom';
 import PUERTO from './config';
+import { useState, useEffect } from "react";
+
+const INACTIVITY_LIMIT = 30 * 60 * 1000; // 1 hora en milisegundos
+
+const resetActivityTimer = () => {
+  localStorage.setItem("lastActivity", Date.now().toString());
+};
+
+const checkInactivity = () => {
+  const lastActivity = parseInt(localStorage.getItem("lastActivity") || "0", 10);
+  if (Date.now() - lastActivity > INACTIVITY_LIMIT) {
+    console.log("Sesión expirada por inactividad");
+    localStorage.removeItem("user_session");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("usuarios");
+    window.location.reload(); // Opcional: Forzar recarga
+  }
+};
+
+// Agregar eventos para detectar actividad del usuario
+window.addEventListener("mousemove", resetActivityTimer);
+window.addEventListener("keydown", resetActivityTimer);
+window.addEventListener("click", resetActivityTimer);
+
+// Iniciar temporizador para comprobar inactividad cada minuto
+setInterval(checkInactivity, 30 * 1000);
+
+// Inicializar el temporizador al cargar la página
+resetActivityTimer();
+
+
 
 // Definición de la interfaz para los datos del usuario
 interface UserData {

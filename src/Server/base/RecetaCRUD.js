@@ -139,11 +139,21 @@ router.put("/:id", (req, res) => {
 
       console.log("Valores para la actualización:", values);
 
-      db.query(updateQuery, values, (err, result) => {
+      db.query(updateQuery, values, async (err, result) => {
         if (err) {
           console.error("Error al actualizar receta:", err);
           return res.status(500).json({ error: "Error al actualizar receta" });
         }
+
+        // 🔥 Eliminar recetas basura después del UPDATE
+        try {
+          const deleteQuery = `DELETE FROM receta WHERE Nombre = 'Receta_nueva' AND Activo = 0`;
+          await queryAsync(deleteQuery);
+          console.log("Recetas basura eliminadas correctamente.");
+        } catch (deleteError) {
+          console.error("Error al eliminar recetas basura:", deleteError);
+        }
+
         res.json({ message: "Receta actualizada con éxito" });
       });
     } catch (err) {

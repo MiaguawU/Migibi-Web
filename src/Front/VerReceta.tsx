@@ -237,7 +237,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     try {
       if (id === null) {
         message.warning("No se encontró el ID de la receta.");
-        return; // Salir si no hay id
+        return; 
       }
   
       const datosForm = new FormData();
@@ -246,29 +246,33 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       datosForm.append("porciones", String(formData.Porciones));
       datosForm.append("calorias", String(formData.Calorias));
       datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
+  
       if (formData.FileImagen) {
-        datosForm.append("imagen", formData.FileImagen); // Solo añade la imagen si existe
+        datosForm.append("imagen", formData.FileImagen); 
       }
   
-      // Enviar la solicitud PUT con el id en la URL
-      const response = await axios.put(
-        `${PUERTO}/recetaCRUD/${id}`, // Usa el ID directamente en la URL
-        datosForm,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
   
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
-        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualiza la receta inicial si es necesario
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen }));
       } else {
-        message.error("No se pudo actualizar la receta.");
+        message.error(`Error al actualizar la receta: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error al actualizar receta:", error);
+  
+      // Verifica si es un error de Axios con respuesta del servidor
+      if (axios.isAxiosError(error) && error.response) {
+        message.error(`Error del servidor: ${error.response.data.message || "No se pudo actualizar la receta."}`);
+      } else {
+        message.error("Error inesperado al actualizar la receta.");
+      }
     }
   };
+  
   
   
   

@@ -82,6 +82,14 @@ router.post("/", async (req, res) => {
     const es_perecedero = fecha_caducidad ? 1 : 0;
     const Fecha_Caducidad = fecha_caducidad ? formatFechaCaducidad(fecha_caducidad) : null;
     const imagen = req.file ? `/imagenes/${req.file.filename}` : `/imagenes/defIng.png`;
+    
+    if (Fecha_Caducidad) {
+      const fechaCaducidadDate = new Date(Fecha_Caducidad);
+      if (fechaCaducidadDate < new Date()) {
+        return res.status(400).json({ error: "No puedes agregar un alimento con fecha de caducidad vencida." });
+      }
+    }
+    
 
     try {
       // Verificar si el alimento ya existe
@@ -300,6 +308,12 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       }
     }
 
+    if (Fecha_Caducidad) {
+      const fechaCaducidadDate = new Date(Fecha_Caducidad);
+      if (fechaCaducidadDate < new Date()) {
+        return res.status(400).json({ error: "No puedes agregar un alimento con fecha de caducidad vencida." });
+      }
+    }
     // Obtener la imagen existente si no se proporciona una nueva
     let imagen;
     if (req.file) {

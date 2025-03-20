@@ -148,7 +148,7 @@ export default function Inicio() {
   
         setAlimentosPerecederos(perecederos);
         setAlimentosNoPerecederos(noPerecederos);
-        message.success("Alimentos obtenidos exitosamente");
+        console.log("Alimentos obtenidos exitosamente");
       } else {
         throw new Error("Formato de datos inválido");
       }

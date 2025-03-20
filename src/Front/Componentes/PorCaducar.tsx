@@ -73,7 +73,7 @@ const PorCaducar: React.FC<PorCaducarProps> = ({ onUpdate }) => {
         });
   
       setItems(perecederos);
-      message.success("Alimentos obtenidos exitosamente");
+      console.log("Alimentos obtenidos exitosamente");
     } catch (error) {
       console.error("Error al obtener alimentos", error);
     } finally {
