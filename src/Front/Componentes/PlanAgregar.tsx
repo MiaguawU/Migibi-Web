@@ -93,8 +93,6 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
       });
       if(response){
         setTipos(response.data );
-        message.success("Tipos de consumo cargados correctamente.");
-        console.log("Tipos recibidos:", response.data);
       }
       else{
         message.error("No hay datos en los tipos");
@@ -127,16 +125,16 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
   };
 
   const validarPlan = async(values: any) => {
-    try {
+    let response;
       
     const payload = {
       Id_Usuario_Alta: idUsuario,
       Fecha: values.expirationDate
     };
-    const response = await axios.post(`${PUERTO}/planGeneral/agregarPlan/${idUsuario}`, payload, {
+    try {
+     response = await axios.post(`${PUERTO}/planGeneral/agregarPlan/${idUsuario}`, payload, {
       headers: { "Content-Type": "application/json" },
     });
-  
     if (response.data && response.data.length > 0) {
       console.log(response.data);
     {/** 
@@ -164,8 +162,9 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
       validarPlan(values);
     }
   } catch (error) {
-    console.error("Error al obtener receta:", error);
-    message.error("No se pudo cargar la receta.");
+    console.log(`error al hacer el post de ${PUERTO}/planGeneral/agregarPlan/${idUsuario}`);
+    console.error("Error en ValidarPlan:", error);
+    message.error("No se pudo guardar el plan.");
   } 
   }
 
@@ -175,22 +174,23 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
       Id_Usuario_Alta: idUsuario,
       Fecha: values.expirationDate
     };
-
+    let response;
   try {
-    const response = await axios.post(`${PUERTO}/planGeneral/${idUsuario}`, payload, {
+    response = await axios.post(`${PUERTO}/planGeneral/${idUsuario}`, payload, {
       headers: { "Content-Type": "application/json" },
     });
 
     if (response.status === 200) {
-      message.success("Receta editada correctamente.");
+      message.success("Plan creado correctamente.");
       form.resetFields();
       onSubmit();
       onClose();
     } else {
-      message.error("Error al editar la receta.");
+      message.error("Error al crear el plan.");
     }
   } catch (error) {
-    console.error("Error en la solicitud:", error);
+    console.log(`Error al ejecutar post ${PUERTO}/planGeneral/${idUsuario}`);
+    console.error("Error al crear el plan:", error);
     message.error("Error al procesar la solicitud.");
   }}
 
@@ -201,9 +201,9 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
       id_receta: idReceta,
       Id_Usuario_Alta: idUsuario
     };
-
+    let response;
   try {
-    const response = await axios.put(`${PUERTO}/editar${comida}/${planId}`, payload, {
+    response = await axios.put(`${PUERTO}/editar${comida}/${planId}`, payload, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -216,8 +216,9 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
       message.error("Error al editar la receta.");
     }
   } catch (error) {
-    console.error("Error en la solicitud:", error);
-    message.error("Error al procesar la solicitud.");
+    console.log(`Error al ejecutar PUT ${PUERTO}/editar${comida}/${planId}`);
+    console.error("Error el editar el plan:", error);
+    message.error("Error al editar el plan.");
   }}
   
   const confirmarAccion = (comida: string, planId: number, idReceta: number | null) => {
