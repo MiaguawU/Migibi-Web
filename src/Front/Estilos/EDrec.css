@@ -3,7 +3,9 @@
     font-weight: 400;
     font-style: normal;
   }
-  
+.p {
+    line-height: initial;
+}  
 
 .imgCom{
     max-width: 30px;
@@ -14,41 +16,164 @@
     max-height: 20px;
 }
 
+.btUp .anticon-upload {
+    color: #86A071; /* Color del ícono cuando el botón está en estado normal */
+  }
+  
+  /* Color cuando el botón está en hover */
+  .btUp:hover .anticon-upload {
+    color: #3E7E1E;
+  }
 
+  .btUp:hover{
+    border-color: #3E7E1E !important;
+  }
+  .receta {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: #3E7E1E;
+    background-color: #E3FFCB;
+    padding: 25px;
+    height: 100%;
+    width: 100%;
+    justify-content: space-around;
+  }
+.nC{
+    border-color: #3E7E1E;
+    right: 10px;
+}
 
-.receta {
+.tiempo, .tipo, .porciones, .calorias {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 2.5%; /* Proporción de separación entre los elementos */
+    max-height: 50px;
+    max-width: 250px;
+    gap: 2.5%;
+    background-color: #CEDFAC;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: #3E7E1E;
 }
-
-.tiempo, .tipo, .f2, .calorias, .porciones {
+.nP{
+    border-color: #3E7E1E;
+    right: 10px;
+}
+.f1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    column-gap: 20px;
+    height: 100%;
+}
+.f2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    gap: 2.5%; /* Usamos una proporción similar para todos los contenedores */
+    flex-direction: column;
+    padding: 10px;
+    height: 100%;
 }
-p{
+.f3{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.rect{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+    padding-left: 10px;
+}
+
+.nRecCom {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+.divEnviarReset {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.sl, .sl2{
+    border-color: #3E7E1E !important;
+    border: 1px solid;
+    border-radius: 7px;
+    position: relative;
+    right: 10px;
+    
+}
+.tipo  .ant-input {  /* Borde verde oscuro */
+    color: #2c6b2f;  /* Texto verde oscuro */
+    font-size: 16px;  /* Ajusta el tamaño de la fuente */
+    padding: 8px 15px;  /* Espaciado dentro del input */
+    transition: all 0.3s ease;  /* Transición suave para el borde y fondo */
+  }
+.time:hover{
+    border-color: #3E7E1E;
+}
+.time{
+    border-color: #3E7E1E;
+    position: relative;
+    right: 10px;
+}
+p,h3{
     font-family: 'Jomhuria';
     color: #86A071;
-    font-size: 20px;
+}
+.nRec{
+    font-size: 40px;
+    display: flex;
+    margin: 0px;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-block-end: 0px;
 }
 
+.user-title {
+    margin-bottom: 20px;
+    color: #8BA577;
+  }
+.tx{
+    font-size: 25px;
+    padding: 20px;
+}
+.tx2{
+    font-size: 30px;
+    padding: 10px;
+    position: relative;
+    top: 4px;
+    margin: 0px;
+}
+.txi, .txt, .txp, .txc{
+    padding: 20px;
+    position: relative;
+    margin: 0px;
+    font-size: 25px;
+    top: 1px;
+}
 
 .todo {
-    border-radius: 10px;
-    border: 3px solid;
-    border-color: #3E7E1E;
-    width: 90%; 
-    max-width: 1000px; 
-    height: 70vh; 
-    background-color: #E3FFCB;
+    padding: 2%;
     position: relative;
-    margin: 0 auto; /* Centrar el contenedor */
-    padding: 2%; /* Espacio interno de 2% de su tamaño */
+    display: flex;
+    justify-content: center;
 }
 
 .btImg {
@@ -56,6 +181,152 @@ p{
     background-color: transparent;
     max-width: 30px;
     max-height: 30px;
+    bottom: 2px;
 }
 
+.btUp{
+    border: 1px solid;
+    border-color: #3E7E1E;
+    background-color: #CEDFAC;
+    max-width: 46px;
+    max-height: 30px;
+    position: relative;
+    bottom: 25px;
+    left: 220px;
+    width: 100%;
+}
 
+.btEn, .btEn2{
+    background-color: #CAE2B5 !important;
+    border: 1px solid;
+    border-color:#3E7E1E !important;
+}
+
+.ing {
+    width: 100%;
+    gap: 10px;
+    display: flex
+}
+@media (max-width: 655px) {
+    .receta {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .f1 {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .f2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .ing {
+        
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    }
+    .btUp {
+        position: relative;
+        top: 110px;
+        right: 15px;
+        bottom: auto;
+        left: auto;
+    }
+}
+
+@media (min-width:655px) { /*Ipad size*/
+    .todo {
+        flex-direction: column;
+        height: 100%;
+    }
+    .receta {
+        flex-direction: column;
+    }
+    .btUp {
+        position: relative;
+        top: 100px;
+        right: 15px;
+        bottom: auto;
+        left: auto;
+    }
+    .rect {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: normal;
+        flex-wrap: nowrap;
+    }
+    .nRecCom {
+        width: auto;
+    }
+    .divEnviarReset {
+        width: auto;
+    }
+    .f1 {
+        flex-direction: row;
+        gap: 10px;
+    }
+    .f2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column;
+    }
+    .ing {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    }
+}
+
+@media (min-width:900px) { /*Laptop size*/
+    .todo {
+        flex-direction: row;
+        height: 90vh;
+    }
+    .receta {
+        flex-direction: row;
+    }
+    .btUp {
+        position: relative;
+        bottom: 25px;
+        left: 220px;
+        top: auto;
+        right: auto;
+    }
+    .rect {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        align-content: flex-start;
+        flex-wrap: wrap;
+    }
+    .nRecCom {
+        width: 100%;
+    }
+    .divEnviarReset {
+        width: 100%;
+    }
+    .f1 {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        gap: auto;
+    }
+    .f2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column;
+    }
+    .ing {
+        
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    }
+}
