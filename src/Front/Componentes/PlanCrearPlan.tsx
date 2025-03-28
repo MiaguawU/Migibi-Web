@@ -9,8 +9,23 @@ const { Option } = Select;
 
 {/** 
 PlanCrear sirve para crear un nuevo plan del sistema
-El algoritmo de la base de datos se conserva como procedure en la base de datos
-
+Primero debe preguntarle al usuario si quiere que el plan se haga solo con cosas que tenga en su casa o si quiere que dure toda la semana
+El algoritmo para conseguir ambos planes se conserva como procedure en la base de datos
+  Se necesita del procedure PlanEstricto que se hace con cosas que ya se tiene en la casa
+  Se necesita del procedure PlanRellenar que dura toda la semana y que 
+  
+  En Hoy, hay un botón que te da las recetas que puedes hacer con los ingredientes en ese momento
+    Utiliza el procedure PlanEstricto
+    Te deja agregar esas recetas a Hoy como desayuno, comida o cena
+      Usa el código de agregar receta para confirmar que puede agregarla
+      Se muestra con HoyCrearPlan que es una sola lista en el panel
+  En plan:
+      Hay un botón con el que usas PlanEstricto 
+        Se abre PlanCrearPlan con las recetas de PlanEstricto y donde faltan hay un botón para agregar recetas.
+        
+      Hay un botón para PlanRellenar
+        Se abre PlanCrearPlan con las recetas de PlanRellenar
+      Al guardar los planes, confirma si todos los días y manda un Modal.confirm de que no están todas las recetas
 */}
 
 interface FormModalProps {
