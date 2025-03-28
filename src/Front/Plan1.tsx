@@ -7,6 +7,7 @@ import "./perfil.css";
 import {formatoFechaLegible} from "./Metodos/FormatoFecha";
 import PlanEditar from "./Componentes/PlanEditar";
 import PlanAgregar from "./Componentes/PlanAgregar";
+import PlanCrear from "./Componentes/PlanCrear";
 //import {FormatoSQL} from "./Metodos/FormatoSQL";
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
@@ -213,6 +214,12 @@ const Inicio = () => {
                 onClick={() => {setIsAgregarOpen(true);}}>
                 Agregar receta
               </Button>
+              <Button
+                key={`CrearNuevoPlan`}
+                style={{height: "40px", margin: '10px', marginTop: '5px',}}
+                onClick={() => {setIsCrearOpen(true);}}>
+                Crear Plan
+              </Button>
               </ConfigProvider>
               {/**
                * 
@@ -311,6 +318,11 @@ const Inicio = () => {
         <PlanAgregar
               visible= {isAgregarOpen}
               onClose={() => setIsAgregarOpen(false)}
+              onSubmit={datosRecetasSemana}
+            />
+        <PlanCrear
+              visible= {isCrearOpen}
+              onClose={() => setIsCrearOpen(false)}
               onSubmit={datosRecetasSemana}
             />
       </div>
