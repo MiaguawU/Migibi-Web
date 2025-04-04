@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const Joi = require('joi');
 const db = require('./connection');
 const router = express.Router();
 
@@ -45,11 +46,28 @@ const upload = multer({
   },
 });
 
+// Esquema de validación con Joi
+const unidadMedidaSchema = Joi.object({
+  unidad_medida: Joi.string().min(1).max(50).required(),
+  abreviatura: Joi.string().min(1).max(10).required(),
+  id_usuario_alta: Joi.number().integer().required()
+});
+
+const unidadMedidaUpdateSchema = Joi.object({
+  unidad_medida: Joi.string().min(1).max(50).required(),
+  abreviatura: Joi.string().min(1).max(10).required(),
+  id_usuario_modif: Joi.number().integer().required()
+});
+
+const unidadMedidaDeleteSchema = Joi.object({
+  id_usuario_baja: Joi.number().integer().required()
+});
+
 router.post("/", (req, res) => {
+  const { error } = unidadMedidaSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
   const { unidad_medida, abreviatura, id_usuario_alta } = req.body;
-  if (!unidad_medida || !abreviatura || !id_usuario_alta) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
   verificarPermisos(id_usuario_alta, res, () => {
     const fecha_alta = new Date();
     const query = `INSERT INTO cat_unidad_medida (Unidad_Medida, Abreviatura, Id_Usuario_Alta, Fecha_Alta) VALUES (?, ?, ?, ?)`;
@@ -68,11 +86,11 @@ router.get("/", (req, res) => {
 });
 
 router.put("/:id", (req, res) => {
+  const { error } = unidadMedidaUpdateSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
   const { id } = req.params;
   const { unidad_medida, abreviatura, id_usuario_modif } = req.body;
-  if (!unidad_medida || !abreviatura || !id_usuario_modif) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
   verificarPermisos(id_usuario_modif, res, () => {
     const fecha_modif = new Date();
     const query = `UPDATE cat_unidad_medida SET Unidad_Medida = ?, Abreviatura = ?, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Unidad_Medida = ?`;
@@ -84,11 +102,11 @@ router.put("/:id", (req, res) => {
 });
 
 router.delete("/:id", (req, res) => {
+  const { error } = unidadMedidaDeleteSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
   const { id } = req.params;
   const { id_usuario_baja } = req.body;
-  if (!id_usuario_baja) {
-    return res.status(400).send("Faltan datos requeridos para la baja");
-  }
   verificarPermisos(id_usuario_baja, res, () => {
     const fecha_baja = new Date();
     const query = `UPDATE cat_unidad_medida SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? WHERE Id_Unidad_Medida = ?`;

@@ -28,19 +28,36 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-  destination: uploadDir,
+  destination: path.join(__dirname, '../imagenes'),
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
+const verificarWikimedia = async (filename) => {
+  const endpoint = `https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=File:${encodeURIComponent(filename)}`;
+  try {
+    const response = await axios.get(endpoint);
+    return response.data.query.pages["-1"] ? false : true;
+  } catch (error) {
+    console.error("Error al verificar la imagen en Wikimedia:", error);
+    return false;
+  }
+};
+
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
+  fileFilter: async (req, file, cb) => {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
       return cb(new Error('Solo se permiten imágenes PNG, JPG o JPEG'));
     }
+    
+    const tieneCopyright = await verificarWikimedia(file.originalname);
+    if (tieneCopyright) {
+      return cb(new Error('La imagen tiene derechos de autor y no puede ser subida.'));
+    }
+    
     cb(null, true);
   },
 });

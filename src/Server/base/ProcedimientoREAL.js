@@ -6,19 +6,31 @@ const router = express.Router();
 // Esquema de validación con Joi
 const instruccionSchema = Joi.object({
   instruccion: Joi.string().required(),
-  orden: Joi.number().required(),
 });
 
 // Crear una nueva instrucción de receta (POST)
 router.post("/:id", async (req, res) => {
   const { id } = req.params; // Id de la receta
-  const { instruccion, orden, Id_Usuario_Alta } = req.body;
+  const { instruccion, Id_Usuario_Alta } = req.body;
 
   // Validar entrada
-  const { error } = instruccionSchema.validate({ instruccion, orden });
+  const { error } = instruccionSchema.validate({ instruccion });
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
+
+  const query2 = `
+        SELECT 
+        ri.Instruccion AS Nombre,
+        ri.Orden AS Orden,
+        ri.Id_Receta_Instrucciones AS id,
+        ri.Activo AS Activo
+      FROM receta_instrucciones ri
+      WHERE ri.Id_Receta = ?
+      ORDER BY ri.Orden DESC
+      LIMIT 1;
+
+`;
 
   // Fecha actual
   const hoy = new Date();
@@ -29,16 +41,31 @@ router.post("/:id", async (req, res) => {
     INSERT INTO receta_instrucciones (Id_Receta, Instruccion, Orden, Id_Usuario_Alta, Fecha_Alta)
     VALUES (?, ?, ?, ?, ?)
   `;
-  const values = [id, instruccion, orden, Id_Usuario_Alta, Fecha_Alta];
+  
 
   // Ejecutar la consulta
-  db.query(query, values, (err, result) => {
-    if (err) {
-      console.error("Error al insertar instrucción:", err);
-      return res.status(500).json({ error: "Error al agregar la instrucción" });
+  db.query(query2, [id], (err1, result1) => {
+    if (err1) {
+      console.error("Error en la consulta:", err1);
+      return res.status(500).json({ error: "Error en la consulta de orden" });
     }
-    res.json({ id: result.insertId, message: "Instrucción agregada con éxito" });
+  
+    // Obtener el último número de orden
+    const orden = result1.length > 0 ? result1[0].Orden + 1 : 1; // Si no hay registros, empieza en 1
+  
+    const values = [id, instruccion, orden, Id_Usuario_Alta, Fecha_Alta];
+  
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error al insertar instrucción:", err);
+        return res.status(500).json({ error: "Error al agregar la instrucción" });
+      }
+      res.json({ id: result.insertId, message: "Instrucción agregada con éxito" });
+    });
   });
+  
+  
+  
 });
 
 
@@ -134,5 +161,35 @@ router.delete("/:id", (req, res) => {
       res.json({ message: "Instrucción eliminada con éxito" });
     });
 });
+
+// Actualizar el orden de las instrucciones
+router.put("/:id/orden", async (req, res) => {
+  const { id } = req.params; // ID de la receta
+  const { instrucciones } = req.body; // Lista de instrucciones con ID y orden
+
+  if (!Array.isArray(instrucciones) || instrucciones.length === 0) {
+    return res.status(400).json({ error: "Se requiere una lista de instrucciones con ID y orden." });
+  }
+
+  const query = `
+    UPDATE receta_instrucciones
+    SET Orden = CASE Id_Receta_Instrucciones
+      ${instrucciones.map((_, i) => `WHEN ? THEN ?`).join(" ")}
+    END
+    WHERE Id_Receta_Instrucciones IN (${instrucciones.map(() => "?").join(", ")});
+  `;
+
+  const values = [...instrucciones.flatMap(({ id, orden }) => [id, orden]), ...instrucciones.map(({ id }) => id)];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error al actualizar los órdenes:", err);
+      return res.status(500).json({ error: "Error al actualizar los órdenes." });
+    }
+    res.json({ message: "Órdenes actualizados correctamente." });
+  });
+});
+
+
 
 module.exports = router;

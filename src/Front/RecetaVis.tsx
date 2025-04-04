@@ -1,12 +1,12 @@
 import { UploadOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import SyncedInputs from "./Componentes/SyncedInput";
-import Ingredientes from './Componentes/IngredientesRecetaEditar';
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import Ingredientes from './Componentes/IngredientesVer';
+import { useSearchParams } from "react-router-dom";
 import type { UploadProps } from 'antd';
 import type { InputNumberProps } from 'antd';
 import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber, message, ConfigProvider } from "antd";
-import Proceso from './Componentes/ProcedimientoEditar';
+import Proceso from './Componentes/ProcedimientoVer';
 import NumericInput from './Componentes/NumberInput';
 import PUERTO from "../config";
 import axios from "axios";
@@ -15,9 +15,6 @@ import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
 import './Estilos/EDrec.css';
 import dayjs, { Dayjs } from 'dayjs';
-import usePreventExit from "./hook/Proteger";
-import useBlockNavigation from "./hook/Bloquear";
-import useBlockShortcuts from "./hook/BloquearC";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -25,10 +22,6 @@ const { TextArea } = Input;
 interface Tipo {
   Id_Tipo_Consumo: number;
   Tipo_Consumo: string;
-}
-
-interface id_rec {
-  id_r: number;
 }
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
@@ -60,9 +53,7 @@ export default function EDreceta() {
   const [syncedValue1, setSyncedValue1] = useState("Valor inicial 1");
   const [syncedValue2, setSyncedValue2] = useState("Valor inicial 2");
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-const location = useLocation();
-const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o null
+  const id = searchParams.get("id");
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,30 +84,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     Porciones: 1,
     Calorias: 0,
   });
-
-  usePreventExit();
-  useBlockNavigation();
-  useBlockShortcuts();
-
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = ""; // Prevenir la recarga o cierre.
-    };
-  
-    const initializeRecipe = async () => {
-      await agregar(); // Crear receta al cargar.
-      await obtenerId(); // Obtener el ID de la nueva receta.
-    };
-  
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    initializeRecipe(); // Ejecutar funciones iniciales.
-  
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
-  
   
 
   const uploadProps = {
@@ -132,50 +99,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     },
     
   };
-
-  const agregar = async () => {
-    try {
-      const currentUser = localStorage.getItem("currentUser");
-      if (!currentUser) {
-        message.warning("No hay un usuario logueado actualmente.");
-        return;
-      }
-  
-      const id_us = Number(currentUser);
-      const response = await axios.post(`${PUERTO}/RecetaGeneral/${id_us}`, {}, {
-        headers: { "Content-Type": "application/json" },
-      });
-  
-      if (response.status === 200) {
-        console.log("Receta creada correctamente.");
-      } else {
-        message.error("Error al crear la receta.");
-      }
-    } catch (error) {
-      console.error("Error al crear la receta:", error);
-    }
-  };
-  
-
-  const obtenerId = async () => {
-    try {
-      const response = await axios.get(`${PUERTO}/agReceta`, {
-        headers: { "Content-Type": "application/json" },
-      });
-      
-      console.log("Respuesta del servidor:", response);  // Aquí puedes ver qué datos están llegando
-      
-      if (response.status === 200 && response.data?.id) {
-        const newId = response.data.id; // Verifica la estructura de la respuesta
-        setId(newId);  // Guarda el id en el estado
-        console.log("ID de nueva receta:", newId);
-      } else {
-      }
-    } catch (error) {
-      console.error("Error al obtener el ID:", error);
-    }
-  };
-  
   
 
   // Obtener tipos de consumo
@@ -200,11 +123,49 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
 
   
 
+  // Obtener datos de la receta
+  const datosReceta = async () => {
+    setLoading(true);
+    try {
+      if (!id) {
+        message.warning("No se encontró el id de la receta.");
+        return;
+      }
   
+      const response = await axios.get(`${PUERTO}/recetaCRUD/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      if (response.data && response.data.length > 0) {
+        const receta = response.data[0];
+        const recetaCargada = {
+          Nombre: receta.Nombre || '',
+          Imagen: receta.Imagen?.startsWith("http")
+            ? receta.Imagen
+            : `${PUERTO}${receta.Imagen}`,
+          Tiempo: receta.Tiempo ? dayjs(receta.Tiempo, 'HH:mm:ss') : dayjs(), // Valor por defecto
+          id_Tipo: receta.id_Tipo || '',
+          Porciones: receta.Porciones || 1,
+          Calorias: receta.Calorias || 0,
+        };
+        
+        setFormData(recetaCargada);        
+        setRecetaInicial(recetaCargada); // Guardar datos iniciales
+      } else {
+        message.warning("No se encontró información de la receta.");
+      }
+    } catch (error) {
+      console.error("Error al obtener receta:", error);
+      message.error("No se pudo cargar la receta.");
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
   // Inicialización del componente
   useEffect(() => {
+    datosReceta();
     obtenerTipos();
   }, [id]);
   
@@ -235,21 +196,20 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
  
   const actualizar = async () => {
     try {
-      if (id === null) {
-        message.warning("No se encontró el ID de la receta.");
-        return; 
+      if (!id) {
+        message.warning("No se encontró el id de la receta.");
+        return;
       }
   
+      // Crear un nuevo FormData
       const datosForm = new FormData();
-      datosForm.append("nombre", formData.Nombre || ""); 
+      datosForm.append("nombre", formData.Nombre || ""); // Asegúrate de que formData.Nombre exista
       datosForm.append("tiempo", formData.Tiempo?.format("HH:mm:ss") || "");
       datosForm.append("porciones", String(formData.Porciones));
       datosForm.append("calorias", String(formData.Calorias));
       datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
-  
-      if (formData.FileImagen) {
-        datosForm.append("imagen", formData.FileImagen); 
-      }
+      datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
+
   
       const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -257,24 +217,15 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
   
       if (response.status === 200) {
         message.success("Receta actualizada correctamente.");
-        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen }));
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
       } else {
-        message.error(`Error al actualizar la receta: ${response.statusText}`);
+        message.error("No se pudo actualizar la receta.");
       }
     } catch (error) {
       console.error("Error al actualizar receta:", error);
-  
-      // Verifica si es un error de Axios con respuesta del servidor
-      if (axios.isAxiosError(error) && error.response) {
-        console.log(`Error del servidor: ${error.response.data.message || "No se pudo actualizar la receta."}`);
-      } else {
-        message.error("Error inesperado al actualizar la receta.");
-      }
+      message.error("Hubo un problema al enviar los datos.");
     }
   };
-  
-  
-  
   
   
 
@@ -293,27 +244,14 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
   };
 
   const onReset = () => {
-    obtenerTipos(); // Recargar tipos de consumo
-    setResetTrigger((prev) => !prev); // Cambiar trigger para componentes dependientes
-  };
-
-  const onSubmit = async () => {
-    if (id === null) {
-      message.error("No se ha encontrado el ID de la receta.");
-      return;
-    }
-    await actualizar();
-    setenviarDatos((prev) => !prev); // Esto probablemente asegura que el componente Ingredientes se refresque.
+    setFormData({ ...recetaInicial }); // Restaurar valores iniciales
+    setResetTrigger((prev) => !prev); // Notificar a componentes dependientes
   };
   
-  useEffect(() => {
-    if (id !== null) {
-      // Aquí ya puedes llamar a la función actualizar
-      actualizar();
-    } else {
-      console.log("No se ha obtenido el ID.");
-    }
-  }, [id]);  // Asegúrate de que se ejecute solo cuando id cambie.
+  const onSubmit = async () => {
+    await actualizar();
+    setenviarDatos((prev) => !prev); 
+  };
   
   
   
@@ -337,6 +275,15 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  const handleReset = () => {
+    setResetTrigger((prev) => !prev); // Esto notificará a ProcedimientoRecetaEditar que debe restaurar los datos iniciales.
+  };
+  
+  const handleSubmit = () => {
+    setenviarDatos((prev) => !prev); // Esto activará el guardado de cambios en ProcedimientoRecetaEditar.
+  };
+  
 
     return (
       <div className='todo'>
@@ -362,15 +309,10 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                         onChange={handleSyncedChange}
                       />
 
-                   
+                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                <Button htmlType="button" className='btEn' onClick={onSubmit}>
-                      <p className='tx2'>Guardar</p>
-                    </Button>
-
-                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Limpiar</p></Button>
                 </div>
               </div>
               )}
@@ -387,10 +329,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                     borderRadius: '10px',
                   }}
                 />
-
-                <Upload {...uploadProps}>{/*...props de Nisa*/}
-                  <Button className='btUp' icon={<UploadOutlined />}></Button>
-                </Upload>
               </div>
               <div className = 'ttpcDiv'>
                 <div className='tiempo'>
@@ -403,6 +341,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                   hourStep={1} 
                   className='time' 
                   placeholder="Seleccione tiempo"
+                  disabled={true}
                   />
                 </div>
                 <div className="tipo" style={{padding:'10px'}}>
@@ -412,6 +351,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                     value={formData.id_Tipo}
                     onChange={handleSelectChange}
                     style={{ width: 150 }}
+                    disabled={true}
                   >
                     {Tipos.map((tipo) => (
                       <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>
@@ -430,7 +370,8 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                     onChange={(value) =>
                       setFormData({ ...formData, Porciones: value || 1 })
                     }
-                    defaultValue={3} />
+                    defaultValue={3}
+                    disabled={true} />
                 </div>
                 <div className='calorias'>
                   <p className='txc'>Calorias:</p>
@@ -440,6 +381,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                     defaultValue={3}
                     max={100000}
                     value={formData.Calorias}
+                    disabled={true}
                     onChange={(value) =>
                       setFormData({ ...formData, Calorias: value || 0 })
                     }/>
@@ -461,7 +403,7 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
                     }}
                   >
                     <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
-                    <Button className='btImg' ><img src={btCom} className='imgCom'/></Button>
+                    {/*<Button className='btImg' ><img src={btCom} className='imgCom'/></Button>*/}
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
@@ -471,16 +413,23 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
               </div>
               )}
               <div className='ing'>
-              <Ingredientes recetaId={id ?? 0} onSubmit={enviarDatos} onReset={resetTrigger} />
-              {(isMobile || isTablet) && (
+                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
+                {(isMobile || isTablet) && (
                   <Proceso recetaId={Number(id)} onSubmit={() => {}} onReset={() => {}} />
                 )}
+
+
               </div>
             </div>
             <div className='f3'>
               {!isMobile && !isTablet && (
               <div className='proceso'>
-                <Proceso recetaId={Number(id??0)} onSubmit={() => setenviarDatos((prev) => !prev)} onReset={() => setResetTrigger((prev) => !prev)} />
+                <Proceso 
+                  recetaId={Number(id)} 
+                  onReset={handleReset} 
+                  onSubmit={handleSubmit} 
+                />
+
               </div>
               )}
             </div>
@@ -492,5 +441,4 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
 };
 
   
-
   

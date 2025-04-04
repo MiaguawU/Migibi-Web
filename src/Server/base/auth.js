@@ -2,6 +2,15 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcrypt");
 const db = require("./connection");
+const Joi = require("joi");
+
+const userSchema = Joi.object({
+  nombre: Joi.string().min(3).max(100).required(),
+  email: Joi.string().email().required(),
+  fotoPerfil: Joi.string().uri().required(),
+  esGmail: Joi.number().valid(0, 1).required(),
+  contrasena: Joi.string().min(8).max(20).required()
+});
 
 passport.use(
   new GoogleStrategy(
@@ -19,38 +28,38 @@ passport.use(
         if (err) return done(err);
 
         if (results.length > 0) {
-          // Usuario existente: devolver los datos
           return done(null, results[0]);
         } else {
           function generatePassword() {
             const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             const lowercase = "abcdefghijklmnopqrstuvwxyz";
             const numbers = "0123456789";
-        
             function getRandomChar(set) {
-                return set.charAt(Math.floor(Math.random() * set.length));
+              return set.charAt(Math.floor(Math.random() * set.length));
             }
-        
             let password = [
-                getRandomChar(uppercase), getRandomChar(uppercase), // 2 mayúsculas
-                getRandomChar(lowercase), getRandomChar(lowercase), // 2 minúsculas
-                getRandomChar(numbers), getRandomChar(numbers),     // 2 números
-                getRandomChar(uppercase + lowercase + numbers)      // Último carácter libre
+              getRandomChar(uppercase), getRandomChar(uppercase),
+              getRandomChar(lowercase), getRandomChar(lowercase),
+              getRandomChar(numbers), getRandomChar(numbers),
+              getRandomChar(uppercase + lowercase + numbers)
             ];
-        
-            // Mezclamos los caracteres aleatoriamente
-            password = password.sort(() => Math.random() - 0.5).join('');
-            
-            return password;
-        }
-        
-        
+            return password.sort(() => Math.random() - 0.5).join('');
+          }
 
-          // Usuario nuevo: cifrar la contraseña predeterminada antes de insertarla
           const contrasenaPredeterminada = generatePassword();
-          console.log(contrasenaPredeterminada);
-          const saltRounds = 10;
-          const hashedPassword = await bcrypt.hash(contrasenaPredeterminada, saltRounds);
+          const hashedPassword = await bcrypt.hash(contrasenaPredeterminada, 10);
+
+          const validation = userSchema.validate({
+            nombre,
+            email,
+            fotoPerfil,
+            esGmail: 1,
+            contrasena: contrasenaPredeterminada
+          });
+
+          if (validation.error) {
+            return done(validation.error);
+          }
 
           const query = `
             INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena, Id_Rol) 
@@ -67,7 +76,7 @@ passport.use(
               Cohabitantes: null,
               Es_Gmail: 1,
             };
-            return done(null, newUser); // Usuario recién creado
+            return done(null, newUser);
           });
         }
       });

@@ -27,6 +27,7 @@ import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
 import InstruccionModal from './Front/Componentes/InstruccionModal';
 import Ingrediente from './Front/Componentes/IngredienteModal';
 import { useSession } from "./Front/hook/useSession";
+import RecetaVIS from "./Front/RecetaVis";
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -120,6 +121,7 @@ function App() {
           <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} />
           <Route path="/verR" element={<VerR />} />
           <Route path="/modal" element={<Modal />} />
+          <Route path="/recetaVis" element={<RecetaVIS />} />
         </Routes>
       </main>
     </MainLayout>

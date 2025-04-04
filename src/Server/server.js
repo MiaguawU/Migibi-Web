@@ -34,8 +34,13 @@ const alimUnico = require("./base/AlimentoUnico");
 const cat_alimento = require("./base/cat_alimento");
 const usuario_adm = require("./base/usuario_admin");
 const rol = require("./base/rol");
+const registro = require("./base/Registro");
+const recuperar = require("./base/Recuperar_Contrasena");
+const rateLimit = require("express-rate-limit");
+
 
 dotenv.config();
+
 
 // Configuración de multer
 const upload = multer({
@@ -58,6 +63,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+let tempDatabase = {};
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Máximo 100 solicitudes por IP
+  message: "Demasiadas solicitudes desde esta IP, intenta más tarde."
+});
+
+app.use(limiter);
 
 app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
 
@@ -83,6 +97,8 @@ app.use("/manejo",call)
 app.use("/save", routerSave);
 app.use("/us_adm", usuario_adm);
 app.use("/rol", rol);
+app.use("/registro", registro);
+app.use("/password", recuperar);
 
 // Ruta de autenticación con Google
 app.get(

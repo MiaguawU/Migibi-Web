@@ -14,6 +14,7 @@ interface CardData {
   portions: string;
   calories: string; 
   time: string; 
+  editar: boolean;
   image: string;
   Activo: number;
   Id_Usuario_Alta: number;
@@ -24,6 +25,8 @@ const Recetas: React.FC = (): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<number | null>(null);
+
 
   const navigate = useNavigate();
 
@@ -49,6 +52,8 @@ const Recetas: React.FC = (): JSX.Element => {
   
       // Parsear el ID del usuario como número
       const userId = parseInt(currentUser, 10);
+      setUserId(userId); // <--- Esto es nuevo
+
       if (isNaN(userId)) {
         message.error("ID de usuario inválido.");
         setLoading(false);
@@ -64,16 +69,23 @@ const Recetas: React.FC = (): JSX.Element => {
             (receta: any) =>
               receta.Activo > 0 && (receta.Id_Usuario_Alta === userId || receta.Id_Usuario_Alta === 1)
           )
-          .map((receta: any) => ({
-            id: receta.Id_Receta || ' ',
-            title: receta.Nombre || ' ',
-            portions: receta.Porciones || ' ',
-            calories: String(receta.Calorias || '0'),
-            time: String(receta.Tiempo || '0'),
-            image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
-            Activo: receta.Activo,
-            Id_Usuario_Alta: receta.Id_Usuario_Alta,
-          }));
+          .map((receta: any) => {
+            const isDefault = receta.Id_Usuario_Alta === 1;
+            const puedeEditar = !isDefault || userId === 1;
+          
+            return {
+              id: receta.Id_Receta || ' ',
+              title: receta.Nombre || ' ',
+              portions: receta.Porciones || ' ',
+              calories: String(receta.Calorias || '0'),
+              time: String(receta.Tiempo || '0'),
+              image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
+              Activo: receta.Activo,
+              Id_Usuario_Alta: receta.Id_Usuario_Alta,
+              editar: puedeEditar
+            };
+          });
+          
   
         // Actualizar el estado con las recetas filtradas
         setRecipes(recData);
@@ -187,18 +199,22 @@ const Recetas: React.FC = (): JSX.Element => {
             padding: '16px',
           }}
         >
+          {//si es default y el usuario no es igual a 1, envia editar=false
+          }
           {filteredRecipes.map((card, index) => (
             <RecipeCard
-              id={card.id}
-              key={index}
-              title={card.title}
-              portions={card.portions}
-              calories={card.calories}
-              time={card.time}
-              image={card.image}
-              onEdit={() => handleEdit(card.id)}
-              onDelete={() => eliminarReceta(card.id)}
-            />
+            id={card.id}
+            key={index}
+            title={card.title}
+            portions={card.portions}
+            calories={card.calories}
+            time={card.time}
+            image={card.image}
+            editar={card.editar} 
+            onEdit={() => handleEdit(card.id)}
+            onDelete={() => eliminarReceta(card.id)}
+          />
+          
           ))}
         </div>
       </div>

@@ -1,6 +1,19 @@
 const express = require("express");
 const db = require("./connection");
+const Joi = require("joi");
 const router = express.Router();
+
+// Esquema de validación con Joi
+const alimentoSchema = Joi.object({
+  nombre: Joi.string().min(2).max(100).required(),
+  id_tipo: Joi.number().integer().required(),
+  id: Joi.number().integer().required(),
+  es_pe: Joi.boolean().required(),
+});
+
+const bajaSchema = Joi.object({
+  id_usuario_baja: Joi.number().integer().required(),
+});
 
 // Middleware para verificar permisos
 const verificarPermisos = (req, res, next) => {
@@ -28,12 +41,11 @@ const verificarPermisos = (req, res, next) => {
 
 // 📌 **Ruta para agregar un alimento**
 router.post("/", verificarPermisos, (req, res) => {
+  const { error } = alimentoSchema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
   const { nombre, id_tipo, id, es_pe } = req.body;
   const Fecha_Alta = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-  if (!nombre || !id_tipo || !id) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
 
   const query1 = `
     INSERT INTO cat_alimento (Alimento, Id_Tipo_Alimento, Id_Usuario_Alta, Fecha_Alta, Es_Perecedero) 
@@ -50,28 +62,14 @@ router.post("/", verificarPermisos, (req, res) => {
   });
 });
 
-// 📌 **Ruta para obtener alimentos**
-router.get("/:id", verificarPermisos, (req, res) => {
-  const query = `SELECT * FROM cat_alimento`;
-
-  db.query(query, (err, result) => {
-    if (err) {
-      console.error("Error al obtener alimentos:", err);
-      return res.status(500).send("Error al obtener alimentos");
-    }
-    res.json(result);
-  });
-});
-
 // 📌 **Ruta para actualizar un alimento**
 router.put("/:id", verificarPermisos, (req, res) => {
+  const { error } = alimentoSchema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
   const { nombre, id_tipo, id, es_pe } = req.body;
   const id_al = req.params.id;
   const Fecha_Modif = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-  if (!nombre || !id_tipo || !id) {
-    return res.status(400).send("Faltan datos requeridos");
-  }
 
   const query1 = `
     UPDATE cat_alimento 
@@ -91,13 +89,12 @@ router.put("/:id", verificarPermisos, (req, res) => {
 
 // 📌 **Ruta para eliminar un alimento (baja lógica)**
 router.delete("/:id", verificarPermisos, (req, res) => {
+  const { error } = bajaSchema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
   const id_al = req.params.id;
   const { id_usuario_baja } = req.body;
   const Fecha_Baja = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-  if (!id_usuario_baja) {
-    return res.status(400).send("Faltan datos requeridos para la baja");
-  }
 
   const query1 = `
     UPDATE cat_alimento 
@@ -112,6 +109,18 @@ router.delete("/:id", verificarPermisos, (req, res) => {
       return res.status(500).send("Error al eliminar alimento");
     }
     res.json({ message: "Alimento eliminado con éxito" });
+  });
+});
+
+router.get("/:id", verificarPermisos, (req, res) => {
+  const query = `SELECT * FROM cat_alimento`;
+
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error("Error al obtener alimentos:", err);
+      return res.status(500).send("Error al obtener alimentos");
+    }
+    res.json(result);
   });
 });
 

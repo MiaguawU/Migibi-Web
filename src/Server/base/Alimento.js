@@ -30,22 +30,36 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-  destination: uploadDir,
+  destination: path.join(__dirname, '../imagenes'),
   filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
+    cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
+const verificarWikimedia = async (filename) => {
+  const endpoint = `https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=File:${encodeURIComponent(filename)}`;
+  try {
+    const response = await axios.get(endpoint);
+    return response.data.query.pages["-1"] ? false : true;
+  } catch (error) {
+    console.error("Error al verificar la imagen en Wikimedia:", error);
+    return false;
+  }
+};
+
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // Límite de tamaño de archivo 5MB
-  },
-  fileFilter: (req, file, cb) => {
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: async (req, file, cb) => {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
-      return cb(new Error("Solo se permiten imágenes PNG, JPG o JPEG"));
+      return cb(new Error('Solo se permiten imágenes PNG, JPG o JPEG'));
     }
+    
+    const tieneCopyright = await verificarWikimedia(file.originalname);
+    if (tieneCopyright) {
+      return cb(new Error('La imagen tiene derechos de autor y no puede ser subida.'));
+    }
+    
     cb(null, true);
   },
 });
@@ -95,7 +109,7 @@ router.post("/", async (req, res) => {
       // Verificar si el alimento ya existe
       const existencia = await queryAsync(
         `SELECT Id_Alimento, Es_Perecedero FROM cat_alimento 
-        WHERE Id_Usuario_Alta = ? AND Alimento LIKE ? AND Activo = 1`,
+        WHERE Id_Usuario_Alta = ? AND Alimento = ? AND Activo = 1`,
         [Id_Usuario_Alta, `%${nombre}%`]
       );
 

@@ -27,22 +27,23 @@ router.get('/', (req, res) => {
   });
 });
 
+// Esquema de validación Joi para POST y PUT
+const schema = Joi.object({
+  Tipo_Consumo: Joi.string().required(),
+  Id_Usuario: Joi.number().required()
+});
+
 // Crear un nuevo registro
 router.post('/', (req, res) => {
-  const schema = Joi.object({
-    Tipo_Consumo: Joi.string().required(),
-    Id_Usuario_Alta: Joi.number().required(),
-  });
-
   const { error } = schema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
-  const { Tipo_Consumo, Id_Usuario_Alta } = req.body;
+  const { Tipo_Consumo, Id_Usuario } = req.body;
   const fecha_alta = new Date();
 
-  verificarPermisos(Id_Usuario_Alta, res, () => {
+  verificarPermisos(Id_Usuario, res, () => {
     const query = 'INSERT INTO cat_tipo_consumo (Tipo_Consumo, Activo, Id_Usuario_Alta, Fecha_Alta) VALUES (?, 1, ?, ?)';
-    db.query(query, [Tipo_Consumo, Id_Usuario_Alta, fecha_alta], (err, result) => {
+    db.query(query, [Tipo_Consumo, Id_Usuario, fecha_alta], (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.status(201).json({ message: 'Registro creado', id: result.insertId });
     });
@@ -51,36 +52,39 @@ router.post('/', (req, res) => {
 
 // Actualizar un registro
 router.put('/:id', (req, res) => {
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
   const { id } = req.params;
-  const { Tipo_Consumo, Id_Usuario_Modif } = req.body;
+  const { Tipo_Consumo, Id_Usuario } = req.body;
   const fecha_modif = new Date();
 
-  if (!Tipo_Consumo || !Id_Usuario_Modif) {
-    return res.status(400).json({ error: "Faltan datos requeridos" });
-  }
-
-  verificarPermisos(Id_Usuario_Modif, res, () => {
+  verificarPermisos(Id_Usuario, res, () => {
     const query = 'UPDATE cat_tipo_consumo SET Tipo_Consumo = ?, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Tipo_Consumo = ?';
-    db.query(query, [Tipo_Consumo, Id_Usuario_Modif, fecha_modif, id], (err) => {
+    db.query(query, [Tipo_Consumo, Id_Usuario, fecha_modif, id], (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Registro actualizado' });
     });
   });
 });
 
+// Esquema de validación Joi para DELETE
+const deleteSchema = Joi.object({
+  Id_Usuario: Joi.number().required()
+});
+
 // Eliminar (desactivar) un registro
 router.delete('/:id', (req, res) => {
+  const { error } = deleteSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
   const { id } = req.params;
-  const { Id_Usuario_Baja } = req.body;
+  const { Id_Usuario } = req.body;
   const fecha_baja = new Date();
 
-  if (!Id_Usuario_Baja) {
-    return res.status(400).json({ error: "Faltan datos requeridos para la baja" });
-  }
-
-  verificarPermisos(Id_Usuario_Baja, res, () => {
+  verificarPermisos(Id_Usuario, res, () => {
     const query = 'UPDATE cat_tipo_consumo SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? WHERE Id_Tipo_Consumo = ?';
-    db.query(query, [Id_Usuario_Baja, fecha_baja, id], (err) => {
+    db.query(query, [Id_Usuario, fecha_baja, id], (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Registro eliminado (desactivado)' });
     });

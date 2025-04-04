@@ -185,17 +185,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
             </SortableContext>
           </DndContext>
         )}
-        <Button style={{ marginTop: "10px" }} onClick={() => setIsModalOpen(true)}>
-          <img src={btAg} alt="Agregar" style={{ width: "20px" }} />
-        </Button>
       </Card>
-      
-      <InsModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleNewInstruction}  // Aquí pasamos la función corregida
-        recetaId={recetaId}
-      />
 
     </ConfigProvider>
   );
@@ -228,8 +218,6 @@ const DraggableItem: React.FC<{ item: Item; onToggleCheck: (id: number) => void;
       <Checkbox checked={item.isChecked} onChange={() => onToggleCheck(item.id)} style={{ flex: 1 }}>
         {item.orden}. {item.name}
       </Checkbox>
-      <div {...listeners} style={{ cursor: "grab", padding: "0 10px" }}>☰</div>
-      <Button danger onClick={onDelete} style={{ marginLeft: "10px" }}>Eliminar</Button>
     </div>
   );
 };

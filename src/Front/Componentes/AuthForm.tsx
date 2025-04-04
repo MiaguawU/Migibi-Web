@@ -56,65 +56,59 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
   const sesionNormal = async () => {
     try {
-      const data = { identifier: email, password }; // Se usa "identifier" para permitir usuario o correo
-
+      const data = { identifier: email, password };
       const response = await axios.post(`${PUERTO}/login`, data, {
         headers: { 'Content-Type': 'application/json' },
       });
-
+  
       const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
-
       localStorage.setItem("currentUser", id);
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
-
       onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
+  
     } catch (error: unknown) {
       console.error('Error al iniciar sesión:', error);
-
+      
       if (axios.isAxiosError(error)) {
-        message.error(error.response?.data || 'Error al iniciar sesión. Por favor, intente nuevamente.');
+        const errorMsg = error.response?.data?.message || "Cuenta bloqueada temporalmente (15 min))";
+        message.error(errorMsg);
       } else {
-        message.error('Ocurrió un error inesperado.');
+        message.error("Ocurrió un error inesperado.");
       }
     }
   };
+  
 
 
   const registro = async () => {
-    if (!validateUsername(username)) {
-      message.error("El nombre de usuario debe tener al menos 4 caracteres.");
-      return;
-    }
-
-    if (!email.includes("@")) {
-      message.error("Ingrese un correo electrónico válido.");
-      return;
-    }
-
-    if (!validatePassword(password)) {
-      message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      message.error("Las contraseñas no coinciden.");
-      return;
-    }
-
+    if (!validateUsername(username)) return message.error("El nombre de usuario debe tener al menos 4 caracteres.");
+    if (!validateEmailFormat(email)) return message.error("Ingrese un correo de Gmail válido.");
+    if (!validatePassword(password)) return message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
+    if (password !== confirmPassword) return message.error("Las contraseñas no coinciden.");
+  
+    const data = { username, email, password };
+    console.log("📤 Enviando datos al servidor:", data);
+  
     try {
-      const data = { username, email, password };
-
-      const response = await axios.post(`${PUERTO}/usuarios`, data, {
-        headers: { "Content-Type": "application/json" },
-      });
-
+      const response = await axios.post(`${PUERTO}/registro`, data, { headers: { "Content-Type": "application/json" } });
+      console.log("✅ Respuesta del servidor:", response.data);
+  
       localStorage.setItem("user", JSON.stringify(response.data));
-      message.success("Registro exitoso");
+      message.success("Correo de confirmacion enviado");
+  
     } catch (error) {
       console.error("❌ Error en registro():", error);
-      message.error("Error al registrar");
+  
+      if (axios.isAxiosError(error)) {
+        const errorMsg = error.response?.data?.message || "Error al registrar.";
+        message.error(errorMsg);
+      } else {
+        message.error("Error inesperado al registrar.");
+      }
     }
   };
+  
+  
 
   const handleSubmit = () => {
     if (formMode === "register") {
@@ -185,11 +179,11 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
           )}
 
           <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-            {formMode === "register" ? "Correo Electrónico" : "Nombre de Usuario o Correo"}
+            {formMode === "register" ? "Correo Electrónico" : "Correo Electrónico"}
           </Title>
 
           <Input
-            placeholder={formMode === "register" ? "Correo Electrónico" : "Nombre de Usuario o Correo"}
+            placeholder={formMode === "register" ? "Correo Electrónico" : "Correo Electrónico"}
             style={{ marginBottom: "8px", borderRadius: "8px" }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}

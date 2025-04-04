@@ -181,15 +181,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
         </Drawer>
       </ConfigProvider>
 
-      <InsModal
-          visible={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={(newItem) => {
-            setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
-            setIsModalOpen(false);
-          }}
-          recetaId={recetaId}
-        />
+      <InsModal visible={isModalOpen} onClose={() => setIsModalOpen(false)} recetaId={recetaId} onSubmit={() => {}} />
 
     </>
   );

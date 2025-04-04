@@ -244,15 +244,15 @@ export default function EDreceta() {
   };
 
   const onReset = () => {
-    datosReceta(); // Recargar receta
-    obtenerTipos(); // Recargar tipos de consumo
-    setResetTrigger((prev) => !prev); // Cambiar trigger para componentes dependientes
+    setFormData({ ...recetaInicial }); // Restaurar valores iniciales
+    setResetTrigger((prev) => !prev); // Notificar a componentes dependientes
   };
-
+  
   const onSubmit = async () => {
     await actualizar();
     setenviarDatos((prev) => !prev); 
   };
+  
   
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -275,6 +275,15 @@ export default function EDreceta() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  const handleReset = () => {
+    setResetTrigger((prev) => !prev); // Esto notificará a ProcedimientoRecetaEditar que debe restaurar los datos iniciales.
+  };
+  
+  const handleSubmit = () => {
+    setenviarDatos((prev) => !prev); // Esto activará el guardado de cambios en ProcedimientoRecetaEditar.
+  };
+  
 
     return (
       <div className='todo'>
@@ -305,10 +314,10 @@ export default function EDreceta() {
                 </div>
                 <div className='divEnviarReset'>
                 <Button htmlType="button" className='btEn' onClick={onSubmit}>
-                      <p className='tx2'>Enviar</p>
+                      <p className='tx2'>Guardar</p>
                     </Button>
 
-                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Limpiar</p></Button>
                 </div>
               </div>
               )}
@@ -410,18 +419,22 @@ export default function EDreceta() {
               )}
               <div className='ing'>
                 <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
-                { (isMobile || isTablet) && (
-                <div className='proceso'>
-                  <Proceso recetaId={Number(id)} />
-
-                </div>
+                {(isMobile || isTablet) && (
+                  <Proceso recetaId={Number(id)} onSubmit={() => {}} onReset={() => {}} />
                 )}
+
+
               </div>
             </div>
             <div className='f3'>
               {!isMobile && !isTablet && (
               <div className='proceso'>
-                <Proceso recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger} />
+                <Proceso 
+                  recetaId={Number(id)} 
+                  onReset={handleReset} 
+                  onSubmit={handleSubmit} 
+                />
+
               </div>
               )}
             </div>
