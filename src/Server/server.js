@@ -59,7 +59,24 @@ const storage = multer.diskStorage({
 
 // Inicializamos el servidor
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTM,
+  process.env.FRONTEND_URL,
+  process.env.FRONTM2, // si estás usando Expo Go en un dispositivo físico
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permite solicitudes sin origen (como curl o postman) o si el origen está en la lista
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("No permitido por CORS"));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -106,7 +123,17 @@ app.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-const BASE_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const getRedirectUrl = (origin) => {
+  const allowedRedirects = {
+    [process.env.FRONTM]: process.env.FRONTM,
+    [process.env.FRONTEND_URL]: process.env.FRONTEND_URL,
+    [process.env.FRONTM2]: process.env.FRONTM2
+  };
+  
+
+  return allowedRedirects[origin] || "http://localhost:3000";
+};
+
 
 // Ruta de callback después de la autenticación con Google
 app.get(
@@ -114,7 +141,6 @@ app.get(
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
     try {
-      // Datos del usuario autenticado
       const user = {
         id: req.user.Id_Usuario,
         username: req.user.Nombre_Usuario,
@@ -123,7 +149,6 @@ app.get(
         Cohabitantes: req.user.Cohabitantes || null,
       };
 
-      // Serializar los datos del usuario como query string
       const queryParams = new URLSearchParams({
         id: user.id.toString(),
         username: user.username,
@@ -133,12 +158,12 @@ app.get(
         message: "Sesión iniciada con éxito",
       });
 
-      // Redirigir al frontend con los datos
-      const frontendURL = process.env.FRONTEND_URL || "http://localhost:3000";
-      res.redirect(`${frontendURL}/dashboard?${queryParams}`);
+      const origin = req.headers.origin || "http://localhost:3000";
+      const redirectURL = getRedirectUrl(origin);
+      res.redirect(`${redirectURL}/dashboard?${queryParams}`);
     } catch (error) {
       console.error("Error durante el callback de Google:", error);
-      res.redirect(`${BASE_URL}/error?message=Error durante la autenticación`);
+      res.redirect("/error?message=Error durante la autenticación");
     }
   }
 );
