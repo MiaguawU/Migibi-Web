@@ -17,7 +17,7 @@ label {
   font-family: 'Jomhuria', serif;  /* Aplicar la fuente personalizada */
   font-weight: lighter;
   height: 90px;
-  border-bottom: none;  /* Eliminar bordes */
+  /*border-bottom: none;*/  /* Eliminar bordes */
   display: flex;  /* Flexbox para alinear elementos */
   justify-content: space-between;  /* Enlaces a la izquierda, perfil a la derecha */
   align-items: center;
@@ -62,11 +62,13 @@ label {
   color: #CDFFAD;  /* Verde intermedio */
 }
 
+/*
 /* Elimina el borde azul predeterminado de Ant Design */
 .custom-menu .ant-menu-item::after {
   content: '';  /* Sobrescribe el pseudo-elemento */
   border-bottom: none !important;  /* Quita la línea azul */
 }
+
 
 /* Ajustar tamaños de imágenes */
 .img-inicio {

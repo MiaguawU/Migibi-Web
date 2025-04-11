@@ -1,0 +1,27 @@
+Lista de tareas para el proyecto
+Iniciar Sesión
+- Recuperar contraseña
+
+Perfil
+- Arreglar el botón de cambiar la foto de perfil
+- Tipos de alimentos que no puedo comer:
+  - Buscador de alimentos
+  - Tabla de alimentos
+- Cambiar contraseña
+- Página de Formulario para la nueva contraseña
+
+Receta
+- Resaltar el nombre de la receta nueva
+- Botón de guardar en la receta
+- Rule obligatorio el nombre de la receta para guardar
+- Cambiar orden a Número de paso
+
+
+Dashboard
+- visitas
+- páginas de entrada
+- tasa de rebote
+- fuentes de tráfico
+
+SR&!TPc8qhaGoeM
+
