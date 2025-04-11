@@ -1,10 +1,18 @@
 import { UploadOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import SyncedInputs from "./Componentes/SyncedInput";
+import React, { useState, useEffect } from 'react';
+import SyncedInputs from "./Componentes/SyncedInput";
 import Ingredientes from './Componentes/IngredientesRecetaEditar';
+import { useSearchParams } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import type { UploadProps } from 'antd';
 import type { InputNumberProps } from 'antd';
+import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber, message, ConfigProvider } from "antd";
+import Proceso from './Componentes/ProcedimientoEditar';
+import NumericInput from './Componentes/NumberInput';
+import PUERTO from "../config";
+import axios from "axios";
 import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber, message, ConfigProvider } from "antd";
 import Proceso from './Componentes/ProcedimientoEditar';
 import NumericInput from './Componentes/NumberInput';
@@ -23,8 +31,25 @@ interface Tipo {
   Id_Tipo_Consumo: number;
   Tipo_Consumo: string;
 }
+import dayjs, { Dayjs } from 'dayjs';
+
+const { Option } = Select;
+const { TextArea } = Input;
+
+interface Tipo {
+  Id_Tipo_Consumo: number;
+  Tipo_Consumo: string;
+}
 
 const handleChange = (value: { value: string; label: React.ReactNode }) => {
+  console.log(value);
+};
+
+function getBase64(file: File, callback: (url: string) => void) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => callback(reader.result as string);
+  reader.onerror = (error) => message.error("Error al procesar la imagen.");
   console.log(value);
 };
 
@@ -234,7 +259,199 @@ export default function EDreceta() {
   
   const { TextArea } = Input;
 
+export default function EDreceta() {
+  const [syncedValue1, setSyncedValue1] = useState("Valor inicial 1");
+  const [syncedValue2, setSyncedValue2] = useState("Valor inicial 2");
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [form] = Form.useForm();
+  const [Tipos, setTipos] = useState<Tipo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [resetTrigger, setResetTrigger] = useState(false);
+  const [enviarDatos, setenviarDatos] = useState(false);
+  const [formData, setFormData] = useState<{
+    Nombre: string;
+    Imagen: string;
+    Tiempo: Dayjs | null;
+    id_Tipo: string | number;
+    Porciones: number;
+    Calorias: number;
+    FileImagen?: File;
+  }>({
+    Nombre: '',
+    Imagen: def,
+    Tiempo: dayjs('00:00:00', 'HH:mm:ss'),
+    id_Tipo: '',
+    Porciones: 1,
+    Calorias: 0,
+  });
+
+  const [recetaInicial, setRecetaInicial] = useState({
+    Nombre: '',
+    Imagen: def,
+    Tiempo: dayjs('00:00:00', 'HH:mm:ss'),
+    id_Tipo: '',
+    Porciones: 1,
+    Calorias: 0,
+  });
+  
+
+  const uploadProps = {
+    showUploadList: false,
+    beforeUpload: (file: File) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("Solo puedes subir archivos de imagen.");
+        return false;
+      }
+      setFormData((prev) => ({ ...prev, Imagen: URL.createObjectURL(file), FileImagen: file })); // Previsualización y guardado del archivo
+      return false; // Evitar subida automática
+    },
+    
+  };
+  
+
+  // Obtener tipos de consumo
+  const obtenerTipos = async () => {
+    try {
+      const response = await axios.get(`${PUERTO}/tipoC`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      if(response){
+        setTipos(response.data );
+        console.log("Tipos recibidos:", response.data);
+      }
+      else{
+        message.error("No hay datos en los tipos");
+      }
+      
+    } catch (error) {
+      console.error("Error al cargar tipos:", error);
+      message.error("No se pudo cargar los tipos.");
+    }
+  };
+
+  
+
+  // Obtener datos de la receta
+  const datosReceta = async () => {
+    setLoading(true);
+    try {
+      if (!id) {
+        message.warning("No se encontró el id de la receta.");
+        return;
+      }
+  
+      const response = await axios.get(`${PUERTO}/recetaCRUD/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      if (response.data && response.data.length > 0) {
+        const receta = response.data[0];
+        const recetaCargada = {
+          Nombre: receta.Nombre || '',
+          Imagen: receta.Imagen?.startsWith("http")
+            ? receta.Imagen
+            : `${PUERTO}${receta.Imagen}`,
+          Tiempo: receta.Tiempo ? dayjs(receta.Tiempo, 'HH:mm:ss') : dayjs(), // Valor por defecto
+          id_Tipo: receta.id_Tipo || '',
+          Porciones: receta.Porciones || 1,
+          Calorias: receta.Calorias || 0,
+        };
+        
+        setFormData(recetaCargada);        
+        setRecetaInicial(recetaCargada); // Guardar datos iniciales
+      } else {
+        message.warning("No se encontró información de la receta.");
+      }
+    } catch (error) {
+      console.error("Error al obtener receta:", error);
+      message.error("No se pudo cargar la receta.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  // Inicialización del componente
+  useEffect(() => {
+    datosReceta();
+    obtenerTipos();
+  }, [id]);
+  
+
+  const handleSyncedChange = (value: string) => {
+    console.log("Nuevo valor para Nombre:", value);
+    setFormData((prevData) => ({
+      ...prevData,
+      Nombre: value,
+    }));
+  };
+  
+
+  // Manejar cambios en el Select
+  const handleSelectChange = (value: string | number) => {
+    setFormData((prev) => ({ ...prev, id_Tipo: value }));
+  };
+
+  // Manejar cambios en el TimePicker
+  const handleTimeChange = (time: Dayjs | null) => {
+    if (time && time.isValid()) {
+      setFormData((prev) => ({ ...prev, Tiempo: time }));
+    } else {
+      message.error("Formato de tiempo inválido.");
+    }
+  };
+
+ 
+  const actualizar = async () => {
+    try {
+      if (!id) {
+        message.warning("No se encontró el id de la receta.");
+        return;
+      }
+  
+      // Crear un nuevo FormData
+      const datosForm = new FormData();
+      datosForm.append("nombre", formData.Nombre || ""); // Asegúrate de que formData.Nombre exista
+      datosForm.append("tiempo", formData.Tiempo?.format("HH:mm:ss") || "");
+      datosForm.append("porciones", String(formData.Porciones));
+      datosForm.append("calorias", String(formData.Calorias));
+      datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
+      datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
+
+  
+      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
+      if (response.status === 200) {
+        message.success("Receta actualizada correctamente.");
+        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
+      } else {
+        message.error("No se pudo actualizar la receta.");
+      }
+    } catch (error) {
+      console.error("Error al actualizar receta:", error);
+      message.error("Hubo un problema al enviar los datos.");
+    }
+  };
+  
+  
+
+  
+
+  
+  const { TextArea } = Input;
+
   const [value, setValue] = useState('');
+  
+  const [inputValue, setInputValue] = useState<string>("");
+
+  // Función para actualizar el estado
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
   
   const [inputValue, setInputValue] = useState<string>("");
 
@@ -396,7 +613,28 @@ export default function EDreceta() {
             </div>
             <div className='f2'>
               {!isMobile && !isTablet && (
+            </div>
+            <div className='f2'>
+              {!isMobile && !isTablet && (
               <div className='rect'>
+                <div className='nRecCom'>
+                  <ConfigProvider
+                    theme={{
+                      token: {
+                        fontFamily: "Jomhuria, Serif",
+                        fontSize: 35,
+                        colorText: "#8BA577",
+                      },
+                    }}
+                  >
+                    <SyncedInputs variant="borderless" className="nRec" placeholder1='receta' value={formData.Nombre} onChange={handleSyncedChange}/>
+                    {/*<Button className='btImg' ><img src={btCom} className='imgCom'/></Button>*/}
+                  </ConfigProvider>
+                </div>
+                <div className='divEnviarReset'>
+                  <Button htmlType="submit"  className='btEn' onClick={onSubmit}><p className='tx2'>Enviar</p></Button>
+                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+                </div>
                 <div className='nRecCom'>
                   <ConfigProvider
                     theme={{
@@ -417,6 +655,7 @@ export default function EDreceta() {
                 </div>
               </div>
               )}
+              )}
               <div className='ing'>
                 <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
                 {(isMobile || isTablet) && (
@@ -425,6 +664,9 @@ export default function EDreceta() {
 
 
               </div>
+            </div>
+            <div className='f3'>
+              {!isMobile && !isTablet && (
             </div>
             <div className='f3'>
               {!isMobile && !isTablet && (
@@ -438,10 +680,16 @@ export default function EDreceta() {
               </div>
               )}
             </div>
+              )}
+            </div>
           
+          </div>
           </div>
         </Form>
       </div>
+  );
+};
+
   );
 };
 

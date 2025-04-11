@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Input, Button, Radio, Typography, ConfigProvider, message } from "antd";
+import React, { useState } from 'react';
+import { Card, Input, Button, Radio, Typography, ConfigProvider, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import axios from 'axios';
 import PUERTO from '../../config';
@@ -7,7 +9,12 @@ import PUERTO from '../../config';
 const { Title } = Typography;
 
 const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) => {
+const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) => {
   const [formMode, setFormMode] = useState<"register" | "login">("register");
+  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -15,117 +22,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
 
   const handleModeChange = (e: any) => {
     setFormMode(e.target.value);
-  };
-
-  const handleGoogleLogin = async (): Promise<void> => {
-    window.location.href = `${PUERTO}/auth/google`;
-  };
-
-  const validatePassword = (password: string): boolean => {
-    return (
-      password.length >= 8 &&
-      (password.match(/[A-Z]/g) || []).length >= 2 &&
-      (password.match(/[a-z]/g) || []).length >= 2 &&
-      (password.match(/[0-9]/g) || []).length >= 2
-    );
-  };
-
-  const validateEmailFormat = (email: string): boolean => {
-    // Expresión regular para validar correos de Gmail correctamente formateados
-    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    return gmailRegex.test(email);
-  };
-  
-  const correctEmailFormat = (email: string): string => {
-    // Elimina espacios en blanco, corrige errores menores como "@gmial.com" → "@gmail.com"
-    return email
-      .trim()
-      .replace(/\s+/g, '') // Elimina espacios
-      .replace(/@gmai\.com$/, '@gmail.com') // Corrige errores comunes
-      .toLowerCase(); // Normaliza a minúsculas
-  };
-  
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const correctedEmail = correctEmailFormat(e.target.value);
-    setEmail(correctedEmail);
-  };
-
-  const validateUsername = (username: string): boolean => {
-    return username.length >= 4;
-  };
-
-  const sesionNormal = async () => {
-    try {
-      const data = { identifier: email, password };
-      const response = await axios.post(`${PUERTO}/login`, data, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-  
-      const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
-      localStorage.setItem("currentUser", id);
-      message.success(`Bienvenido, ${username}. ${serverMessage}`);
-      onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
-  
-    } catch (error: unknown) {
-      console.error('Error al iniciar sesión:', error);
-      
-      if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message || "Cuenta bloqueada temporalmente (15 min))";
-        message.error(errorMsg);
-      } else {
-        message.error("Ocurrió un error inesperado.");
-      }
-    }
-  };
-  
-
-
-  const registro = async () => {
-    if (!validateUsername(username)) return message.error("El nombre de usuario debe tener al menos 4 caracteres.");
-    if (!validateEmailFormat(email)) return message.error("Ingrese un correo de Gmail válido.");
-    if (!validatePassword(password)) return message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
-    if (password !== confirmPassword) return message.error("Las contraseñas no coinciden.");
-  
-    const data = { username, email, password };
-    console.log("📤 Enviando datos al servidor:", data);
-  
-    try {
-      const response = await axios.post(`${PUERTO}/registro`, data, { headers: { "Content-Type": "application/json" } });
-      console.log("✅ Respuesta del servidor:", response.data);
-  
-      localStorage.setItem("user", JSON.stringify(response.data));
-      message.success("Correo de confirmacion enviado");
-  
-    } catch (error) {
-      console.error("❌ Error en registro():", error);
-  
-      if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message || "Error al registrar.";
-        message.error(errorMsg);
-      } else {
-        message.error("Error inesperado al registrar.");
-      }
-    }
-  };
-  
-  
-
-  const handleSubmit = () => {
-    if (formMode === "register") {
-      if (!validateEmailFormat(email)) {
-        message.error("El correo debe ser un Gmail válido (ejemplo@gmail.com).");
-        return;
-      }
-      registro();
-    } else {
-      if (!email.includes("@")) {
-        // Si el usuario ingresa solo un nombre, asumimos que es un nombre de usuario
-        sesionNormal();
-      } else {
-        setEmail(correctEmailFormat(email)); // Corrige posibles errores en el email
-        sesionNormal();
-      }
-    }
   };
 
   return (
@@ -158,7 +54,38 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
             <Radio.Button value="register" style={{ minWidth: "100px", maxWidth: "200px" }}>Registrarse</Radio.Button>
             <Radio.Button value="login" style={{ minWidth: "100px", maxWidth: "200px" }}>Iniciar Sesión</Radio.Button>
           </Radio.Group>
+      theme={{
+        token: {
+          colorPrimary: '#00b96b',
+          borderRadius: 10,
+          colorBorder: "#3E7E1E",
+          colorBgContainer: '#E1EBCD',
+        },
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}>
+        <Card
+          style={{
+            width: '80vw',
+            maxWidth: '500px',
+            backgroundColor: "#CEDFAC",
+            borderRadius: 10,
+            padding: "16px",
+          }}
+          bodyStyle={{ padding: "16px" }}
+        >
+          <Radio.Group
+            onChange={handleModeChange}
+            value={formMode}
+            style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}
+          >
+            <Radio.Button value="register" style={{ minWidth: "100px", maxWidth: "200px" }}>Registrarse</Radio.Button>
+            <Radio.Button value="login" style={{ minWidth: "100px", maxWidth: "200px" }}>Iniciar Sesión</Radio.Button>
+          </Radio.Group>
 
+          <Title level={4} style={{ textAlign: "center", color: "#669144" }}>
+            {formMode === "register" ? "Registrarse" : "Iniciar Sesión"}
+          </Title>
           <Title level={4} style={{ textAlign: "center", color: "#669144" }}>
             {formMode === "register" ? "Registrarse" : "Iniciar Sesión"}
           </Title>
@@ -221,9 +148,24 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
               icon={<GoogleOutlined />}
               style={{ backgroundColor: "#E1EBCD", border: "1px solid #3E7E1E" }}
               onClick={handleGoogleLogin}
+              onClick={handleGoogleLogin}
             />
           </div>
 
+          <Button
+            type="primary"
+            block
+            style={{
+              borderRadius: "8px",
+              backgroundColor: "#669144",
+              borderColor: "#669144",
+            }}
+            onClick={handleSubmit}
+          >
+            {formMode === "register" ? "Registrarse" : "Iniciar Sesión"}
+          </Button>
+        </Card>
+      </div>
           <Button
             type="primary"
             block

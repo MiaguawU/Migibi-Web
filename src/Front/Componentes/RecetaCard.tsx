@@ -6,6 +6,7 @@ import { EditOutlined, DeleteOutlined, ClockCircleOutlined, ThunderboltOutlined 
 
 interface RecipeCardProps {
   id: number;
+  id: number;
   title: string;
   portions: string;
   calories: string;

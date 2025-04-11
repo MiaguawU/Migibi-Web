@@ -13,6 +13,7 @@ import InsModal from "./InstruccionModal";
 
 interface Item {
   id: number;
+  id: number;
   name: string;
   isChecked: boolean;
   orden: number;
@@ -174,6 +175,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
     <ConfigProvider
         theme={{
           token: {
+            colorPrimary: "#638552",
             colorPrimary: "#638552",
           },
         }}
