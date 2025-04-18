@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, ConfigProvider, message } from "antd";
 import axios from "axios";
-import "../Estilos/proceso.css";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
@@ -171,34 +170,23 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
   
 
   return (
-    <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: "#638552",
-          },
-        }}
-      >
-      <Card
-          title={<span className="card-title">Instrucciones</span>}
-          className="card-container"
-          bodyStyle={{ padding: "16px" }}>
+    <ConfigProvider theme={{ token: { colorPrimary: "#638552" } }}>
+      <Card title={<span style={{ fontSize: "18px", fontWeight: "bold" }}>Instrucciones</span>} style={{ borderRadius: "8px" }}>
         {loading ? (
           <p>Cargando instrucciones...</p>
         ) : (
-          <div className="card-checkbox-container">
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} >
-              <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-                <div className="card-checkbox">
-                  {items.map((item, index) => (
-                    <DraggableItem key={item.id} item={item} onToggleCheck={handleCheckboxChange} onDelete={() => handleDeleteInstruction(index)}/>
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+              <div>
+                {items.map((item, index) => (
+                  <DraggableItem key={item.id} item={item} onToggleCheck={handleCheckboxChange} onDelete={() => handleDeleteInstruction(index)} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
-        <Button className="btAg" onClick={() => setIsModalOpen(true)}>
-          <img src={btAg} alt="Agregar" className="img" />
+        <Button style={{ marginTop: "10px" }} onClick={() => setIsModalOpen(true)}>
+          <img src={btAg} alt="Agregar" style={{ width: "20px" }} />
         </Button>
       </Card>
       
@@ -209,7 +197,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
         recetaId={recetaId}
       />
 
-</ConfigProvider>
+    </ConfigProvider>
   );
 };
 
@@ -236,7 +224,6 @@ const DraggableItem: React.FC<{ item: Item; onToggleCheck: (id: number) => void;
         alignItems: "center",
         boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
       }}
-      className = "card-checkbox-text"
     >
       <Checkbox checked={item.isChecked} onChange={() => onToggleCheck(item.id)} style={{ flex: 1 }}>
         {item.orden}. {item.name}
