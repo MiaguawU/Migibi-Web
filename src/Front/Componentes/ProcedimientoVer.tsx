@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, ConfigProvider, message } from "antd";
 import axios from "axios";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from "@dnd-kit/sortable";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { DragEndEvent } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import PUERTO from "../../config";
 import btAg from "../../Img/btagregar.png";

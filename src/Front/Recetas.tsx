@@ -70,6 +70,8 @@ const Recetas: React.FC = (): JSX.Element => {
               receta.Activo > 0 && (receta.Id_Usuario_Alta === userId || receta.Id_Usuario_Alta === 1)
           )
           .map((receta: any) => {
+            {/**const isDefault = receta.Id_Usuario_Alta === 1;
+            const puedeEditar = !isDefault || userId === 1; */}
             const puedeEditar = !receta.Es_Default || userId === 1;
           
             return {

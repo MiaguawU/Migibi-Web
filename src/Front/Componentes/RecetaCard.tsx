@@ -2,7 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { PopconfirmProps } from "antd";
 import { Card, Button, Tooltip, Popconfirm, ConfigProvider } from "antd";
-import { EditOutlined, DeleteOutlined, ClockCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  ClockCircleOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
 
 interface RecipeCardProps {
   id: number;
@@ -15,8 +20,6 @@ interface RecipeCardProps {
   onEdit: () => void;
   onDelete: () => void;
 }
-
-const cancel: PopconfirmProps["onCancel"] = (e) => {};
 
 const RecipeCard: React.FC<RecipeCardProps> = ({
   id,
@@ -35,6 +38,13 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
     navigate(`/recetaVis?id=${id}`);
   };
 
+  // Envolver onDelete para evitar propagación cuando se confirma
+  const handleDeleteConfirm = (e?: React.MouseEvent<HTMLElement>) => {
+    e?.stopPropagation();
+    onDelete();
+  };
+  
+
   return (
     <ConfigProvider>
       <Card
@@ -44,26 +54,26 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           borderRadius: "10px",
           overflow: "hidden",
         }}
-        onClick={handleCardClick} // Manejar clic en la tarjeta
+        onClick={handleCardClick}
         actions={
           editar
             ? [
-                <Tooltip title="Editar">
+                <Tooltip title="Editar" key="edit">
                   <Button
                     type="text"
                     icon={<EditOutlined style={{ color: "#86A071" }} />}
                     onClick={(e) => {
-                      e.stopPropagation(); // Evitar propagación
+                      e.stopPropagation();
                       onEdit();
                     }}
                   />
                 </Tooltip>,
-                <Tooltip title="Eliminar">
+                <Tooltip title="Eliminar" key="delete">
                   <Popconfirm
                     title="Borrar la receta"
                     description="¿Está seguro de borrar la receta de su plan?"
-                    onConfirm={onDelete}
-                    onCancel={cancel}
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={(e) => e?.stopPropagation()}
                     okText="Sí"
                     cancelText="No"
                   >
@@ -71,9 +81,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                       type="text"
                       danger
                       icon={<DeleteOutlined />}
-                      onClick={(e) => e.stopPropagation()} // Evitar propagación
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </Popconfirm>
+
                 </Tooltip>,
               ]
             : []
@@ -108,12 +119,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             marginTop: "10px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <span
               style={{
                 fontSize: 35,

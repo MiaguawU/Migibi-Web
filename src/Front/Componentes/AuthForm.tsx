@@ -17,12 +17,115 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
     setFormMode(e.target.value);
   };
 
-  const handleGoogleLogin = () => {
-    message.info("Funcionalidad de Google aún no implementada");
+  const handleGoogleLogin = async (): Promise<void> => {
+    window.location.href = `${PUERTO}/auth/google`;
   };
 
+  const validatePassword = (password: string): boolean => {
+    return (
+      password.length >= 8 &&
+      (password.match(/[A-Z]/g) || []).length >= 2 &&
+      (password.match(/[a-z]/g) || []).length >= 2 &&
+      (password.match(/[0-9]/g) || []).length >= 2
+    );
+  };
+
+  const validateEmailFormat = (email: string): boolean => {
+    // Expresión regular para validar correos de Gmail correctamente formateados
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return gmailRegex.test(email);
+  };
+  
+  const correctEmailFormat = (email: string): string => {
+    // Elimina espacios en blanco, corrige errores menores como "@gmial.com" → "@gmail.com"
+    return email
+      .trim()
+      .replace(/\s+/g, '') // Elimina espacios
+      .replace(/@gmai\.com$/, '@gmail.com') // Corrige errores comunes
+      .toLowerCase(); // Normaliza a minúsculas
+  };
+  
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const correctedEmail = correctEmailFormat(e.target.value);
+    setEmail(correctedEmail);
+  };
+
+  const validateUsername = (username: string): boolean => {
+    return username.length >= 4;
+  };
+
+  const sesionNormal = async () => {
+    try {
+      const data = { identifier: email, password };
+      const response = await axios.post(`${PUERTO}/login`, data, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
+      localStorage.setItem("currentUser", id);
+      message.success(`Bienvenido, ${username}. ${serverMessage}`);
+      onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
+  
+    } catch (error: unknown) {
+      console.error('Error al iniciar sesión:', error);
+      
+      if (axios.isAxiosError(error)) {
+        const errorMsg = error.response?.data?.message || "Cuenta bloqueada temporalmente (15 min))";
+        message.error(errorMsg);
+      } else {
+        message.error("Ocurrió un error inesperado.");
+      }
+    }
+  };
+  
+
+
+  const registro = async () => {
+    if (!validateUsername(username)) return message.error("El nombre de usuario debe tener al menos 4 caracteres.");
+    if (!validateEmailFormat(email)) return message.error("Ingrese un correo de Gmail válido.");
+    if (!validatePassword(password)) return message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
+    if (password !== confirmPassword) return message.error("Las contraseñas no coinciden.");
+  
+    const data = { username, email, password };
+    console.log("📤 Enviando datos al servidor:", data);
+  
+    try {
+      const response = await axios.post(`${PUERTO}/registro`, data, { headers: { "Content-Type": "application/json" } });
+      console.log("✅ Respuesta del servidor:", response.data);
+  
+      localStorage.setItem("user", JSON.stringify(response.data));
+      message.success("Correo de confirmacion enviado");
+  
+    } catch (error) {
+      console.error("❌ Error en registro():", error);
+  
+      if (axios.isAxiosError(error)) {
+        const errorMsg = error.response?.data?.message || "Error al registrar.";
+        message.error(errorMsg);
+      } else {
+        message.error("Error inesperado al registrar.");
+      }
+    }
+  };
+  
+  
+
   const handleSubmit = () => {
-    message.info("Funcionalidad aún no implementada");
+    if (formMode === "register") {
+      if (!validateEmailFormat(email)) {
+        message.error("El correo debe ser un Gmail válido (ejemplo@gmail.com).");
+        return;
+      }
+      registro();
+    } else {
+      if (!email.includes("@")) {
+        // Si el usuario ingresa solo un nombre, asumimos que es un nombre de usuario
+        sesionNormal();
+      } else {
+        setEmail(correctEmailFormat(email)); // Corrige posibles errores en el email
+        sesionNormal();
+      }
+    }
   };
 
   return (
@@ -71,14 +174,16 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
+
             </>
           )}
 
           <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-            Correo Electrónico
+            {formMode === "register" ? "Correo Electrónico" : "Correo Electrónico"}
           </Title>
+
           <Input
-            placeholder="Correo Electrónico"
+            placeholder={formMode === "register" ? "Correo Electrónico" : "Correo Electrónico"}
             style={{ marginBottom: "8px", borderRadius: "8px" }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -87,6 +192,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
           <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
             Contraseña
           </Title>
+
           <Input.Password
             placeholder="Contraseña"
             style={{ marginBottom: "16px", borderRadius: "8px" }}
@@ -99,6 +205,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
               <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
                 Confirmar Contraseña
               </Title>
+
               <Input.Password
                 placeholder="Confirmar Contraseña"
                 style={{ marginBottom: "16px", borderRadius: "8px" }}
