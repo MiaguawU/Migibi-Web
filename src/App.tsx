@@ -12,8 +12,7 @@ import Caducar from './Front/Componentes/PorCaducar';
 import Conocenos from './Front/Conocenos';
 import Contactanos from './Front/contactanos';
 import Hoy from './Front/Hoy';
-import Plan1 from './Front/Plan1';
-import Plan2 from './Front/Plan2';
+import Plan from './Front/Plan';
 import Recetas from './Front/Recetas';
 import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
@@ -113,8 +112,8 @@ function App() {
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/conocenos" element={<Conocenos />} />
           <Route path="/contactanos" element={<Contactanos />} />
-          <Route path="/hoy" element={<Plan2 />} />
-          <Route path="/plan" element={<Plan1 />} />
+          <Route path="/hoy" element={<Hoy />} />
+          <Route path="/plan" element={<Plan />} />
           <Route path="/recetas" element={<Recetas />} />
           <Route path="/refri" element={<Refri />} />
           <Route path="/edReceta" element={<EDreceta />} />

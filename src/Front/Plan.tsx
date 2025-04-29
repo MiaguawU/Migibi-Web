@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Button, Card, ConfigProvider, message, Popconfirm } from 'antd'; 
-import { Modo, Plan } from '../Front/Metodos/Enum';
+import React, { useState, useEffect} from "react";
+import { Card, ConfigProvider, message, Button, Popconfirm  } from 'antd'; 
+import { Modo, Plan } from './Metodos/Enum';
 import axios from "axios";
 import PUERTO from "../config";
+import "./perfil.css";
 import {formatoFechaLegible} from "./Metodos/FormatoFecha";
 import PlanEditar from "./Componentes/PlanEditar";
 import PlanAgregar from "./Componentes/PlanAgregar";
 import PlanCrearPlan from "./Componentes/PlanCrearPlan";
+//import {FormatoSQL} from "./Metodos/FormatoSQL";
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
 //import imgdesayuno from "../Img/imgdesayuno.png";
@@ -36,17 +38,16 @@ interface semanaData {
   comidas: comidaSemana[] 
 }
 
-export default function Inicio() {   
-  const [weekIndex, setWeekIndex] = useState(0);
-  const [loading, setLoading] = useState(true);  
+const Inicio = () => { 
   const [DiasPlan, setDiasPlan] = useState<semanaData[]>([]);
+  const [loading, setLoading] = useState(true);  
+  const [weekIndex, setWeekIndex] = useState(0);
   const [isEditarOpen, setIsEditarOpen] = useState(false); // Estado del modal
-  const [isAgregarOpen, setIsAgregarOpen] = useState(false); // Estado del modal
   const [isCrearOpen, setIsCrearOpen] = useState(false); // Estado del modal
+  const [isAgregarOpen, setIsAgregarOpen] = useState(false); // Estado del modal
   const [diaSelected, setdiaSelected] = useState(0);
   const [comidaSelected, setcomidaSelected] = useState("");
   const [modoSelected, setmodoSelected] = useState<Modo>(Modo.PlanRellenar);
-
 
   const weeks = [
     "Semana del 1 al 7 de noviembre",
@@ -54,26 +55,10 @@ export default function Inicio() {
     "Semana del 15 al 21 de noviembre",
     "Semana del 22 al 28 de noviembre",
   ];
-
-  const handlePrevious = () => {
-    if (weekIndex > 0) setWeekIndex(weekIndex - 1);
-  };
-
-  const handleNext = () => {
-    if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
-  };
-
   const datosRecetasSemana = async () => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) {
-      message.warning("No hay un usuario logueado actualmente.");
-      return;
-    }
-    const id = Number(currentUser);
-  
     setLoading(true);
     try {
-      const response = await axios.get(`${PUERTO}/hoyGeneral/${id}`);
+      const response = await axios.get(`${PUERTO}/planGeneral`);
   
       if (response.data) {
         const semanaData: semanaData[] = response.data.map((registro: any) => ({
@@ -93,7 +78,7 @@ export default function Inicio() {
                       image: registro.Imagen_Desayuno
                         ? `${PUERTO}${registro.Imagen_Desayuno}`
                         : "defRec.png",
-                        editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
+                      editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -129,7 +114,7 @@ export default function Inicio() {
                       image: registro.Imagen_Cena
                         ? `${PUERTO}${registro.Imagen_Cena}`
                         : "defRec.png",
-                        editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
+                      editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -137,23 +122,29 @@ export default function Inicio() {
           ],
         }));
   
-        console.log("HoyData procesada:", semanaData);
+        console.log("Semana Data procesada:", semanaData);
         setDiasPlan(semanaData);
         setLoading(false);
-        message.success("Recetas del día obtenidas exitosamente.");
+        message.success("Recetas de la semana obtenidas exitosamente.");
       }
     } catch (error) {
-      console.error("Error al obtener las recetas del día", error);
+      console.error("Error al obtener las recetas de la semana", error);
       setLoading(false);
       message.error("No se pudo conectar con el servidor.");
     }
   };
   
-  
   useEffect(() => {
     datosRecetasSemana();
   }, []);
 
+  const handlePrevious = () => {
+    if (weekIndex > 0) setWeekIndex(weekIndex - 1);
+  };
+
+  const handleNext = () => {
+    if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
+  };
 
   const handleEdit = (idDia: number, comidaNombre: string) => {
     setdiaSelected(idDia);
@@ -162,6 +153,10 @@ export default function Inicio() {
   };
   
   const handleDelete = async(idDia: number, comidaNombre: string) => {
+    setdiaSelected(idDia);
+    setcomidaSelected(comidaNombre);
+    console.log(diaSelected);
+    console.log(comidaSelected);
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
       message.warning("No hay un usuario logueado actualmente.");
@@ -169,12 +164,12 @@ export default function Inicio() {
     }
 
     const payload = {
-      Id_Recetas_Dia: idDia,
+        Id_Recetas_Dia: idDia,
       Id_Usuario_Modif: Number(currentUser)
     };
 
     try {
-      const response = await axios.put(`${PUERTO}/editar${comidaNombre}/borrar/${idDia}`, payload, {
+      const response = await axios.put(`${PUERTO}/editar${comidaSelected}/borrar/${diaSelected}`, payload, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -189,7 +184,6 @@ export default function Inicio() {
       message.error("Error al procesar la solicitud.");
     }
   };
-
 
   return (  
     <ConfigProvider
@@ -219,7 +213,15 @@ export default function Inicio() {
                 colorPrimary: '#00b96b',
                 borderRadius: 10,
                 colorBgContainer: '#CAE2B5',
-              }}}>
+              },
+              components: {
+                Popconfirm: {
+                  fontSize: 25,
+                  borderRadius: 5,
+                  marginXS: 10
+                },
+              },
+              }}>
               <Button
                 key={`AgregarNuevoPlan`}
                 style={{height: "40px", margin: '10px', marginTop: '5px',}}
@@ -228,6 +230,7 @@ export default function Inicio() {
               </Button>
               <Popconfirm
                 title="Elegir modo"
+                style={{fontSize: 25}}
                 description="¿Quieres usar solo lo que tienes?"
                 onConfirm={() => {setmodoSelected(Modo.PlanEstricto);setIsCrearOpen(true);}}
                 onCancel={() => {setmodoSelected(Modo.PlanRellenar);setIsCrearOpen(true);}}
@@ -275,6 +278,7 @@ export default function Inicio() {
               <div key={index}>
                 <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}>
                   <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071'}}>{comida.comida}</a>
+
                   <div>
                     <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px'}}>
                     {comida.recetas.length > 0 ? (
@@ -309,9 +313,7 @@ export default function Inicio() {
                         style={{height: "40px"}}
                         onClick={() => {
                           setdiaSelected(dia.id);
-                          console.log(dia.id);
                           setcomidaSelected(comida.comida);
-                          console.log(dia.id);
                           setIsEditarOpen(true); // Abre el modal para agregar receta
                         }}
                       >
@@ -329,6 +331,7 @@ export default function Inicio() {
             <br />
           </div>
         ))}
+        
         <PlanEditar
               visible= {isEditarOpen}
               onClose={() => setIsEditarOpen(false)}
@@ -352,3 +355,5 @@ export default function Inicio() {
     </ConfigProvider>
   );
 }
+
+export default Inicio;

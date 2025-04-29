@@ -7,26 +7,19 @@ import { isNumberObject } from 'util/types';
 
 const { Option } = Select;
 
-{/** 
-PlanCrear sirve para crear un nuevo plan del sistema
-Primero debe preguntarle al usuario si quiere que el plan se haga solo con cosas que tenga en su casa o si quiere que dure toda la semana
-El algoritmo para conseguir ambos planes se conserva como procedure en la base de datos
-  Se necesita del procedure PlanEstricto que se hace con cosas que ya se tiene en la casa
-  Se necesita del procedure PlanRellenar que dura toda la semana y que 
-  
-  En Hoy, hay un botón que te da las recetas que puedes hacer con los ingredientes en ese momento
-    Utiliza el procedure PlanEstricto
-    Te deja agregar esas recetas a Hoy como desayuno, comida o cena
-      Usa el código de agregar receta para confirmar que puede agregarla
-      Se muestra con HoyCrearPlan que es una sola lista en el panel
-  En plan:
-      Hay un botón con el que usas PlanEstricto 
-        Se abre PlanCrearPlan con las recetas de PlanEstricto y donde faltan hay un botón para agregar recetas.
-        
-      Hay un botón para PlanRellenar
-        Se abre PlanCrearPlan con las recetas de PlanRellenar
-      Al guardar los planes, confirma si todos los días y manda un Modal.confirm de que no están todas las recetas
-*/}
+    {/** 
+    Nuevo_Plan sirve para agregar una nueva receta en el plan
+    Tiene que validar si el plan ya existe
+        Si ya existe el plan, evalúa si la comida que eligió el usuario es nula o no
+            si es nula, le va a agregar la nueva receta a la comida que sea
+                EditarReceta()
+            si no es nula, le va a mandar un dialog que le dice que se va a editar la comida de ese plan
+                modalSeguro de que quiere editar la comida
+                EditarReceta()
+        Si no existe el plan, va a crear el plan y le va a agregar la nueva receta
+                Crear plan()
+                EditarReceta(),
+    */}
 
 interface FormModalProps {
   visible: boolean;
@@ -131,8 +124,9 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
     
   };
 
-  const validarPlan = async(values: any) => {
+  const validarPlan = async(values: any, reintento = false) => {
     let response;
+    const idUsuario = Number(localStorage.getItem("currentUser"));
       
     const payload = {
       Id_Usuario_Alta: idUsuario,
@@ -144,19 +138,6 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
     });
     if (response.data && response.data.length > 0) {
       console.log(response.data);
-    {/** 
-    Nuevo_Plan sirve para agregar una nueva receta en el plan
-    Tiene que validar si el plan ya existe
-        Si ya existe el plan, evalúa si la comida que eligió el usuario es nula o no
-            si es nula, le va a agregar la nueva receta a la comida que sea
-                EditarReceta()
-            si no es nula, le va a mandar un dialog que le dice que se va a editar la comida de ese plan
-                modalSeguro de que quiere editar la comida
-                EditarReceta()
-        Si no existe el plan, va a crear el plan y le va a agregar la nueva receta
-                Crear plan()
-                EditarReceta(),
-    */}
       if (response.data[0][`Id_Receta_${tipoConsumo}`] === null) {
         EditarReceta(tipoConsumo, response.data[0][`Id_Recetas_Dia`], selectedValue);
       } else {
@@ -164,9 +145,12 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
       }
       
     } else {
-      console.log("No hay plan");
-      CrearPlan(values);
-      validarPlan(values);
+      if (!reintento) {
+        await CrearPlan(values);
+        await validarPlan(values, true); // solo reintenta una vez
+      } else {
+        message.error("No se pudo crear ni validar el plan.");
+      }
     }
   } catch (error) {
     console.log(`error al hacer el post de ${PUERTO}/planGeneral/agregarPlan/${idUsuario}`);
@@ -176,7 +160,7 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
   }
 
   const CrearPlan = async(values: any) => {
-    
+    const idUsuario = Number(localStorage.getItem("currentUser"));
     const payload = {
       Id_Usuario_Alta: idUsuario,
       Fecha: values.expirationDate
@@ -202,6 +186,7 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
   }}
 
   const EditarReceta = async(comida: string, planId: number, idReceta: number | null) => {
+    const idUsuario = Number(localStorage.getItem("currentUser"));
 
     const payload = {
       Id_Recetas_Dia: planId,

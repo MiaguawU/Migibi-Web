@@ -41,7 +41,7 @@ router.get("/", (req, res) => {
 
 // Obtener nombres de recetas (GET)
 router.get("/nombres", (req, res) => {
-  const query = `SELECT Id_Receta, Nombre, Activo FROM receta`;
+  const query = `SELECT Id_Receta, Nombre, Activo FROM receta WHERE Activo = 1`;
   db.query(query, (err, result) => {
     if (err) return res.status(500).send("Error al obtener nombres de recetas");
     res.json(result);

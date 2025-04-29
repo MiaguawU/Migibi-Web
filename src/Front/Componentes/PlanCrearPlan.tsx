@@ -1,58 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, DatePicker, Button, Select, ConfigProvider, message } from 'antd';
+import { Modal, Form, DatePicker, Button, Select, ConfigProvider, message, Flex, Card, Typography } from 'antd';
 import { Modo, Plan } from '../Metodos/Enum';
+import { StarOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
-import { any } from 'joi';
-import { isNumberObject } from 'util/types';
 
 const { Option } = Select;
+const { Title, Text } = Typography;
 
-{/** 
-    PlanCrear sirve para crear un nuevo plan del sistema
-    El algoritmo para conseguir ambos planes se conserva como procedure en la base de datos
-      Se necesita del procedure PlanEstricto que se hace con cosas que ya se tiene en la casa
-      Se necesita del procedure PlanRellenar que dura toda la semana y que 
-  
-En Hoy, hay un botón que te da las recetas que puedes hacer con los ingredientes en ese momento
-    Hay un botón que te pregunta si quieres el PlanEstricto o PlanRellenar
-  Te deja agregar esas recetas a Hoy como desayuno, comida o cena
-    Usa el código de agregar receta para confirmar que puede agregarla
-    Se muestra con HoyCrearPlan que es una sola lista en el panel
-En plan:
-    Hay un botón con el que usas PlanEstricto 
-      Se abre PlanCrearPlan con las recetas de PlanEstricto y donde faltan hay un botón para agregar recetas.
-      
-    Hay un botón para PlanRellenar
-      Se abre PlanCrearPlan con las recetas de PlanRellenar
-    Al guardar los planes, confirma si todos los días y manda un Modal.confirm de que no están todas las recetas
-*/}
- 
-{/**
-Lo que hay en PlanCrearPlan
-  interface de la recetaDia
-  interface de la receta
-  Está la estructura de la lista de RecetasDia
-    Dia
-      Desayuno - Receta || null
-      Comida - Receta || null
-      Cena - Receta || null
+interface Dia {
+  Id_Desayuno: number;
+  Desayuno: string;
+  Id_Comer: number;
+  Comer: string;
+  Id_Cena: number;
+  Cena: string;
+}
 
-  Hay un Método que manda a llamar PlanEstricto
-    Recibe las recetas de RecetasDisponiblesEstricto()
-      Debe estructurar la información de la manera que se necesita
-        Separa las recetas en Desayuno, Comida, Cena || null
-        Separa las recetas en días 
+interface Tipo {
+  Id_Tipo_Consumo: number;
+  Tipo_Consumo: string;
+}
 
-  Hay un Método que manda a llamar PlanRellenar
-    Recibe las RecetasDisponibles
-    Recibe las recetas de RecetasDisponibles()
-      Debe estructurar la información de la manera que se necesita
-        Separa las recetas en Desayuno, Comida, Cena || null
-        Separa las recetas en días 
-  
-  
-*/}
 interface FormModalProps {
   visible: boolean;
   ModoSelected: Modo;
@@ -61,77 +30,89 @@ interface FormModalProps {
   onSubmit: () => void;
 }
 
-interface Tipo {
-  Id_Tipo_Consumo: number;
-  Tipo_Consumo: string;
-}
-
 const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 14 },
-  },
+  labelCol: { xs: { span: 24 }, sm: { span: 6 } },
+  wrapperCol: { xs: { span: 24 }, sm: { span: 14 } },
 };
-const ValidarComidaNull = (data: any, recipeType: string): boolean => {
-  if (!data || data.length === 0) {
-    console.error("El arreglo de datos está vacío o no es válido.");
-    return false;
-  }
 
-  // Verifica si el campo especificado es null
-  return data[0][recipeType] === null;
-};
+const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSelected, onClose, onSubmit }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [currentDayIndex, setCurrentDayIndex] = useState<number | null>(null);
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
   const [recetas, setRecetas] = useState<any[]>([]);
-  const [Tipos, setTipos] = useState<Tipo[]>([]);  
-  const [searchTerm, setSearchTerm] = useState<string>(""); // Para la búsqueda
-  const [selectedValue, setSelectedValue] = useState<number | null>(null); // Para el valor seleccionado
+  const [Tipos, setTipos] = useState<Tipo[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [idUsuario, setIdUSuario] = useState(0);
   const [tipoConsumo, setTipoConsumo] = useState<string>("");
+  const [dias, setDias] = useState<Dia[]>([
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 29, Comer: 'Ensalada de atún', Id_Cena: 31, Cena: 'Lasaña' },
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 29, Comer: 'Ensalada de atún', Id_Cena: 31, Cena: 'Lasaña' },
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 29, Comer: 'Ensalada de atún', Id_Cena: 31, Cena: 'Lasaña' },
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 30, Comer: 'Espagueti con albóndigas', Id_Cena: 31, Cena: 'Lasaña' },
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 30, Comer: 'Espagueti con albóndigas', Id_Cena: 31, Cena: 'Lasaña' },
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 30, Comer: 'Espagueti con albóndigas', Id_Cena: 31, Cena: 'Lasaña' },
+    { Id_Desayuno: 26, Desayuno: 'Cazuela de Huevo con Calabacitas y Frijoles', Id_Comer: 30, Comer: 'Espagueti con albóndigas', Id_Cena: 31, Cena: 'Lasaña' },
+  ]);
 
   const filteredOptions = recetas
-  .filter((receta) =>
-    receta.Nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-  .map((receta) => ({
-    value: receta.Id_Receta,
-    label: receta.Nombre,
-  }));
+    .filter((receta) => receta.Nombre.toLowerCase().includes(searchTerm.toLowerCase()))
+    .map((receta) => ({
+      value: receta.Id_Receta,
+      label: receta.Nombre,
+    }));
 
   const handleFinish = (values: any) => {
     handleSubmit(values);
-    form.resetFields(); // Resetea el formulario después de enviar
+    form.resetFields();
+  };
+
+  const handleEditFinish = (values: any) => {
+    if (currentDayIndex !== null) {
+      const updatedDias = [...dias];
+      const selectedDesayuno = recetas.find(r => r.Id_Receta === values.desayuno);
+      const selectedComida = recetas.find(r => r.Id_Receta === values.comida);
+      const selectedCena = recetas.find(r => r.Id_Receta === values.cena);
+
+      updatedDias[currentDayIndex] = {
+        Id_Desayuno: values.desayuno || updatedDias[currentDayIndex].Id_Desayuno,
+        Desayuno: selectedDesayuno?.Nombre || updatedDias[currentDayIndex].Desayuno,
+        Id_Comer: values.comida || updatedDias[currentDayIndex].Id_Comer,
+        Comer: selectedComida?.Nombre || updatedDias[currentDayIndex].Comer,
+        Id_Cena: values.cena || updatedDias[currentDayIndex].Id_Cena,
+        Cena: selectedCena?.Nombre || updatedDias[currentDayIndex].Cena,
+      };
+
+      setDias(updatedDias);
+      message.success('Día actualizado localmente');
+      setEditModalVisible(false);
+      editForm.resetFields();
+    }
   };
 
   const fetchRecetas = async () => {
     try {
       const response = await axios.get(`${PUERTO}/recetaGeneral/nombres`);
-      const recetasData = response.data;
-      setRecetas(recetasData);
+      setRecetas(response.data);
     } catch (error) {
       message.error("Error al obtener las recetas.");
     }
   };
 
-  // Obtener tipos de consumo
   const obtenerTipos = async () => {
     try {
       const response = await axios.get(`${PUERTO}/tipoC`, {
         headers: { "Content-Type": "application/json" },
       });
-      if(response){
-        setTipos(response.data );
-      }
-      else{
+      if (response.data) {
+        setTipos(response.data);
+      } else {
         message.error("No hay datos en los tipos");
       }
-      
     } catch (error) {
       console.error("Error al cargar tipos:", error);
       message.error("No se pudo cargar los tipos.");
@@ -153,119 +134,166 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
     }
 
     setIdUSuario(Number(currentUser));
-    
     validarPlan(values);
-    
   };
 
-  const validarPlan = async(values: any) => {
-    let response;
-      
+  const handleFinalSave = async () => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+
+    setIdUSuario(Number(currentUser));
+
+    try {
+      // Create or validate plan
+      const payload = {
+        Id_Usuario_Alta: idUsuario,
+        Fecha: new Date().toISOString().split('T')[0]
+      };
+
+      const planResponse = await axios.post(`${PUERTO}/planGeneral/agregarPlan/${idUsuario}`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (planResponse.data && planResponse.data.length > 0) {
+        // Update all modified meals
+        for (let i = 0; i < dias.length; i++) {
+          const dia = dias[i];
+          const planId = planResponse.data[0][`Id_Recetas_Dia`];
+
+          // Check and update each meal type
+          if (dia.Id_Desayuno) {
+            if (planResponse.data[0][`Id_Receta_Desayuno`] === null) {
+              await EditarReceta('Desayuno', planId, dia.Id_Desayuno);
+            } else {
+              await confirmarAccion('Desayuno', planId, dia.Id_Desayuno);
+            }
+          }
+          if (dia.Id_Comer) {
+            if (planResponse.data[0][`Id_Receta_Comida`] === null) {
+              await EditarReceta('Comida', planId, dia.Id_Comer);
+            } else {
+              await confirmarAccion('Comida', planId, dia.Id_Comer);
+            }
+          }
+          if (dia.Id_Cena) {
+            if (planResponse.data[0][`Id_Receta_Cena`] === null) {
+              await EditarReceta('Cena', planId, dia.Id_Cena);
+            } else {
+              await confirmarAccion('Cena', planId, dia.Id_Cena);
+            }
+          }
+        }
+
+        message.success("Plan guardado correctamente.");
+        onSubmit();
+        onClose();
+      } else {
+        // Create new plan if it doesn't exist
+        await CrearPlan(payload);
+        // Retry saving
+        await handleFinalSave();
+      }
+    } catch (error) {
+      console.error("Error al guardar el plan:", error);
+      message.error("No se pudo guardar el plan.");
+    }
+  };
+
+  const validarPlan = async (values: any) => {
     const payload = {
       Id_Usuario_Alta: idUsuario,
       Fecha: values.expirationDate
     };
     try {
-     response = await axios.post(`${PUERTO}/planGeneral/agregarPlan/${idUsuario}`, payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-    if (response.data && response.data.length > 0) {
-      console.log(response.data);
-    {/** 
-    Nuevo_Plan sirve para agregar una nueva receta en el plan
-    Tiene que validar si el plan ya existe
-        Si ya existe el plan, evalúa si la comida que eligió el usuario es nula o no
-            si es nula, le va a agregar la nueva receta a la comida que sea
-                EditarReceta()
-            si no es nula, le va a mandar un dialog que le dice que se va a editar la comida de ese plan
-                modalSeguro de que quiere editar la comida
-                EditarReceta()
-        Si no existe el plan, va a crear el plan y le va a agregar la nueva receta
-                Crear plan()
-                EditarReceta(),
-    */}
-      if (response.data[0][`Id_Receta_${tipoConsumo}`] === null) {
-        EditarReceta(tipoConsumo, response.data[0][`Id_Recetas_Dia`], selectedValue);
+      const response = await axios.post(`${PUERTO}/planGeneral/agregarPlan/${idUsuario}`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.data && response.data.length > 0) {
+        if (response.data[0][`Id_Receta_${tipoConsumo}`] === null) {
+          EditarReceta(tipoConsumo, response.data[0][`Id_Recetas_Dia`], selectedValue);
+        } else {
+          confirmarAccion(tipoConsumo, response.data[0][`Id_Recetas_Dia`], selectedValue);
+        }
       } else {
-        confirmarAccion(tipoConsumo, response.data[0][`Id_Recetas_Dia`], selectedValue);
+        CrearPlan(values);
+        validarPlan(values);
       }
-      
-    } else {
-      console.log("No hay plan");
-      CrearPlan(values);
-      validarPlan(values);
+    } catch (error) {
+      console.error("Error en ValidarPlan:", error);
+      message.error("No se pudo guardar el plan.");
     }
-  } catch (error) {
-    console.log(`error al hacer el post de ${PUERTO}/planGeneral/agregarPlan/${idUsuario}`);
-    console.error("Error en ValidarPlan:", error);
-    message.error("No se pudo guardar el plan.");
-  } 
-  }
+  };
 
-  const CrearPlan = async(values: any) => {
-    
+  const CrearPlan = async (values: any) => {
     const payload = {
       Id_Usuario_Alta: idUsuario,
-      Fecha: values.expirationDate
+      Fecha: values.expirationDate || new Date().toISOString().split('T')[0]
     };
-    let response;
-  try {
-    response = await axios.post(`${PUERTO}/planGeneral/${idUsuario}`, payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (response.status === 200) {
-      message.success("Plan creado correctamente.");
-      form.resetFields();
-      onSubmit();
-      onClose();
-    } else {
-      message.error("Error al crear el plan.");
+    try {
+      const response = await axios.post(`${PUERTO}/planGeneral/${idUsuario}`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.status === 200) {
+        message.success("Plan creado correctamente.");
+        form.resetFields();
+      } else {
+        message.error("Error al crear el plan.");
+      }
+    } catch (error) {
+      console.error("Error al crear el plan:", error);
+      message.error("Error al procesar la solicitud.");
     }
-  } catch (error) {
-    console.log(`Error al ejecutar post ${PUERTO}/planGeneral/${idUsuario}`);
-    console.error("Error al crear el plan:", error);
-    message.error("Error al procesar la solicitud.");
-  }}
+  };
 
-  const EditarReceta = async(comida: string, planId: number, idReceta: number | null) => {
-
+  const EditarReceta = async (comida: string, planId: number, idReceta: number | null) => {
     const payload = {
       Id_Recetas_Dia: planId,
       id_receta: idReceta,
       Id_Usuario_Alta: idUsuario
     };
-    let response;
-  try {
-    response = await axios.put(`${PUERTO}/editar${comida}/${planId}`, payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (response.status === 200) {
-      message.success("Receta editada correctamente.");
-      form.resetFields();
-      onSubmit();
-      onClose();
-    } else {
-      message.error("Error al editar la receta.");
+    try {
+      const response = await axios.put(`${PUERTO}/editar${comida}/${planId}`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.status === 200) {
+        message.success("Receta editada correctamente.");
+      } else {
+        message.error("Error al editar la receta.");
+      }
+    } catch (error) {
+      console.error("Error el editar el plan:", error);
+      message.error("Error al editar el plan.");
     }
-  } catch (error) {
-    console.log(`Error al ejecutar PUT ${PUERTO}/editar${comida}/${planId}`);
-    console.error("Error el editar el plan:", error);
-    message.error("Error al editar el plan.");
-  }}
-  
+  };
+
   const confirmarAccion = (comida: string, planId: number, idReceta: number | null) => {
-    Modal.confirm({
-      title: '¿Estás seguro de programar esa comida?',
-      content: 'Ya hay una comida programada para ese día.',
-      okText: 'Sí',
-      cancelText: 'No',
-      onOk: () => {
-        EditarReceta(comida, planId, idReceta);
-      },
-      onCancel: () => {
-      },
+    return new Promise<void>((resolve) => {
+      Modal.confirm({
+        title: '¿Estás seguro de programar esa comida?',
+        content: 'Ya hay una comida programada para ese día.',
+        okText: 'Sí',
+        cancelText: 'No',
+        onOk: async () => {
+          await EditarReceta(comida, planId, idReceta);
+          resolve();
+        },
+        onCancel: () => {
+          resolve();
+        },
+      });
+    });
+  };
+
+  const openEditModal = (index: number) => {
+    setCurrentDayIndex(index);
+    setEditModalVisible(true);
+    editForm.setFieldsValue({
+      desayuno: dias[index].Id_Desayuno,
+      comida: dias[index].Id_Comer,
+      cena: dias[index].Id_Cena,
     });
   };
 
@@ -281,69 +309,100 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
       }}
     >
       <Modal
-        title={ModoSelected}
-        visible={visible}
+        title="Plan Semanal de Menús"
+        open={visible}
         onCancel={onClose}
+        footer={[
+          <Button key="cancel" onClick={onClose}>
+            Cancelar
+          </Button>,
+          <Button key="save" type="primary" onClick={handleFinalSave}>
+            Guardar
+          </Button>,
+        ]}
+        width={800}
+      >
+        <Flex wrap="wrap" gap="middle" justify="center">
+          {dias.map((dia, index) => (
+            <Card
+              key={index}
+              title={diasSemana[index]}
+              style={{ width: 200, marginBottom: 16 }}
+              actions={[<Text onClick={() => openEditModal(index)}>Edit</Text>]}
+            >
+              <Flex vertical gap="small">
+                <Flex align="center" gap="small">
+                  <StarOutlined />
+                  <Text>{dia.Desayuno}</Text>
+                </Flex>
+                <Text type="secondary">Desayuno</Text>
+                <Flex align="center" gap="small">
+                  <StarOutlined />
+                  <Text>{dia.Comer}</Text>
+                </Flex>
+                <Text type="secondary">Comida</Text>
+                <Flex align="center" gap="small">
+                  <StarOutlined />
+                  <Text>{dia.Cena}</Text>
+                </Flex>
+                <Text type="secondary">Cena</Text>
+              </Flex>
+            </Card>
+          ))}
+        </Flex>
+      </Modal>
+
+      <Modal
+        title={`Editar ${currentDayIndex !== null ? diasSemana[currentDayIndex] : ''}`}
+        open={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
         footer={null}
       >
         <Form
           {...formItemLayout}
-          form={form}
+          form={editForm}
           style={{ maxWidth: 600 }}
-          onFinish={handleFinish}
+          onFinish={handleEditFinish}
         >
           <Form.Item
-            name="name"
-            label="Nombre"
-            rules={[{ required: true, message: 'Por favor, introduce el nombre de la receta' }]}
+            name="desayuno"
+            label="Desayuno"
+            rules={[{ required: false }]}
           >
             <Select
               showSearch
               placeholder="Buscar o escribir receta"
               options={filteredOptions}
-              value={selectedValue}
               onSearch={(value) => setSearchTerm(value)}
-              onChange={(value) => {
-                setSelectedValue(value); // Actualizar el valor seleccionado
-                const recetaSeleccionada = recetas.find(
-                  (receta) => receta.Id_Receta === value
-                );
-                if (recetaSeleccionada) {
-                  setSearchTerm(recetaSeleccionada.Nombre); // Actualizar el término de búsqueda para que refleje el nombre
-                }
-              }}
               filterOption={false}
             />
           </Form.Item>
 
           <Form.Item
-            name="type"
-            label="Tipo"
-            rules={[{ required: true, message: 'Por favor, selecciona el tipo de alimento' }]}
+            name="comida"
+            label="Comida"
+            rules={[{ required: false }]}
           >
             <Select
-              placeholder="Seleccione un tipo"
-              value={tipoConsumo}
-              onChange={setTipoConsumo}
-              style={{ width: 200 }}
-            >
-              <Option key={0} value={"Desayuno"}>
-                {"Desayuno"}
-              </Option>
-              <Option key={1} value={"Comida"}>
-                {"Comida"}
-              </Option>
-              <Option key={2} value={"Cena"}>
-                {"Cena"}
-              </Option>
-            </Select>
+              showSearch
+              placeholder="Buscar o escribir receta"
+              options={filteredOptions}
+              onSearch={(value) => setSearchTerm(value)}
+              filterOption={false}
+            />
           </Form.Item>
 
-          <Form.Item name="expirationDate" label="Fecha de caducidad">
-            <DatePicker
-              style={{ width: '100%' }}
-              format="YYYY-MM-DD"
-              placeholder="Selecciona una fecha"
+          <Form.Item
+            name="cena"
+            label="Cena"
+            rules={[{ required: false }]}
+          >
+            <Select
+              showSearch
+              placeholder="Buscar o escribir receta"
+              options={filteredOptions}
+              onSearch={(value) => setSearchTerm(value)}
+              filterOption={false}
             />
           </Form.Item>
 

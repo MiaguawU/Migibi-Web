@@ -1,6 +1,8 @@
 Lista de tareas para el proyecto
 Iniciar Sesión
 - Recuperar contraseña
+- Trigger para que el usuario nuevo pueda comer todos los alimentos
+- Trigger para que el nuevo alimento pueda ser comido por todos los usuarios
 
 Perfil
 - Arreglar el botón de cambiar la foto de perfil
@@ -16,6 +18,13 @@ Receta
 - Rule obligatorio el nombre de la receta para guardar
 - Cambiar orden a Número de paso
 
+Refri
+- IMPORTANTE. Funcionalidad para consumir alimentos
+- Comprobar uso del Perecedero de Stock_Detalle
+- Comprobar uso de %alimento% en el query
+
+Hoy, Plan, Lista de Compra
+- Arreglar problema de conversiones para la lista de Compra
 
 Dashboard
 - visitas
