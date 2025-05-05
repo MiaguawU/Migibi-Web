@@ -1,9 +1,10 @@
 export const formatoFechaLegible = (fechaSQL: string): string => {
-    const fecha = new Date(fechaSQL); // Convertir la cadena SQL a un objeto Date
+    const FechaR = fechaSQL.slice(0, 19);
+    const fecha = new Date(FechaR); // Convertir la cadena SQL a un objeto Date
   
     // Obtener los elementos de la fecha
     const diasSemana = [
-      "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", 
+       "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", 
     ];
     const meses = [
       "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", 
@@ -15,7 +16,7 @@ export const formatoFechaLegible = (fechaSQL: string): string => {
     const mes = meses[fecha.getMonth()]; // Mes (0-11)
     const año = fecha.getFullYear(); // Año
   
-    return `${diaSemana} ${dia} de ${mes} de ${año}`;
+    return `${diaSemana} ${dia} de ${mes} del ${año}`;
   };
   
   // Ejemplo de uso

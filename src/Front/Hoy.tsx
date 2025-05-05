@@ -330,23 +330,23 @@ export default function Inicio() {
           </div>
         ))}
         <PlanEditar
-              visible= {isEditarOpen}
-              onClose={() => setIsEditarOpen(false)}
-              planId={diaSelected}
-              comida={comidaSelected}
-              onSubmit={datosRecetasSemana}
+              visible = {isEditarOpen}
+              onClose = {() => setIsEditarOpen(false)}
+              planId = {diaSelected}
+              comida = {comidaSelected}
+              onSubmit = {datosRecetasSemana}
             />
         <PlanAgregar
-              visible= {isAgregarOpen}
-              onClose={() => setIsAgregarOpen(false)}
-              onSubmit={datosRecetasSemana}
+              visible = {isAgregarOpen}
+              onClose = {() => setIsAgregarOpen(false)}
+              onSubmit = {datosRecetasSemana}
             />
         <PlanCrearPlan
-              visible= {isCrearOpen}
-              ModoSelected={modoSelected}
-              PlanSelected={Plan.PlanSemanal}
-              onClose={() => setIsCrearOpen(false)}
-              onSubmit={datosRecetasSemana}
+              visible = {isCrearOpen}
+              ModoSelected = {modoSelected}
+              PlanSelected = {Plan.PlanHoy}
+              onClose = {() => setIsCrearOpen(false)}
+              onSubmit = {datosRecetasSemana}
             />
       </div>
     </ConfigProvider>

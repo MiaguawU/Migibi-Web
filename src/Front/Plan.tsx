@@ -28,10 +28,12 @@ interface CardData {
   image: string;
   editar: boolean;
 }
+
 interface comidaSemana {
   comida: string;
   recetas: CardData[];
 }
+
 interface semanaData {
   id: number;
   fecha: string; 
@@ -57,8 +59,14 @@ const Inicio = () => {
   ];
   const datosRecetasSemana = async () => {
     setLoading(true);
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+    const idUsuario = Number(currentUser);
     try {
-      const response = await axios.get(`${PUERTO}/planGeneral`);
+      const response = await axios.get(`${PUERTO}/planGeneral/${idUsuario}`);
   
       if (response.data) {
         const semanaData: semanaData[] = response.data.map((registro: any) => ({

@@ -39,7 +39,7 @@ router.put("/:Id_Recetas_Dia", (req, res) => {
       SET Id_Receta_Desayuno = ?, Id_Usuario_Modif = ?, Fecha_Modif = NOW()
       WHERE Id_Recetas_Dia = ?
     `;
-  
+    console.log(query);
     db.query(query, [id_receta, Id_Usuario_Alta, Id_Recetas_Dia], (err, result) => {
       if (err) {
         

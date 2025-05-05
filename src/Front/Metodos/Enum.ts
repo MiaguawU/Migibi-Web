@@ -1,9 +1,9 @@
 export enum Modo {
-    PlanEstricto = 'Plan Estricto',
-    PlanRellenar = 'Plan Rellenar',
+    PlanEstricto = 'Estricto',
+    PlanRellenar = 'Rellenar',
 }
 
 export enum Plan {
-    PlanHoy,
-    PlanSemanal,
+    PlanHoy = 'Hoy',
+    PlanSemanal = 'Semanal',
 }

@@ -37,6 +37,7 @@ const rol = require("./base/rol");
 const registro = require("./base/Registro");
 const recuperar = require("./base/Recuperar_Contrasena");
 const rateLimit = require("express-rate-limit");
+const planes = require("./base/Planes");
 
 
 dotenv.config();
@@ -202,6 +203,8 @@ app.use("/editarCena", recetas_diaCena);
 
 //Hoy
 app.use("/hoyGeneral", hoyGeneral);
+
+app.use("/planes", planes);
 
 app.disable('etag'); 
 

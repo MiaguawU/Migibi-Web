@@ -126,8 +126,13 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
 
   const validarPlan = async(values: any, reintento = false) => {
     let response;
-    const idUsuario = Number(localStorage.getItem("currentUser"));
-      
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+    const idUsuario = Number(currentUser);
+
     const payload = {
       Id_Usuario_Alta: idUsuario,
       Fecha: values.expirationDate

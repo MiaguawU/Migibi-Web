@@ -15,6 +15,7 @@ const UserProfile: React.FC = () => {
     Cohabitantes: '',
     Email: '',
     FileImagen: null as File | null,
+    Contrasenia: ''
   });
 
   const [loading, setLoading] = useState(true);
@@ -160,7 +161,7 @@ const UserProfile: React.FC = () => {
                 objectFit: "cover",
               }} src={formData.foto_perfil || btPerfil} alt="Perfil" onError={(e) => e.currentTarget.src = btPerfil} className="profile-image" />
             <Upload {...uploadProps}>
-              <Button className="btUp" icon={<UploadOutlined />} />
+              <Button className="edit-button" icon={<UploadOutlined style={{fontSize: '22px'}}/>} />
             </Upload>
           </div>
         </div>
@@ -176,13 +177,20 @@ const UserProfile: React.FC = () => {
             <div className="info-card">
               <span>Cantidad de personas que viven conmigo:</span>
               <NumericInput
-              style={{ width: 50, textAlign: "center" }}
-              value={formData.Cohabitantes}
-              onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
-            />
-
+                style={{ width: 50, textAlign: "center" }}
+                value={formData.Cohabitantes}
+                onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
+              />
             </div>
           </div>
+          
+          <div className="info-card-contrasenia">
+              <span>Cambiar Contraseña:</span>
+              <Input
+              value={formData.Contrasenia} 
+              onChange={(e) => setFormData({ ...formData, Contrasenia: e.target.value })} 
+              style={{ padding: '0px 0px',  textAlign: 'center',  width: 'min-content' }} />
+            </div>
         </div>
       </div>
     </ConfigProvider>
