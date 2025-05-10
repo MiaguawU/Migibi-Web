@@ -3,12 +3,17 @@ import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProv
 import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
+import Pregunta from './EsPerecedero';
 
 const { Option } = Select;
 
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
+}
+interface FormModalProps2 {
+  visible1: boolean;
+  onClose1: () => void;
 }
 
 interface Tipo {
@@ -49,20 +54,11 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);  
   const [Unidades, setUnidad] = useState<Unidad[]>([]); 
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [productoGuardado, setProductoGuardado] = useState<number | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPerecederoModalOpen, setIsPerecederoModalOpen] = useState(false);
 
-  const props: UploadProps = {
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image/'); // Verifica que sea cualquier tipo de imagen
-      if (!isImage) {
-        message.error(`${file.name} no es un archivo de imagen válido`);
-      }
-      return isImage || Upload.LIST_IGNORE;
-    },
-    onChange: (info) => {
-      console.log(info.fileList);
-    },
-  };
-  
 
   useEffect(() => {
     if (visible) {
@@ -79,6 +75,20 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       message.error("No se pudieron cargar los tipos.");
     }
   };
+
+  const handleConfirm = async (isPerecedero: boolean) => {
+    setIsModalVisible(false);
+    const values = form.getFieldsValue();
+    values.expirationDate = isPerecedero ? values.expirationDate : null;
+    
+    if (isPerecedero) {
+    } else {
+      
+    }
+
+    onClose();
+  };
+
   const obtenerUnidad = async () => {
     try {
       const response = await axios.get(`${PUERTO}/unidad`);
@@ -87,6 +97,34 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       message.error("No se pudieron cargar las unidades.");
     }
   };
+
+  const enviar = ()=> {
+    setIsPerecederoModalOpen(true);
+  }
+
+  const pregunta = (isPerecedero: boolean) => {
+    setIsPerecederoModalOpen(false);
+    //si no tiene fecha de caducidad pedir el dato con una advertencia, cerrar modal es perecedero 
+    //dejar agregar abiefecha == ''rto y de nuevo todo
+    if (!form.getFieldValue("expirationDate")){
+      message.warning("No hay fecha de caducidad");
+    }
+
+    else {
+      form.submit();
+    }
+   
+  };
+
+  const preguntaNO = (isPerecedero: boolean) => {
+    setIsPerecederoModalOpen(false);
+  
+    form.setFieldsValue({ expirationDate: null });  // Asegura que la fecha esté vacía
+    form.submit();
+  };
+  
+  
+
   const handleSubmit = async (values: any) => {
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
@@ -104,24 +142,24 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   
     const formData = new FormData();
     formData.append('nombre', values.name);
-    formData.append('fecha_caducidad', values.expirationDate || '');
-    formData.append('cantidad', values.quantity);
-    formData.append('id_unidad', values.unit);
     formData.append('tipo', values.type);
+    formData.append('id_unidad', values.unit);
+    formData.append('cantidad', values.quantity);
+    formData.append('fecha_caducidad', values.expirationDate || "");
     formData.append('Id_Usuario_Alta', currentUser);
   
     if (values.imgsrc && values.imgsrc.file) {
       formData.append('image', values.imgsrc.file.originFileObj);
-    } else { 
-      
     }
-    
   
     try {
       const response = await axios.post(`${PUERTO}/alimento`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       message.success('Producto agregado');
+  
+      setProductoGuardado(response.data.id); // Guarda el ID del producto agregado
+  
       form.resetFields();
     } catch (error) {
       console.error(error);
@@ -129,11 +167,12 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     }
   };
   
-
   const handleFinish = (values: any) => {
-    handleSubmit(values); // Llama a la función que maneja los datos
-    form.resetFields(); // Resetea el formulario después de enviar
+    handleSubmit(values);
   };
+  
+  
+  
 
   
 
@@ -164,7 +203,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
           {...formItemLayout}
           form={form}
           style={{ maxWidth: 600 }}
-          onFinish={handleFinish} // Se conecta al envío
+          onFinish={handleFinish}
         >
           <Form.Item
             name="name"
@@ -196,7 +235,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
               min={0}
               max={1000}
               step={0.01}
-              precision={2} // Dos decimales
+              precision={2}
             />
           </Form.Item>
 
@@ -234,22 +273,34 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
             </Upload>
           </Form.Item>
 
-
           <Form.Item
             wrapperCol={{
               xs: { span: 24 },
-              sm: { span: 24 }, // Ocupa todo el espacio
-              offset: 0, // Sin desplazamiento
+              sm: { span: 24 },
+              offset: 0,
             }}
           >
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" onClick={enviar} block>
               Guardar
             </Button>
           </Form.Item>
         </Form>
       </Modal>
-    </ConfigProvider>
-  );
-};
+      <Modal
+          title="¿Es perecedero?"
+          visible={isPerecederoModalOpen}
+          onCancel={() => setIsPerecederoModalOpen(false)}
+          footer={null}
+        >
+          <p>Confirma si el producto es perecedero.</p>
+          <Button type="primary" onClick={() => pregunta(true)}>
+            Sí
+          </Button>
+          <Button onClick={() => preguntaNO(false)}>No</Button>
+        </Modal>
+
+            </ConfigProvider>
+          );
+        };
 
 export default ProductModal;

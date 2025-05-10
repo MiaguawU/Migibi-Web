@@ -7,7 +7,7 @@ import btAg from "../../Img/btagregar.png";
 import InsModal from "./InstruccionModal";
 
 interface ProcedimientoProps {
-  recetaId: number; // ID de la receta
+  recetaId: number;
   onSubmit?: boolean;
   onReset?: boolean;
 }
@@ -104,7 +104,6 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Manejar el cambio en los checkboxes
   const handleCheckboxChange = (index: number) => {
     setItems((prevItems) =>
       prevItems.map((item, i) =>

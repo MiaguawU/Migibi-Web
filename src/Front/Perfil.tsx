@@ -18,74 +18,105 @@ const UserProfile: React.FC = () => {
 
   const logout = async () => {
     try {
-      // Obtener el token de autenticación
-      const token = localStorage.getItem("authToken");
-      
-      // Realizar la solicitud de cierre de sesión al backend
-      await axios.post(`${PUERTO}/logout`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      // Eliminar datos relacionados con la sesión en localStorage y sessionStorage
-      sessionStorage.removeItem("usuarios");
-      sessionStorage.removeItem("currentUser");
-      localStorage.removeItem("usuarios");
-      localStorage.removeItem("currentUser");
-      // Notificar al usuario del éxito
-      message.success("Sesión cerrada correctamente.");
-      
-      // Opcional: Redirigir al usuario a la página de inicio o login
-      window.location.href = "/acceder";
-    } catch (error) {
-      // Manejo de errores
-      console.error("Error al cerrar sesión:", error);
-      message.error("No se pudo cerrar la sesión. Inténtalo de nuevo más tarde.");
-    }
-  };
-  
+        // Obtener el token de autenticación
+        const token = localStorage.getItem("authToken");
+        console.log("Token en localStorage:", token);
 
-  const datosPerfil = async () => {
-    setLoading(true);
-    try {
-      const currentUser = localStorage.getItem("currentUser");
-      if (!currentUser) {
-        message.warning("No hay un usuario logueado actualmente.");
-        return;
-      }
+        if (!token) {
+            message.warning("No hay sesión activa.");
+            return;
+        }
 
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-      const user = usuarios[currentUser];
-
-      if (!user) {
-        message.warning("Usuario no encontrado en los datos locales.");
-        return;
-      }
-
-      const response = await axios.get(`${PUERTO}/usuarios`, {
-        params: { id_us: currentUser },
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.data.length > 0) {
-        const userData = response.data[0];
-        setFormData({
-          Nombre_Usuario: userData.Nombre_Usuario || "No info",
-          foto_perfil: userData.foto_perfil?.startsWith("http")
-            ? userData.foto_perfil 
-            : `${PUERTO}/${userData.foto_perfil}`, 
-          Cohabitantes: userData.Cohabitantes || "No info",
-          Email: userData.Email || "No info",
+        // Solicitud de cierre de sesión al backend
+        await axios.post(`${PUERTO}/logout/`, null, {
+            headers: { Authorization: `Bearer ${token}` },
         });
-      } else {
-        message.warning("No se encontró información del usuario.");
-      }
+
+        // 🗑️ Eliminar datos de sesión en localStorage y sessionStorage
+        localStorage.removeItem("authToken");
+        sessionStorage.clear();
+        localStorage.clear();
+
+        // ✅ Notificar al usuario
+        message.success("Sesión cerrada correctamente.");
+
+        // 🔄 Redirigir al usuario a la página de inicio o login
+        window.location.href = "/acceder";
     } catch (error) {
-      console.error("Error al obtener usuario:", error);
-      message.error("No se pudo conectar con el servidor.");
-    } finally {
-      setLoading(false);
+        console.error("Error al cerrar sesión:", error);
+        message.error("No se pudo cerrar la sesión. Inténtalo de nuevo.");
     }
-  };
+};
+
+  
+
+const datosPerfil = async () => {
+  setLoading(true);
+  try {
+    // ✅ Obtener el usuario desde localStorage
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+
+    // ✅ Convertir el usuario a un objeto
+    const user = JSON.parse(storedUser);
+
+    // ✅ Obtener el token de autenticación
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      message.warning("Sesión expirada. Inicia sesión nuevamente.");
+      return;
+    }
+
+    // ✅ Hacer la solicitud con el token en los headers
+    const response = await axios.get(`${PUERTO}/usuarios/`, {
+      params: { id_us: user.id }, // ✅ Enviar ID correcto
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` // ✅ Enviar token en la petición
+      }
+    });
+
+    // ✅ Verificar si la respuesta contiene datos
+    if (!response.data) {
+      message.warning("No se encontró información del usuario.");
+      return;
+    }
+
+    // ✅ Extraer datos de la respuesta
+    const userData = response.data;
+    
+    setFormData({
+      Nombre_Usuario: userData.Nombre_Usuario || "No info",
+      foto_perfil: userData.foto_perfil && userData.foto_perfil.startsWith("http")
+        ? userData.foto_perfil
+        : userData.foto_perfil 
+          ? `${PUERTO}/${userData.foto_perfil}`
+          : "/default-profile.png",  // ✅ Imagen por defecto si no hay foto
+      Cohabitantes: userData.Cohabitantes || "No info",
+      Email: userData.Email || "No info",
+    });
+
+  } catch (error: any) {
+    console.error("Error al obtener usuario:", error);
+
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 404) {
+        message.warning("Usuario no encontrado.");
+      } else {
+        message.error("No se pudo conectar con el servidor.");
+      }
+    } else {
+      message.error("Error inesperado.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   
   useEffect(() => {
     datosPerfil();
@@ -97,25 +128,63 @@ const UserProfile: React.FC = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const currentUser = localStorage.getItem("currentUser"); // Obtener el ID desde localStorage
-      if (!currentUser) {
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
         message.error("No hay un usuario logueado.");
         return;
       }
   
-      // El id debe ser el ID del usuario que está logueado (tomado de localStorage)
-      const userId = currentUser; // Asegúrate que esto es el id del usuario
+      const user = JSON.parse(storedUser);
+      const userId = user.id;
+      if (!userId) {
+        message.error("No se pudo obtener el ID del usuario.");
+        return;
+      }
   
-      // Aquí se manda el id junto con los datos del formulario
-      const response = await axios.put(`${PUERTO}/usuarios/${userId}`, formData, {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        message.error("Sesión expirada. Inicia sesión nuevamente.");
+        return;
+      }
+  
+      // Crear FormData
+      const formDataToSend = new FormData();
+  
+      // Si el nombre de usuario está definido, lo agregamos
+      if (formData.Nombre_Usuario) {
+        formDataToSend.append("Nombre_Usuario", formData.Nombre_Usuario);
+      }
+  
+      // Si hay cohabitantes, lo agregamos
+      if (formData.Cohabitantes) {
+        formDataToSend.append("Cohabitantes", formData.Cohabitantes);
+      }
+  
+      // Si hay email, lo agregamos
+      if (formData.Email) {
+        formDataToSend.append("Email", formData.Email);
+      }
+  
+      // Verificar si la imagen es un archivo antes de agregarla
+      if (formData.foto_perfil && typeof formData.foto_perfil !== "string") {
+        formDataToSend.append("foto_perfil", formData.foto_perfil);
+      }
+  
+      // ✅ Usar `Array.from` para iterar sobre `FormData`
+      Array.from(formDataToSend.entries()).forEach(([key, value]) => {
+        console.log(key, value);
+      });
+  
+      // Enviar la solicitud con los datos
+      const response = await axios.put(`${PUERTO}/usuarios/${userId}`, formDataToSend, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
         },
       });
   
       if (response.status === 200) {
         message.success("Cambios guardados correctamente.");
-        // Actualizar el estado local o hacer cualquier acción adicional si es necesario
       } else {
         message.error("No se pudieron guardar los cambios.");
       }
@@ -124,6 +193,8 @@ const UserProfile: React.FC = () => {
       message.error("Hubo un error al guardar los cambios.");
     }
   };
+  
+  
   
 
   return (

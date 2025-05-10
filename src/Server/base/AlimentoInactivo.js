@@ -12,13 +12,22 @@ router.put("/:id", (req, res) => {  // Se asume que el id se pasa como parámetr
 
     const query1 = `UPDATE cat_alimento SET Activo = 0 WHERE Id_Alimento = ?`;
 
+    const query = `UPDATE stock_detalle SET Activo = 0 WHERE Id_Alimento = ?`;
+
     db.query(query1, [id], (err, result1) => {  // Usamos un arreglo para pasar el parámetro correctamente
         if (err) {
           console.log(err);  // Registra el error en consola
           return res.status(500).send("Error al eliminar el alimento");
         }
-        res.json({ id, message: "Alimento eliminado con éxito" });
+        db.query(query, [id], (err2,result2)=>{
+          if (err2) {
+            console.log(err);  // Registra el error en consola
+            return res.status(500).send("Error al eliminar el alimento");
+          }
+          res.json({ id, message: "Alimento eliminado con éxito" });
         console.log("Alimento inactivo");
+        });
+        
     });
 });
 

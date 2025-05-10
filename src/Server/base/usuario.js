@@ -134,12 +134,11 @@ router.post("/", sanitizeInput, (req, res) => {
 
   const foto_perfil = `/imagenes/defaultPerfil.png`;
 
+
   const query = `
     INSERT INTO usuario (Nombre_Usuario, Contrasena, foto_perfil) 
     VALUES (?, ?, ?)
   `;
-  //al crear usuario se crea un stock y un recetario
-  //al crearse el recetario se le agrega las recetas default
   
   const values = [username, password, foto_perfil];
 

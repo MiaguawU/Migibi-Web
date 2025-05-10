@@ -123,6 +123,7 @@ export default function EDreceta() {
   };
 
   
+
   // Obtener datos de la receta
   const datosReceta = async () => {
     setLoading(true);
@@ -255,6 +256,7 @@ export default function EDreceta() {
     setenviarDatos((prev) => !prev); 
   };
   
+  
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
   
@@ -315,13 +317,17 @@ export default function EDreceta() {
             
             <div className='f1'>
               <div className='imgDiv'>
-                <img src={formData.Imagen || def} alt='Receta'/>
-                {/*style={{
-                  maxHeight: '400px',
-                  maxWidth: '300px',
-                  border: '1px solid #3E7E1E',
-                  borderRadius: '10px' 
-                }} de Isis*/}
+              <img
+                  src={formData.Imagen || def}
+                  alt="Receta"
+                  style={{
+                    maxHeight: '400px',
+                    maxWidth: '300px',
+                    border: '1px solid #3E7E1E',
+                    borderRadius: '10px',
+                  }}
+                />
+
                 <Upload {...uploadProps}>{/*...props de Nisa*/}
                   <Button className='btUp' icon={<UploadOutlined />}></Button>
                 </Upload>
@@ -405,10 +411,11 @@ export default function EDreceta() {
               </div>
               )}
               <div className='ing'>
-                <Ingredientes  recetaId={Number(id)} />
+                <Ingredientes  recetaId={Number(id)} onSubmit={enviarDatos} onReset={resetTrigger}/>
                 { (isMobile || isTablet) && (
                 <div className='proceso'>
-                  <Proceso  recetaId={Number(id)} />
+                  <Proceso recetaId={Number(id)} />
+
                 </div>
                 )}
               </div>
