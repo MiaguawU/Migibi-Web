@@ -1,22 +1,20 @@
 Lista de tareas para el proyecto
-Iniciar Sesión
-- Recuperar contraseña
-- Trigger para que el usuario nuevo pueda comer todos los alimentos
-- Trigger para que el nuevo alimento pueda ser comido por todos los usuarios
-
-Perfil
-- Arreglar el botón de cambiar la foto de perfil
-- Tipos de alimentos que no puedo comer:
-  - Buscador de alimentos
-  - Tabla de alimentos
-- Cambiar contraseña
-- Página de Formulario para la nueva contraseña
+Iniciar Sesión y Perfil
+  Para recargar la página
+      // Opcional: Redirigir al usuario a la página de inicio o login
+      window.location.href = "/acceder";
+      window.location.reload(); 
 
 Receta
 - Resaltar el nombre de la receta nueva
 - Botón de guardar en la receta
 - Rule obligatorio el nombre de la receta para guardar
-- Cambiar orden a Número de paso
+- Arreglar unidades en los ingredientes
+- Arreglar orden en las nuevas instrucciones
+- Revisar recetas
+- Arreglar Front
+  - Arreglar diseño en las instrucciones
+  - Arreglar diseño de ingredientes
 
 Refri
 - IMPORTANTE. Funcionalidad para consumir alimentos

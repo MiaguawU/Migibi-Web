@@ -38,6 +38,7 @@ const registro = require("./base/Registro");
 const recuperar = require("./base/Recuperar_Contrasena");
 const rateLimit = require("express-rate-limit");
 const planes = require("./base/Planes");
+const usuario_Alimento = require("./base/usuario_cat_alimento");
 
 
 dotenv.config();
@@ -117,6 +118,7 @@ app.use("/us_adm", usuario_adm);
 app.use("/rol", rol);
 app.use("/registro", registro);
 app.use("/password", recuperar);
+app.use("/usuario_cat_alimento", usuario_Alimento);
 
 // Ruta de autenticación con Google
 app.get(
@@ -182,7 +184,7 @@ app.use("/tipoC", tipo_consumo);
 app.use("/proceso", Procedimiento);
 app.use("/proED" , ProREAL);
 
-//modificar alimentos
+//modificar stock
 app.use("/alimento", alimento);
 app.use("/caducar", caducar);
 app.use("/alimentoInactivo", routerAlimentoInactivo);
@@ -200,10 +202,8 @@ app.use("/planGeneral", recetas_diaGeneral);
 app.use("/editarDesayuno", recetas_diaDesayuno);
 app.use("/editarComida", recetas_diaComida);
 app.use("/editarCena", recetas_diaCena);
-
 //Hoy
 app.use("/hoyGeneral", hoyGeneral);
-
 app.use("/planes", planes);
 
 app.disable('etag'); 

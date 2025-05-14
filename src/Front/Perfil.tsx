@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Input, ConfigProvider, message, Upload, Button } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import "./perfil.css";
 import NumericInput from "./Componentes/NumberInput";
 import type { UploadProps } from 'antd';
+import AlimentosNoComer from "./Componentes/AlimentosNoComer";
 import PUERTO from "../config";
 import axios from "axios";
 import btPerfil from "../Img/btPerfil.png";
 
 const UserProfile: React.FC = () => {
+  const [IsModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     Nombre_Usuario: '',
     foto_perfil: btPerfil,
     Cohabitantes: '',
     Email: '',
     FileImagen: null as File | null,
-    Contrasenia: ''
   });
 
   const [loading, setLoading] = useState(true);
@@ -131,7 +134,6 @@ const UserProfile: React.FC = () => {
       if (response.status === 200) {
         message.success("Perfil actualizado correctamente.");
         datosPerfil();
-          window.location.reload(); 
       } else {
         message.error("Error al actualizar el perfil.");
       }
@@ -145,13 +147,16 @@ const UserProfile: React.FC = () => {
   
 
   return (
+    <>
     <ConfigProvider theme={{ token: { fontFamily: "Jomhuria, Serif", fontSize: 35, colorText: "#8BA577" } }}>
       <div className="profile-container">
         <div className="logout-button-container">
           <button className="save-button" onClick={handleSaveChanges}>Guardar cambios</button>
           <button className="logout-button" onClick={logout}>Cerrar sesión</button>
         </div>
-
+      </div>
+      
+      <div className="profile-container">
         <div className="avatar-section">
           <div className="avatar">
             <img style={{
@@ -172,7 +177,7 @@ const UserProfile: React.FC = () => {
           <div className="info-cards">
             <div className="info-card">
               <span>Tipos de alimentos que no puedo comer:</span>
-              <button className="view-button">Ver</button>
+              <button className="view-button" onClick={() => setIsModalOpen(true)}>Ver</button>
             </div>
             <div className="info-card">
               <span>Cantidad de personas que viven conmigo:</span>
@@ -182,18 +187,22 @@ const UserProfile: React.FC = () => {
                 onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
               />
             </div>
-          </div>
-          
-          <div className="info-card-contrasenia">
+            <div className="info-card">
               <span>Cambiar Contraseña:</span>
-              <Input
-              value={formData.Contrasenia} 
-              onChange={(e) => setFormData({ ...formData, Contrasenia: e.target.value })} 
-              style={{ padding: '0px 0px',  textAlign: 'center',  width: 'min-content' }} />
+              <button className="view-button" onClick={() => navigate('/cambiarContrasenia')}>Ver</button>
             </div>
+          </div>
         </div>
       </div>
+      
     </ConfigProvider>
+    
+    <AlimentosNoComer
+      visible={IsModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      onSubmit={() => {}}
+    />
+    </>
   );
 };
 

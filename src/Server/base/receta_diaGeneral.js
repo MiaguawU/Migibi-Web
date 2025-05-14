@@ -160,7 +160,6 @@ router.get("/recetasHoy/:Id_Usuario_Alta", (req, res) => {
   console.log(query);
   // Ejecutar la consulta
   db.query(query, (err, result) => {
-   
     if (err) {
       console.error("Error al obtener plan:", err);
       return res.status(500).send("Error al obtener plan");

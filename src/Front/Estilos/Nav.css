@@ -12,6 +12,7 @@ label {
 
 /* Estilos del menú */
 .custom-menu {
+  width: 100%;
   background-color: #6E9A65;  /* Fondo verde oscuro */
   color: white;  /* Texto blanco */
   font-family: 'Jomhuria', serif;  /* Aplicar la fuente personalizada */
@@ -83,6 +84,11 @@ label {
 
 .mobile-menu {
   display: none;
+}
+
+.menu-links {
+  width: 100%;
+  background-color: #6E9A65;
 }
 /* Responsividad del menú para dispositivos pequeños */
 @media (max-width: 768px) {
