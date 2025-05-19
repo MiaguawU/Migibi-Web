@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
 import PorCaducar from './Componentes/PorCaducar';
-import ProductModal from './Componentes/ProductoRefriModal'; // Importa el modal separado
+import ProductModal from './Componentes/AlimentoAgregar';
 import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
-import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import ModalEd from './Componentes/AlimentoEditar';
-
+import ModalCon from './Componentes/AlimentoConsumir';
 const { Meta } = Card;
 
 interface CardData {
@@ -31,36 +31,7 @@ export default function Inicio() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [edAlimento, setEdAlimento] = useState<number | null>(null);
-  
-
-  const agregarAlimento = async () =>{
-    setLoading(true);
-    try {
-      const currentUser = localStorage.getItem("currentUser");
-      if (!currentUser) {
-        message.warning("No hay un usuario logueado actualmente.");
-        return;
-      }
-
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-      const user = usuarios[currentUser];
-
-      if (!user) {
-        message.warning("Usuario no encontrado en los datos locales.");
-        return;
-      }
-      const id_alta = currentUser
-      const response = await axios.get(`${PUERTO}/usuarios`, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-    } catch (error) {
-      console.error("Error al obtener usuario:", error);
-      message.error("No se pudo conectar con el servidor.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [conAlimento, setConAlimento] = useState<number | null>(null);
 
   const eliminarAlimento = async (id: number) => {
     try {
@@ -240,19 +211,24 @@ export default function Inicio() {
                   <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#86A071' }}>
                     {card.fecha}
                   </div>
-                  <Space size="small" style={{ marginTop: '10px' }}>
-                    <Tooltip title="Editar">
-                      <EditOutlined style={{ color: '#6F895A', fontSize: 20 }}  onClick={() => setEdAlimento(card.id)}/>
-                    </Tooltip>
-                    {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
-                      <Tooltip title="Advertencia">
-                        <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
+                  <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                    <Space size="small" style={{ marginTop: '10px' }}>
+                      <Tooltip title="Editar">
+                        <EditOutlined style={{ color: '#6F895A', fontSize: 20 }}  onClick={() => setEdAlimento(card.id)}/>
                       </Tooltip>
-                    )}
-                    <Tooltip title="Eliminar">
-                      <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
+                      {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
+                        <Tooltip title="Advertencia">
+                          <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
+                        </Tooltip>
+                      )}
+                      <Tooltip title="Eliminar">
+                        <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
+                      </Tooltip>
+                    </Space>
+                    <Tooltip title="Consumir">
+                      <MinusSquareOutlined  onClick={() => setConAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
                     </Tooltip>
-                  </Space>
+                  </div>
                 </span>
               </Card>
             ))}
@@ -270,7 +246,15 @@ export default function Inicio() {
                 setEdAlimento(null);
                 datosAlimento(); // Llamar para refrescar los datos después de editar
               }}
-              alimentoId={edAlimento}
+              stockId={edAlimento}
+            />
+            <ModalCon
+              visible={conAlimento !== null}
+              onClose={() => {
+                setConAlimento(null);
+                datosAlimento(); // Llamar para refrescar los datos después de editar
+              }}
+              alimentoId={conAlimento}
             />
           </div>
         </>

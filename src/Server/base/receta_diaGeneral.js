@@ -136,7 +136,6 @@ router.get("/recetasSemanal/:Id_Usuario_Alta", (req, res) => {
       console.error("Error al obtener plan:", err);
       return res.status(500).send("Error al obtener plan");
     }
-    console.log(result);
     res.json(result);
   });
 });

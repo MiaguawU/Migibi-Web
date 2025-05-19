@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, message } from 'antd';
 import axios from 'axios';
-import ProductModal from './Componentes/ProductoRefriModal'; // Importa el modal separado
+import ProductModal from './Componentes/AlimentoAgregar'; // Importa el modal separado
 import InsModal from './Componentes/InstruccionModal';
 
 const Usuarios: React.FC = () => {

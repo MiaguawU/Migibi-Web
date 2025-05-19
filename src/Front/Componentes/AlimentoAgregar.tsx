@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps } from 'antd';
-import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { Modal, Form, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps, Space } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
-import Pregunta from './EsPerecedero';
 
 const { Option } = Select;
 
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
-}
-interface FormModalProps2 {
-  visible1: boolean;
-  onClose1: () => void;
 }
 
 interface Tipo {
@@ -43,11 +38,23 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);  
   const [Unidades, setUnidad] = useState<Unidad[]>([]); 
-  const [isModalOpen, setIsModalOpen] = useState(false); 
-  const [productoGuardado, setProductoGuardado] = useState<number | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isPerecederoModalOpen, setIsPerecederoModalOpen] = useState(false);
+  const [alimentos, setAlimentos] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Para la búsqueda
+  const [esNuevo, setEsNuevo] = useState(false);
+  const [esPerecedero, setEsPerecedero] = useState<boolean | undefined>(undefined);
   const [imagen, setImagen] = useState<File | null>(null);
+  const [alimento, setAlimento] = useState<any | null>(null);
+  const [isPerecederoModalOpen, setIsPerecederoModalOpen] = useState(false);
+
+  const filteredOptions = alimentos
+    .filter((alimento) => 
+      typeof searchTerm === "string" ? 
+       alimento.Alimento.toLowerCase().includes(searchTerm.toLowerCase()) : () => {}
+    )
+    .map((alimento) => ({
+      value: alimento.Alimento,
+      label: alimento.Alimento,
+    }));
 
   const props: UploadProps = {
     beforeUpload: (file) => {
@@ -64,14 +71,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     },
   };
 
-
-  useEffect(() => {
-    if (visible) {
-      obtenerTipos();
-      obtenerUnidad();
-    }
-  }, [visible]);
-
   const obtenerTipos = async () => {
     try {
       const response = await axios.get(`${PUERTO}/tipoA`);
@@ -79,19 +78,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     } catch {
       message.error("No se pudieron cargar los tipos.");
     }
-  };
-
-  const handleConfirm = async (isPerecedero: boolean) => {
-    setIsModalVisible(false);
-    const values = form.getFieldsValue();
-    values.expirationDate = isPerecedero ? values.expirationDate : null;
-    
-    if (isPerecedero) {
-    } else {
-      
-    }
-
-    onClose();
   };
 
   const obtenerUnidad = async () => {
@@ -103,93 +89,101 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
     }
   };
 
-  const enviar = ()=> {
-    setIsPerecederoModalOpen(true);
-  }
+  const fetchAlimentos = async () => {
+    try {
+      const response = await axios.get(`${PUERTO}/cat_ali/nombres`);
+      const alimentosData = response.data;
+      setAlimentos(alimentosData);
+    } catch (error) {
+      message.error("Error al obtener los alimentos.");
+    }
+  };
+
+  useEffect(() => {
+    if (visible) {
+      obtenerTipos();
+      obtenerUnidad();
+      fetchAlimentos();
+    }
+  }, [visible]);
 
   const pregunta = (isPerecedero: boolean) => {
     setIsPerecederoModalOpen(false);
+    setEsPerecedero(true);
     //si no tiene fecha de caducidad pedir el dato con una advertencia, cerrar modal es perecedero 
     //dejar agregar abiefecha == ''rto y de nuevo todo
+    /** 
     if (!form.getFieldValue("expirationDate")){
       message.warning("No hay fecha de caducidad");
-    }
 
     else {
       form.submit();
     }
+    }*/
    
   };
 
   const preguntaNO = (isPerecedero: boolean) => {
     setIsPerecederoModalOpen(false);
-  
+    setEsPerecedero(false);
     form.setFieldsValue({ expirationDate: null });  // Asegura que la fecha esté vacía
-    form.submit();
+    //form.submit();
   };
   
-  
-
   const handleSubmit = async (values: any) => {
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
       message.warning("No hay un usuario logueado actualmente.");
       return;
     }
-  
-    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-    const user = usuarios[currentUser];
-  
-    if (!user) {
-      message.warning("Usuario no encontrado en los datos locales.");
-      return;
-    }
-  
+    const idUsuario = Number(currentUser);
+
     const formData = new FormData();
-    formData.append('nombre', values.name);
-    formData.append('tipo', values.type);
-    formData.append('id_unidad', values.unit);
-    formData.append('cantidad', values.quantity);
-    formData.append('fecha_caducidad', values.expirationDate || "");
-    formData.append('Id_Usuario_Alta', currentUser);
-  
-    if (imagen) {
-      formData.append('image', imagen);
-    }
-  
+    if (esNuevo) { formData.append('nombre', values.name); } else { formData.append('id_alimento', alimento? String(alimento.Id_Alimento) : '0'); }
+    if (esNuevo) { formData.append('tipo', String(values.type)); }
+    formData.append('id_unidad', String(values.unit)); // AntD Select retorna string, pero multer lo maneja como string
+    formData.append('cantidad', String(values.quantity));
+    if (esPerecedero) { formData.append('fecha_caducidad', values.expirationDate); }
+    formData.append('Id_Usuario_Alta', idUsuario.toString()); // Siempre enviar como string en formData
+    if (imagen) { formData.append('image', imagen); }
+
+    let query = "";
+    esNuevo ? query+= "nuevoAlimento" : query+= "alimento";
+    esPerecedero ? query+= "EsPerecedero" : query+= "NoPerecedero";
+    console.log(formData);
+    let response;
     try {
-      const response = await axios.post(`${PUERTO}/alimento`, formData, {
+      response = await axios.post(`${PUERTO}/alimento/${query}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       message.success('Producto agregado');
-  
-      setProductoGuardado(response.data.id); // Guarda el ID del producto agregado
   
       form.resetFields();
     } catch (error: any)  {
       console.error("Error en la solicitud:", error);
 
-    // Verificar si el backend envió un mensaje de error
-    if (error.response) {
-      if (error.response.data && error.response.data.error) {
-        message.error(error.response.data.error); // Muestra el mensaje de error del backend
+      // Verificar si el backend envió un mensaje de error
+      if (error.response) {
+        if (error.response.data && error.response.data.error) {
+          message.error(error.response.data.error); // Muestra el mensaje de error del backend
+        } else {
+          message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
+        }
       } else {
-        message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
-      }
-    } else {
-      message.error('Error de conexión con el servidor.');
-    }
-    }
+        message.error('Error de conexión con el servidor.');
+      }}
   };
   
   const handleFinish = (values: any) => {
     handleSubmit(values);
   };
-  
-  
-  
 
-  
+  const handleClose = () => {
+    onClose();
+    setEsNuevo(false);
+    setEsPerecedero(undefined);
+    form.resetFields();
+  };
 
   return (
     <ConfigProvider
@@ -211,7 +205,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       <Modal
         title="Agregar Producto"
         visible={visible}
-        onCancel={onClose}
+        onCancel={handleClose}
         footer={null} // Elimina los botones predeterminados del modal
       >
         <Form
@@ -222,19 +216,56 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
         >
           <Form.Item
             name="name"
-            label="Nombre"
-            rules={[{ required: true, message: 'Por favor, introduce el nombre' }]}
+            label="Alimento"
+            rules={[{ required: true, message: 'Por favor, introduce el nombre del alimento.' }]}
           >
-            <Input placeholder="Nombre alimento" />
-          </Form.Item>
+            <Select
+              mode="tags"
+              maxCount={1}
+              showSearch
+              placeholder="Buscar o escribir alimento"
+              options={filteredOptions}
+              value={searchTerm ? [searchTerm] : []}
+              onSearch={(value) => setSearchTerm(value)}
+              onChange={(value) => {
+                const newValue = Array.isArray(value) ? value[0] : value;
 
-          <Form.Item name="expirationDate" label="Fecha de caducidad">
+                setSearchTerm(newValue);
+                form.setFieldsValue({ name: newValue });
+
+                if (typeof newValue !== "string") return;
+
+                const alimentoSeleccionado = alimentos.find(
+                  (al) =>
+                    al.Alimento.toLowerCase().trim() === newValue.toLowerCase().trim()
+                );
+
+                if (alimentoSeleccionado) {
+                  console.log("Alimento existente:", alimentoSeleccionado);
+                  setAlimento(alimentoSeleccionado)
+                  setEsNuevo(false);
+                  setEsPerecedero(alimentoSeleccionado.Es_Perecedero === 1);
+                } else {
+                  setEsNuevo(true);
+                  setIsPerecederoModalOpen(true);
+                }
+              }}
+              filterOption={false}
+            />
+          </Form.Item>
+          
+        {esPerecedero && (
+          <Form.Item name="expirationDate" label="Fecha de caducidad" 
+          rules={[
+            {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
+            ]}>
             <DatePicker
               style={{ width: '100%' }}
               format="YYYY-MM-DD"
               placeholder="Selecciona una fecha"
             />
           </Form.Item>
+          )}
 
           <Form.Item
             name="quantity"
@@ -268,10 +299,11 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
             </Select>
           </Form.Item>
 
+        {esNuevo && (
           <Form.Item
             name="type"
             label="Tipo"
-            rules={[{ required: true, message: 'Por favor, selecciona el tipo de alimento' }]}
+            rules={[{ required: esNuevo, message: 'Por favor, selecciona el tipo de alimento' }]}
           >
             <Select placeholder="Selecciona el tipo de alimento">
               {Tipos.map((tipo) => (
@@ -281,6 +313,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
               ))}
             </Select>
           </Form.Item>
+        )}
 
           <Form.Item name="imgsrc" label="Imagen">
             <Upload listType="picture" maxCount={1} {...props}>
@@ -295,7 +328,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
               offset: 0,
             }}
           >
-            <Button type="primary" onClick={enviar} block>
+            <Button type="primary" htmlType="submit" block>
               Guardar
             </Button>
           </Form.Item>
@@ -308,14 +341,16 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
           footer={null}
         >
           <p>Confirma si el producto es perecedero.</p>
-          <Button type="primary" onClick={() => pregunta(true)}>
-            Sí
-          </Button>
-          <Button onClick={() => preguntaNO(false)}>No</Button>
+          <Space size="small">
+            <Button type="primary" onClick={() => pregunta(true)}>
+              Sí
+            </Button>
+            <Button onClick={() => preguntaNO(false)}>No</Button>
+          </Space>
         </Modal>
 
-            </ConfigProvider>
-          );
-        };
+    </ConfigProvider>
+  );
+};
 
 export default ProductModal;

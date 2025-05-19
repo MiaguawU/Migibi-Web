@@ -39,7 +39,7 @@ const verificarPermisos = (req, res, next) => {
 
 // Obtener nombres de recetas (GET)
 router.get("/nombres", (req, res) => {
-  const query = `SELECT Id_Alimento, Alimento, Activo FROM cat_alimento WHERE Activo = 1;`;
+  const query = `SELECT Id_Alimento, Alimento, Activo, Es_Perecedero FROM cat_alimento WHERE Activo = 1;`;
   db.query(query, (err, result) => {
     if (err) {
       console.error("Error al actualizar alimento:", err);

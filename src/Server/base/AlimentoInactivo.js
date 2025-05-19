@@ -10,7 +10,7 @@ router.put("/:id", (req, res) => {  // Se asume que el id se pasa como parámetr
   const { id } = req.params;  // Obtener el id de los parámetros de la URL
   console.log("id recibido:", id);
 
-  const query1 = `UPDATE stock_detalle SET Activo = 0 WHERE Id_Alimento = ?`;
+  const query1 = `UPDATE stock_detalle SET Activo = 0 WHERE Id_Stock_Detalle = ?`;
 
   db.query(query1, [id], (err, result1) => {  // Usamos un arreglo para pasar el parámetro correctamente
       if (err) {
