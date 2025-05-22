@@ -1,9 +1,6 @@
-Lista de tareas para el proyecto
-Iniciar Sesión y Perfil
-  Para recargar la página
-      // Opcional: Redirigir al usuario a la página de inicio o login
-      window.location.href = "/acceder";
-      window.location.reload(); 
+Funcionalidad de admin
+- Catálogos
+- Usuarios
 
 Receta
 - Puede editar debe considerar el rol del usuario en Recetas
@@ -16,6 +13,14 @@ Receta
 - Arreglar Front
   - Arreglar diseño en las instrucciones
   - Arreglar diseño de ingredientes
+
+
+Lista de tareas para el proyecto
+Iniciar Sesión y Perfil
+  Para recargar la página
+      // Opcional: Redirigir al usuario a la página de inicio o login
+      window.location.href = "/acceder";
+      window.location.reload(); 
 
 refri
 OP: avisar que va a cambiar la imagen
@@ -30,4 +35,3 @@ Dashboard
 - fuentes de tráfico
 
 SR&!TPc8qhaGoeM
-
