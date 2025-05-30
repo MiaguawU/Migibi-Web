@@ -82,7 +82,7 @@ function App() {
     const idUsuario = Number(currentUser);
     const acceso = currentUser && usuariosLocal[currentUser] ? true : false;
     setHasAccess(acceso);
-    setisAdmin(idUsuario === 1 && acceso);
+    setisAdmin(idUsuario === 2 && acceso);
   }, []);
 
   const onLogin = (userData: any) => {

@@ -1,0 +1,16 @@
+.todo {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.botones-div {
+    display: flex;
+    gap: 15px;
+}
+
+.tabla {
+    display: flex;
+}

@@ -500,13 +500,13 @@ INSERT INTO `recetas_dia` VALUES (1,'2024-06-01 19:26:57',5,2,4,1,2,'2024-05-31 
 UNLOCK TABLES;
 
 --
--- Table structure for table `roles`
+-- Table structure for table `rol`
 --
 
-DROP TABLE IF EXISTS `roles`;
+DROP TABLE IF EXISTS `cat_rol`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `roles` (
+CREATE TABLE `cat_rol` (
   `Id_Rol` int NOT NULL AUTO_INCREMENT,
   `Rol` varchar(250) NOT NULL,
   PRIMARY KEY (`Id_Rol`),
@@ -515,13 +515,13 @@ CREATE TABLE `roles` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `roles`
+-- Dumping data for table `cat_rol`
 --
 
-LOCK TABLES `roles` WRITE;
-/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (2,'Administrador'),(1,'Cliente'),(3,'Premium');
-/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+LOCK TABLES `cat_rol` WRITE;
+/*!40000 ALTER TABLE `cat_rol` DISABLE KEYS */;
+INSERT INTO `cat_rol` VALUES (2,'Administrador'),(1,'Cliente'),(3,'Premium');
+/*!40000 ALTER TABLE `cat_rol` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
