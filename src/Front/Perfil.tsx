@@ -158,7 +158,7 @@ const UserProfile: React.FC = () => {
                 width: "100px",
                 height: "100px",
                 objectFit: "cover",
-              }} src={formData.foto_perfil || btPerfil} alt="Perfil" onError={(e) => e.currentTarget.src = btPerfil} className="profile-image" />
+              }} src={formData.foto_perfil} alt="Perfil" onError={(e) => e.currentTarget.src = btPerfil} className="profile-image" />
             <Upload {...uploadProps}>
               <Button className="btUp" icon={<UploadOutlined />} />
             </Upload>
