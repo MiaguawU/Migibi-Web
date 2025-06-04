@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Checkbox, Button, Drawer, ConfigProvider, message } from "antd";
+import { Card, Checkbox, Button, Drawer, ConfigProvider, message, List } from "antd";
 import IngModal from "./IngredienteModal";
 import btAg from "../../Img/btagregar.png";
 import "../Estilos/ing.css";
@@ -126,14 +126,23 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
             </Button>
           }
           className="card-container"
-          bodyStyle={{ padding: "16px" }}
+          bodyStyle={{ padding: "0px" }}
         >
           {loading ? (
             <p>Cargando ingredientes...</p>
           ) : (
-            <div className="card-checkbox-container">
-              {items.map((item, index) => (
-                <div key={index} className="card-checkbox">
+            <div>
+            <List
+              itemLayout="horizontal"
+              dataSource={items}
+              className="card-checkbox-container"
+              style={{
+                maxHeight: 300, // Ajusta la altura máxima deseada
+                overflowY: 'auto',
+              }}
+              renderItem={(item: Item, index) => (
+                <List.Item className="card-checkbox" key={index}>
+                  
                   <Checkbox
                     checked={item.isChecked}
                     onChange={() => handleCheckboxChange(index)}
@@ -144,15 +153,29 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
                   <Button danger onClick={() => handleDelete(index)}>
                     Eliminar
                   </Button>
-                </div>
-              ))}
-              <Button className="btAg" onClick={() => setIsModalOpen(true)}>
-                <img className="img" src={btAg} alt="Agregar" />
-              </Button>
+
+                </List.Item>
+              )}
+            />
+            <Button className="btAg" onClick={() => setIsModalOpen(true)}>
+              <img className="img" src={btAg} alt="Agregar" />
+            </Button>
             </div>
           )}
         </Card>
-
+{/**
+ * 
+            <List
+              itemLayout="horizontal"
+              dataSource={items}
+              style= {{width: 300}}
+              renderItem={(item: Item, index) => (
+                <List.Item className="card-checkbox" key={index} actions={[<Button danger onClick={() => handleDelete(index)}>Eliminar</Button>]}>
+                  {item.name} {item.cantidad} {item.unidad}
+                </List.Item>
+              )}
+            />
+ */}
         <Drawer
           title="Ingredientes"
           placement="right"
@@ -174,6 +197,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
               </Button>
             </div>
           ))}
+          
         </Drawer>
       </ConfigProvider>
 

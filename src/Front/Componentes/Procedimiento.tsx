@@ -110,8 +110,12 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
         i === index ? { ...item, isChecked: !item.isChecked } : item
       )
     );
+    setItems((prevItems) =>
+      prevItems.map((item, i) =>
+        i === index ? { ...item, isChecked: !item.isChecked } : item
+      )
+    );
   };
-
 
   return (
     <>
@@ -181,7 +185,11 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
         </Drawer>
       </ConfigProvider>
 
-      <InsModal visible={isModalOpen} onClose={() => setIsModalOpen(false)} recetaId={recetaId} onSubmit={() => {}} />
+      <InsModal
+          visible={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          recetaId={recetaId}
+          onSubmit = {() => {}} />
 
     </>
   );

@@ -92,6 +92,7 @@
     border: solid #28a745 1px;
     font-family: "Jomhuria", serif;
     font-size: x-large;
+    gap: 10px
   }
   .user-title {
     margin-bottom: 20px;
@@ -119,7 +120,19 @@
     color: #8BA577
     
   }
-  
+  .info-card-contrasenia {
+    background-color: #C3DCA2;
+    border-radius: 8px;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    min-width: 150px;
+    border: solid #3E7E1E 1px;
+    color: #8BA577
+  }
   .view-button {
     background-color: #EEEEED;
     border: none;

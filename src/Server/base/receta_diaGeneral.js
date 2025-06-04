@@ -4,13 +4,16 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./connection');
 const Joi = require("joi");
-const { FechaSQL} = require("./FechaActual");
+const { FechaSQL, FechaActual1, semanaFormato, getCurrentWeekDates} = require("./FechaActual");
 const router = express.Router();
 
 // Esquema de validación con Joi
 const existePlanSchema = Joi.object({
   Id_Usuario_Alta: Joi.number().required(),
   Fecha: Joi.string().required(),
+});
+const Usuario = Joi.object({
+  Id_Usuario_Alta: Joi.number().required(),
 });
 
 // Crear un nuevo registro de recetas del día
@@ -48,7 +51,19 @@ if (error) {
 });
 
 // Obtener receta(s) (GET)
-router.get("/", (req, res) => {
+router.get("/:Id_Usuario_Alta", (req, res) => {
+
+  const { Id_Usuario_Alta } = req.params;
+    
+  // Validar entrada (fusionando params y body)
+  const { error } = Usuario.validate({
+    Id_Usuario_Alta: Number(Id_Usuario_Alta),
+  });
+
+  if (error) {
+    console.log("Error al validar:", error);
+    return res.status(400).json({ error: error.details[0].message });
+  }
 
   let query = `
 SELECT 
@@ -81,8 +96,8 @@ LEFT JOIN receta d ON rd.Id_Receta_Desayuno = d.Id_Receta
 LEFT JOIN receta c ON rd.Id_Receta_Comida = c.Id_Receta
 LEFT JOIN receta ce ON rd.Id_Receta_Cena = ce.Id_Receta
 WHERE 
-    WEEK(rd.Fecha) = WEEK(CURDATE()) AND YEAR(rd.Fecha) = YEAR(CURDATE());`;
-  
+    ${semanaFormato()} AND rd.Id_Usuario_Alta = ${Id_Usuario_Alta};`;
+  console.log(query);
   // Ejecutar la consulta
   db.query(query, (err, result) => {
    
@@ -91,6 +106,63 @@ WHERE
       return res.status(500).send("Error al obtener plan");
     }
     console.log("Este es el plan");
+    console.log(result);
+    res.json(result);
+  });
+});
+
+// Obtener receta(s) (GET)
+router.get("/recetasSemanal/:Id_Usuario_Alta", (req, res) => {
+
+  const { Id_Usuario_Alta } = req.params;
+    
+  // Validar entrada (fusionando params y body)
+  const { error } = Usuario.validate({
+    Id_Usuario_Alta: Number(Id_Usuario_Alta),
+  });
+
+  if (error) {
+    console.log("Error al validar:", error);
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  let query = `SELECT * FROM recetas_dia WHERE 
+    ${semanaFormato()} and Id_Usuario_Alta = ${Id_Usuario_Alta};`;
+  
+  // Ejecutar la consulta
+  db.query(query, (err, result) => {
+   
+    if (err) {
+      console.error("Error al obtener plan:", err);
+      return res.status(500).send("Error al obtener plan");
+    }
+    res.json(result);
+  });
+});
+
+// Obtener receta(s) (GET)
+router.get("/recetasHoy/:Id_Usuario_Alta", (req, res) => {
+
+  const { Id_Usuario_Alta } = req.params;
+    
+  // Validar entrada (fusionando params y body)
+  const { error } = Usuario.validate({
+    Id_Usuario_Alta: Number(Id_Usuario_Alta),
+  });
+
+  if (error) {
+    console.log("Error al validar:", error);
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  let query = `SELECT * FROM recetas_dia WHERE ${FechaActual1()} and Id_Usuario_Alta = ${Id_Usuario_Alta};`;
+  console.log(query);
+  // Ejecutar la consulta
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error("Error al obtener plan:", err);
+      return res.status(500).send("Error al obtener plan");
+    }
     console.log(result);
     res.json(result);
   });
@@ -138,5 +210,37 @@ if (error) {
     res.json(result);
   });
 });
+
+// Crear receta(s)
+router.post("/agregarPlanes/:Id_Usuario_Alta", (req, res) => {
+  const { Id_Usuario_Alta } = req.params;
+
+// Validar entrada (fusionando params y body)
+const { error } = Usuario.validate({
+  Id_Usuario_Alta: Number(Id_Usuario_Alta),
+});
+
+if (error) {
+  console.log("Error al validar:", error);
+  return res.status(400).json({ error: error.details[0].message });
+}
+
+const fechas = getCurrentWeekDates();
+const valores = fechas.map(fecha => `('${fecha}', ${Id_Usuario_Alta})`).join(', ');
+
+  let query = `INSERT IGNORE INTO recetas_dia (Fecha, Id_Usuario_Alta) VALUES ${valores};`;
+  // Ejecutar la consulta
+  console.log(query);
+  db.query(query, valores, (err, result) => {
+   
+    if (err) {
+      console.error("Error al crear planes:", err);
+      return res.status(500).send("Error al crear planes");
+    }
+    console.log(result);
+    res.json(result);
+  });
+});
+
 
 module.exports = router;

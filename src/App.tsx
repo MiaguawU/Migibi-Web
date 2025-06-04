@@ -8,26 +8,22 @@ import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
 import Inicio from './Front/Inicio';
 import Perfil from './Front/Perfil';
-import Caducar from './Front/Componentes/PorCaducar';
 import Conocenos from './Front/Conocenos';
 import Contactanos from './Front/contactanos';
 import Hoy from './Front/Hoy';
-import Plan1 from './Front/Plan1';
-import Plan2 from './Front/Plan2';
+import Plan from './Front/Plan';
 import Recetas from './Front/Recetas';
 import Refri from './Front/Refri';
 import EDreceta from './Front/EDreceta';
-import Acceder from './Front/Acceder';
 import VerR from './Front/VerReceta';
 import MainLayout from './Front/MainLayout';
-import Prueba from './Front/PruebaCam';
 import AuthForm from './Front/Componentes/AuthForm';
-import IngRecetaEditar from './Front/Componentes/IngredientesRecetaEditar';
-import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
-import InstruccionModal from './Front/Componentes/InstruccionModal';
-import Ingrediente from './Front/Componentes/IngredienteModal';
 import { useSession } from "./Front/hook/useSession";
 import RecetaVIS from "./Front/RecetaVis";
+import Usuarios from './Front/Usuarios';
+import Cat_Alimentos from './Front/Cat_Alimentos';
+import Catalogos from './Front/Catalogos';
+import CambiarContrasenia from './Front/CambiarContrasenia';
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -38,6 +34,16 @@ const mainItems: ItemType[] = [
   { label: <Link to="/plan" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Recetas</Link>, key: 'recetas' },
   { label: <Link to="/refri" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Refri</Link>, key: 'refri' },
+  { label: <Link to="/modal" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Modal</Link>, key: 'modal' },
+];
+
+const adminItems: ItemType[] = [
+  { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
+  { label: <Link to="/conocenos" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Conócenos</Link>, key: 'conocenos' },
+  { label: <Link to="/recetas" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Recetas</Link>, key: 'recetas' },
+  { label: <Link to="/usuarios" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Usuarios</Link>, key: 'usuarios' },
+  { label: <Link to="/cat_alimentos" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Alimentos</Link>, key: 'alimentos' },
+  { label: <Link to="/catalogos" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Catálogos</Link>, key: 'catalogos' },
   { label: <Link to="/modal" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Modal</Link>, key: 'modal' },
 ];
 
@@ -53,20 +59,31 @@ function App() {
   const { session, setSession, clearSession } = useSession<{ userId: number; name: string }>();
   const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isAdmin, setisAdmin] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+  const [menuKey, setMenuKey] = useState(0);
 
   useEffect(() => {
-    const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
-    const currentUser = localStorage.getItem("currentUser");
-
-    setHasAccess(currentUser && usuariosLocal[currentUser] ? true : false);
-
     const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    // Forzar re-render después de 100ms
+    setTimeout(() => setMenuKey(prev => prev + 1), 100);
+  }, []);
+
+  useEffect(() => {
+    const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
+    const currentUser = localStorage.getItem("currentUser");
+    const idUsuario = Number(currentUser);
+    const acceso = currentUser && usuariosLocal[currentUser] ? true : false;
+    setHasAccess(acceso);
+    setisAdmin(idUsuario === 2 && acceso);
+  }, []);
 
   const onLogin = (userData: any) => {
     localStorage.setItem("usuarios", JSON.stringify({ [userData.id]: userData }));
@@ -74,12 +91,35 @@ function App() {
     setHasAccess(true);
   };
   
+  const getMainItems = (isAdmin: boolean, hasAccess: boolean) => {
+    if (hasAccess) {
+      return isAdmin ? adminItems : mainItems;
+    }
+    return mainItems.slice(0, 2);
+  };
   
+  const getProfileItems = (hasAccess: boolean) => {
+    return hasAccess ? profileItem : accederItem;
+  };
 
   return (
     <MainLayout>
       <header>
-        {isMobile ? (
+        {!isMobile ? (
+          <div className="custom-menu">
+            <Menu
+              key={menuKey}
+              mode="horizontal"
+              items={getMainItems(isAdmin, hasAccess)}
+              className="menu-links"
+            />
+            <Menu
+              mode="horizontal"
+              items={getProfileItems(hasAccess)}
+              className="profile-link"
+            />
+          </div>
+        ) : (
           <div className="mobile-menu">
             <Button className="btA" onClick={() => setDrawerVisible(true)}>Menú</Button>
             <Drawer
@@ -88,21 +128,11 @@ function App() {
               onClose={() => setDrawerVisible(false)}
               visible={isDrawerVisible}
             >
-              <Menu mode="vertical" items={hasAccess ? [...mainItems, ...profileItem] : [...mainItems.slice(0, 3), ...accederItem]} />
+              <Menu mode="vertical" items={[
+              ...getMainItems(isAdmin, hasAccess),
+              ...getProfileItems(hasAccess)
+              ]} />
             </Drawer>
-          </div>
-        ) : (
-          <div className="custom-menu">
-            <Menu
-              mode="horizontal"
-              items={hasAccess ? mainItems : mainItems.slice(0, 2)}
-              className="menu-links"
-            />
-            <Menu
-              mode="horizontal"
-              items={hasAccess ? profileItem : accederItem}
-              className="profile-link"
-            />
           </div>
         )}
       </header>
@@ -113,15 +143,19 @@ function App() {
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/conocenos" element={<Conocenos />} />
           <Route path="/contactanos" element={<Contactanos />} />
-          <Route path="/hoy" element={<Plan2 />} />
-          <Route path="/plan" element={<Plan1 />} />
+          <Route path="/hoy" element={<Hoy />} />
+          <Route path="/plan" element={<Plan />} />
           <Route path="/recetas" element={<Recetas />} />
           <Route path="/refri" element={<Refri />} />
           <Route path="/edReceta" element={<EDreceta />} />
           <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} />
           <Route path="/verR" element={<VerR />} />
           <Route path="/modal" element={<Modal />} />
+          <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="/cat_alimentos" element={<Cat_Alimentos />} />
+          <Route path="/catalogos" element={<Catalogos />} />
           <Route path="/recetaVis" element={<RecetaVIS />} />
+          <Route path="/cambiarContrasenia" element={<CambiarContrasenia />} />
         </Routes>
       </main>
     </MainLayout>

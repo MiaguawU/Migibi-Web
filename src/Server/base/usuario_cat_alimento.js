@@ -10,8 +10,9 @@ const usuarioAlimentoSchema = Joi.object({
   puede_comer: Joi.boolean().required()
 });
 
-const puedeComerSchema = Joi.object({
-  puede_comer: Joi.boolean().required()
+const idAlimento = Joi.object({
+  Id_Usuario: Joi.number().integer().required(),
+  Id_Alimento: Joi.number().integer().required(),
 });
 
 const idSchema = Joi.object({
@@ -47,12 +48,13 @@ router.get("/", (req, res) => {
 });
 
 // Obtener las relaciones de un usuario específico (GET)
-router.get("/usuario/:id_usuario", (req, res) => {
-  const { error, value } = idSchema.validate(req.params);
-  if (error) return res.status(400).json({ error: error.details[0].message });
+router.get("/usuario/:id", (req, res) => {
+  const { error: idError, value: idValue } = idSchema.validate(req.params);
+  if (idError) return res.status(400).json({ error: idError.details[0].message });
 
-  const query = `SELECT * FROM usuario_cat_alimento WHERE Id_Usuario = ?`;
-  db.query(query, [value.id], (err, result) => {
+  const query = `SELECT * FROM usuario_cat_alimento WHERE Id_Usuario =  ${idValue.id}`;
+
+  db.query(query, (err, result) => {
     if (err) {
       console.error("Error al obtener las relaciones del usuario:", err);
       return res.status(500).send("Error al obtener las relaciones del usuario");
@@ -64,16 +66,24 @@ router.get("/usuario/:id_usuario", (req, res) => {
   });
 });
 
-// Actualizar la relación usuario-alimento (PUT)
-router.put("/:id", (req, res) => {
-  const { error: idError, value: idValue } = idSchema.validate(req.params);
-  if (idError) return res.status(400).json({ error: idError.details[0].message });
+// Puede_Comer = 0
+router.put("/agregar/:Id_Usuario", (req, res) => {
+  const { Id_Usuario } = req.params;
+  const { Id_Alimento } = req.body;
+  
+  // Validar entrada (fusionando params y body)
+  const { error } = idAlimento.validate({
+    Id_Usuario: Number(Id_Usuario),
+    Id_Alimento: Id_Alimento,
+  });
 
-  const { error, value } = puedeComerSchema.validate(req.body);
-  if (error) return res.status(400).json({ error: error.details[0].message });
+  if (error) {
+    console.log("Error al validar:", error);
+    return res.status(400).json({ error: error.details[0].message });
+  }
 
-  const query = `UPDATE usuario_cat_alimento SET Puede_Comer = ? WHERE Id_Usuario_Cat_Alimento = ?`;
-  db.query(query, [value.puede_comer, idValue.id], (err) => {
+  const query = `UPDATE usuario_cat_alimento SET Puede_Comer = 0 WHERE Id_Alimento = ${Id_Alimento} and Id_Usuario = ${Id_Usuario};`;
+  db.query(query, (err) => {
     if (err) {
       console.error("Error al actualizar la relación usuario-alimento:", err);
       return res.status(500).send("Error al actualizar la relación usuario-alimento");
@@ -82,18 +92,28 @@ router.put("/:id", (req, res) => {
   });
 });
 
-// Eliminar la relación usuario-alimento (DELETE)
-router.delete("/:id", (req, res) => {
-  const { error, value } = idSchema.validate(req.params);
-  if (error) return res.status(400).json({ error: error.details[0].message });
+// Puede_Comer = 1
+router.put("/borrar/:Id_Usuario", (req, res) => {
+  const { Id_Usuario } = req.params;
+  const { Id_Alimento } = req.body;
+  
+  // Validar entrada (fusionando params y body)
+  const { error } = idAlimento.validate({
+    Id_Usuario: Number(Id_Usuario),
+    Id_Alimento: Id_Alimento,
+  });
 
-  const query = `DELETE FROM usuario_cat_alimento WHERE Id_Usuario_Cat_Alimento = ?`;
-  db.query(query, [value.id], (err) => {
+  if (error) {
+    console.log("Error al validar:", error);
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  const query = `UPDATE usuario_cat_alimento SET Puede_Comer = 1 WHERE Id_Alimento = ${Id_Alimento} and Id_Usuario = ${Id_Usuario};`;
+  db.query(query, (err) => {
     if (err) {
-      console.error("Error al eliminar la relación usuario-alimento:", err);
-      return res.status(500).send("Error al eliminar la relación usuario-alimento");
+      console.error("Error al actualizar la relación usuario-alimento:", err);
+      return res.status(500).send("Error al actualizar la relación usuario-alimento");
     }
-    res.json({ message: "Relación usuario-alimento eliminada con éxito" });
+    res.json({ message: "Relación usuario-alimento actualizada con éxito" });
   });
 });
 

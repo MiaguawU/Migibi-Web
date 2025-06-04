@@ -1,10 +1,10 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const db = require("./connection");
-const Redis = require("ioredis");
+//const Redis = require("ioredis");
 
 const router = express.Router();
-const redis = new Redis(); // Asegúrate de tener Redis corriendo
+//const redis = new Redis(); // Asegúrate de tener Redis corriendo
 
 // Middleware para analizar cuerpos de solicitudes con datos JSON
 router.use(express.json());
@@ -14,6 +14,7 @@ const MAX_ATTEMPTS = 5; // Número máximo de intentos antes de bloquear
 const BLOCK_TIME = 15 * 60; // Tiempo de bloqueo en segundos (15 minutos)
 
 // Función para verificar si el usuario está bloqueado
+{/**
 async function isBlocked(identifier) {
   const blocked = await redis.get(`blocked:${identifier}`);
   return blocked !== null;
@@ -38,6 +39,8 @@ async function resetAttempts(identifier) {
   await redis.del(`attempts:${identifier}`);
 }
 
+*/}
+
 router.post("/", async (req, res) => {
   const { identifier, password } = req.body; // "identifier" puede ser email o username
 
@@ -46,9 +49,11 @@ router.post("/", async (req, res) => {
   }
 
   // Verificar si el usuario está bloqueado
+  {/* 
   if (await isBlocked(identifier)) {
     return res.status(403).send("Cuenta bloqueada temporalmente. Intenta más tarde.");
   }
+    */}
 
   let query = identifier.includes("@") 
     ? "SELECT * FROM usuario WHERE Email = ?" 
@@ -61,7 +66,7 @@ router.post("/", async (req, res) => {
     }
 
     if (result.length === 0) {
-      await registerFailedAttempt(identifier); // Registrar intento fallido
+      //await registerFailedAttempt(identifier); // Registrar intento fallido
       return res.status(404).send("Usuario no encontrado");
     }
 
@@ -71,12 +76,12 @@ router.post("/", async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.Contrasena);
 
     if (!passwordMatch) {
-      await registerFailedAttempt(identifier); // Registrar intento fallido
+      //await registerFailedAttempt(identifier); // Registrar intento fallido
       return res.status(401).send("Contraseña incorrecta");
     }
 
     // Restablecer intentos fallidos si el inicio de sesión es exitoso
-    await resetAttempts(identifier);
+    //await resetAttempts(identifier);
 
     res.json({
       id: user.Id_Usuario,

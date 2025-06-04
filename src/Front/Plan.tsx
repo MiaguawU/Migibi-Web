@@ -1,12 +1,13 @@
 import React, { useState, useEffect} from "react";
-import { Card, ConfigProvider, message, Button } from 'antd'; 
-
+import { Card, ConfigProvider, message, Button, Popconfirm  } from 'antd'; 
+import { Modo, Plan } from './Metodos/Enum';
 import axios from "axios";
 import PUERTO from "../config";
 import "./perfil.css";
 import {formatoFechaLegible} from "./Metodos/FormatoFecha";
 import PlanEditar from "./Componentes/PlanEditar";
 import PlanAgregar from "./Componentes/PlanAgregar";
+import PlanCrearPlan from "./Componentes/PlanCrearPlan";
 //import {FormatoSQL} from "./Metodos/FormatoSQL";
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
@@ -25,11 +26,14 @@ interface CardData {
   calories: string;
   time: string;
   image: string;
+  editar: boolean;
 }
+
 interface comidaSemana {
   comida: string;
   recetas: CardData[];
 }
+
 interface semanaData {
   id: number;
   fecha: string; 
@@ -41,9 +45,11 @@ const Inicio = () => {
   const [loading, setLoading] = useState(true);  
   const [weekIndex, setWeekIndex] = useState(0);
   const [isEditarOpen, setIsEditarOpen] = useState(false); // Estado del modal
+  const [isCrearOpen, setIsCrearOpen] = useState(false); // Estado del modal
   const [isAgregarOpen, setIsAgregarOpen] = useState(false); // Estado del modal
   const [diaSelected, setdiaSelected] = useState(0);
   const [comidaSelected, setcomidaSelected] = useState("");
+  const [modoSelected, setmodoSelected] = useState<Modo>(Modo.PlanRellenar);
 
   const weeks = [
     "Semana del 1 al 7 de noviembre",
@@ -53,8 +59,14 @@ const Inicio = () => {
   ];
   const datosRecetasSemana = async () => {
     setLoading(true);
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+    const idUsuario = Number(currentUser);
     try {
-      const response = await axios.get(`${PUERTO}/planGeneral`);
+      const response = await axios.get(`${PUERTO}/planGeneral/${idUsuario}`);
   
       if (response.data) {
         const semanaData: semanaData[] = response.data.map((registro: any) => ({
@@ -74,6 +86,7 @@ const Inicio = () => {
                       image: registro.Imagen_Desayuno
                         ? `${PUERTO}${registro.Imagen_Desayuno}`
                         : "defRec.png",
+                      editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -91,6 +104,7 @@ const Inicio = () => {
                       image: registro.Imagen_Comida
                         ? `${PUERTO}${registro.Imagen_Comida}`
                         : "defRec.png",
+                        editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -108,6 +122,7 @@ const Inicio = () => {
                       image: registro.Imagen_Cena
                         ? `${PUERTO}${registro.Imagen_Cena}`
                         : "defRec.png",
+                      editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -206,13 +221,36 @@ const Inicio = () => {
                 colorPrimary: '#00b96b',
                 borderRadius: 10,
                 colorBgContainer: '#CAE2B5',
-              }}}>
+              },
+              components: {
+                Popconfirm: {
+                  fontSize: 25,
+                  borderRadius: 5,
+                  marginXS: 10
+                },
+              },
+              }}>
               <Button
                 key={`AgregarNuevoPlan`}
                 style={{height: "40px", margin: '10px', marginTop: '5px',}}
                 onClick={() => {setIsAgregarOpen(true);}}>
                 Agregar receta
               </Button>
+              <Popconfirm
+                title="Elegir modo"
+                style={{fontSize: 25}}
+                description="¿Quieres usar solo lo que tienes?"
+                onConfirm={() => {setmodoSelected(Modo.PlanEstricto);setIsCrearOpen(true);}}
+                onCancel={() => {setmodoSelected(Modo.PlanRellenar);setIsCrearOpen(true);}}
+                okText="Sí"
+                cancelText="No, dame un plan completo."
+              >
+                <Button
+                  key={`CrearNuevoPlan`}
+                  style={{height: "40px", margin: '10px', marginTop: '5px',}}>
+                  Crear Plan
+                </Button>
+              </Popconfirm>
               </ConfigProvider>
               {/**
                * 
@@ -261,6 +299,7 @@ const Inicio = () => {
                           calories={card.calories}
                           time={card.time}
                           image={card.image}
+                          editar={card.editar}
                           onEdit={() => handleEdit(dia.id, comida.comida)}
                           onDelete={() => handleDelete(dia.id, comida.comida)}
                         />
@@ -311,6 +350,13 @@ const Inicio = () => {
         <PlanAgregar
               visible= {isAgregarOpen}
               onClose={() => setIsAgregarOpen(false)}
+              onSubmit={datosRecetasSemana}
+            />
+        <PlanCrearPlan
+              visible= {isCrearOpen}
+              ModoSelected={modoSelected}
+              PlanSelected={Plan.PlanSemanal}
+              onClose={() => setIsCrearOpen(false)}
               onSubmit={datosRecetasSemana}
             />
       </div>

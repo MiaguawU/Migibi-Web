@@ -1,0 +1,37 @@
+Funcionalidad de admin
+- Catálogos
+- Usuarios
+
+Receta
+- Puede editar debe considerar el rol del usuario en Recetas
+- Resaltar el nombre de la receta nueva
+- Botón de guardar en la receta
+- Rule obligatorio el nombre de la receta para guardar
+- Arreglar unidades en los ingredientes
+- Arreglar orden en las nuevas instrucciones
+- Revisar recetas
+- Arreglar Front
+  - Arreglar diseño en las instrucciones
+  - Arreglar diseño de ingredientes
+
+
+Lista de tareas para el proyecto
+Iniciar Sesión y Perfil
+  Para recargar la página
+      // Opcional: Redirigir al usuario a la página de inicio o login
+      window.location.href = "/acceder";
+      window.location.reload(); 
+
+refri
+OP: avisar que va a cambiar la imagen
+
+Hoy, Plan, Lista de Compra
+- Arreglar problema de conversiones para la lista de Compra
+
+Dashboard
+- visitas
+- páginas de entrada
+- tasa de rebote
+- fuentes de tráfico
+
+SR&!TPc8qhaGoeM

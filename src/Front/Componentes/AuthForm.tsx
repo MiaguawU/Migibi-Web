@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Input, Button, Radio, Typography, ConfigProvider, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import axios from 'axios';
@@ -12,6 +13,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const navigate = useNavigate();
 
   const handleModeChange = (e: any) => {
     setFormMode(e.target.value);
@@ -65,7 +67,7 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
       localStorage.setItem("currentUser", id);
       message.success(`Bienvenido, ${username}. ${serverMessage}`);
       onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
-  
+      window.location.href = "/";
     } catch (error: unknown) {
       console.error('Error al iniciar sesión:', error);
       
@@ -139,7 +141,15 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
         },
       }}
     >
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}>
+      {formMode === 'login' && (
+        <div className="profile-container">
+          <div className="logout-button-container">
+            <button className="logout-button" onClick={() => navigate('/cambiarContrasenia')}>Recuperar contraseña</button>
+          </div>
+        </div>
+      )}
+      <div style={{ display: "flex", justifyContent: "center", margin: "50px" }}>
+          
         <Card
           style={{
             width: '80vw',

@@ -48,13 +48,13 @@ const upload = multer({
 
 // Esquema de validación con Joi
 const unidadMedidaSchema = Joi.object({
-  unidad_medida: Joi.string().min(1).max(50).required(),
+  nombre: Joi.string().min(1).max(50).required(),
   abreviatura: Joi.string().min(1).max(10).required(),
   id_usuario_alta: Joi.number().integer().required()
 });
 
 const unidadMedidaUpdateSchema = Joi.object({
-  unidad_medida: Joi.string().min(1).max(50).required(),
+  nombre: Joi.string().min(1).max(50).required(),
   abreviatura: Joi.string().min(1).max(10).required(),
   id_usuario_modif: Joi.number().integer().required()
 });
@@ -67,7 +67,7 @@ router.post("/", (req, res) => {
   const { error } = unidadMedidaSchema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
-  const { unidad_medida, abreviatura, id_usuario_alta } = req.body;
+  const { nombre, abreviatura, id_usuario_alta } = req.body;
   verificarPermisos(id_usuario_alta, res, () => {
     const fecha_alta = new Date();
     const query = `INSERT INTO cat_unidad_medida (Unidad_Medida, Abreviatura, Id_Usuario_Alta, Fecha_Alta) VALUES (?, ?, ?, ?)`;
@@ -90,11 +90,11 @@ router.put("/:id", (req, res) => {
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { id } = req.params;
-  const { unidad_medida, abreviatura, id_usuario_modif } = req.body;
-  verificarPermisos(id_usuario_modif, res, () => {
+  const { nombre, abreviatura, Id_Usuario } = req.body;
+  verificarPermisos(Id_Usuario, res, () => {
     const fecha_modif = new Date();
     const query = `UPDATE cat_unidad_medida SET Unidad_Medida = ?, Abreviatura = ?, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Unidad_Medida = ?`;
-    db.query(query, [unidad_medida, abreviatura, id_usuario_modif, fecha_modif, id], (err) => {
+    db.query(query, [nombre, abreviatura, Id_Usuario, fecha_modif, id], (err) => {
       if (err) return res.status(500).send("Error al actualizar unidad de medida");
       res.json({ message: "Unidad de medida actualizada con éxito" });
     });
@@ -106,15 +106,30 @@ router.delete("/:id", (req, res) => {
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { id } = req.params;
-  const { id_usuario_baja } = req.body;
-  verificarPermisos(id_usuario_baja, res, () => {
+  const { Id_Usuario } = req.body;
+  verificarPermisos(Id_Usuario, res, () => {
     const fecha_baja = new Date();
     const query = `UPDATE cat_unidad_medida SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? WHERE Id_Unidad_Medida = ?`;
-    db.query(query, [id_usuario_baja, fecha_baja, id], (err) => {
+    db.query(query, [Id_Usuario, fecha_baja, id], (err) => {
       if (err) return res.status(500).send("Error al eliminar unidad de medida");
       res.json({ message: "Unidad de medida eliminada con éxito" });
     });
   });
 });
 
+router.put("/activar/:id", (req, res) => {
+  const { error } = unidadMedidaDeleteSchema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  const { id } = req.params;
+  const { Id_Usuario } = req.body;
+  verificarPermisos(Id_Usuario, res, () => {
+    const fecha_baja = new Date();
+    const query = `UPDATE cat_unidad_medida SET Activo = 1, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Unidad_Medida = ?`;
+    db.query(query, [Id_Usuario, fecha_baja, id], (err) => {
+      if (err) return res.status(500).send("Error al activar unidad de medida");
+      res.json({ message: "Unidad de medida activada con éxito" });
+    });
+  });
+});
 module.exports = router;

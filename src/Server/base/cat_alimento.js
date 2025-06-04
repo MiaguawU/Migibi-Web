@@ -30,14 +30,24 @@ const verificarPermisos = (req, res, next) => {
       console.error("Error al evaluar permisos:", err);
       return res.status(500).send("Error al validar permisos");
     }
-
     if (result.length === 0 || result[0].Id_Rol == 1) {
       return res.status(403).send("Acceso prohibido: No tienes permiso para realizar esta acción");
     }
-
     next(); // Si pasa la validación, sigue con la siguiente función
   });
 };
+
+// Obtener nombres de recetas (GET)
+router.get("/nombres", (req, res) => {
+  const query = `SELECT Id_Alimento, Alimento, Activo, Es_Perecedero FROM cat_alimento WHERE Activo = 1;`;
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error("Error al actualizar alimento:", err);
+      return res.status(500).send("Error al actualizar alimento");
+    }
+    res.json(result);
+  });
+});
 
 // 📌 **Ruta para agregar un alimento**
 router.post("/", verificarPermisos, (req, res) => {
