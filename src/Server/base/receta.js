@@ -32,7 +32,7 @@ router.post("/:id", (req, res) => {
 
 // Obtener recetas (GET)
 router.get("/", (req, res) => {
-  const query = `SELECT Id_Receta, Nombre, Tiempo, Calorias, Imagen_receta, Id_Usuario_Alta, Activo FROM receta`;
+  const query = `SELECT Id_Receta, Nombre, Tiempo, Calorias, Imagen_receta, Id_Usuario_Alta, Activo, Porciones FROM receta`;
   db.query(query, (err, result) => {
     if (err) return res.status(500).send("Error al obtener recetas");
     res.json(result);

@@ -34,17 +34,25 @@ passport.use(
             const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             const lowercase = "abcdefghijklmnopqrstuvwxyz";
             const numbers = "0123456789";
+          
             function getRandomChar(set) {
               return set.charAt(Math.floor(Math.random() * set.length));
             }
+          
             let password = [
-              getRandomChar(uppercase), getRandomChar(uppercase),
-              getRandomChar(lowercase), getRandomChar(lowercase),
-              getRandomChar(numbers), getRandomChar(numbers),
-              getRandomChar(uppercase + lowercase + numbers)
+              getRandomChar(uppercase),    // 1
+              getRandomChar(uppercase),    // 2
+              getRandomChar(lowercase),    // 3
+              getRandomChar(lowercase),    // 4
+              getRandomChar(numbers),      // 5
+              getRandomChar(numbers),      // 6
+              getRandomChar(uppercase + lowercase + numbers), // 7
+              getRandomChar(uppercase + lowercase + numbers)  // 8
             ];
+          
             return password.sort(() => Math.random() - 0.5).join('');
           }
+          
 
           const contrasenaPredeterminada = generatePassword();
           const hashedPassword = await bcrypt.hash(contrasenaPredeterminada, 10);

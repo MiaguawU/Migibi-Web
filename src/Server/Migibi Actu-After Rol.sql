@@ -1,5 +1,5 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `migibi`;
+USE `migibi`; 
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: migibi
@@ -364,7 +364,7 @@ CREATE TABLE `receta` (
   `Tiempo` time NOT NULL,
   `Calorias` double NOT NULL,
   `Porciones` int NOT NULL DEFAULT '1',
-  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defIng.png',
+  `Imagen_receta` varchar(255) NOT NULL DEFAULT '/imagenes/defRec.png',
   `Es_Default` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`Id_Receta`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),

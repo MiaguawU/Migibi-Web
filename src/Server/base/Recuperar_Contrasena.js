@@ -6,8 +6,12 @@ const validator = require("validator");
 const xss = require("xss");
 const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
+const util = require("util");
+
 
 dotenv.config();
+
+const queryAsync = util.promisify(db.query).bind(db);
 
 const router = express.Router();
 
@@ -32,15 +36,49 @@ const sanitizeInput = (req, res, next) => {
 
 const front = process.env.FRONTEND_URL;
 
-router.post("/", sanitizeInput, (req, res) => {
-  const { email, username } = req.body;
+//actualizar contraseña
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
 
-  if (!email || !username) {
+  // Validación básica de longitud (puedes agregar más reglas si quieres)
+  if (newPassword.length < 8 || !/[A-Z]{2,}/.test(newPassword) || !/[a-z]{2,}/.test(newPassword) || !/[0-9]{2,}/.test(newPassword)) {
+    return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números" });
+  }
+
+  try {
+    // 🔒 Cifrar la contraseña con bcrypt
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const query = `
+      UPDATE usuario
+      SET Contrasena = ?
+      WHERE Id_Usuario = ?;
+    `;
+
+    const result = await queryAsync(query, [hashedPassword, id]);
+
+    if (result.affectedRows > 0) {
+      res.json({ message: "Contraseña actualizada correctamente" });
+    } else {
+      res.status(404).json({ error: "Usuario no encontrado" });
+    }
+  } catch (error) {
+    console.error("Error al actualizar contraseña:", error);
+    res.status(500).json({ error: "Error al actualizar la contraseña" });
+  }
+});
+
+
+router.post("/", sanitizeInput, (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
     return res.status(400).json({ message: "Debe proporcionar un correo o nombre de usuario" });
   }
 
-  let query = "SELECT Id_Usuario, Email FROM usuario WHERE Email = ? OR Nombre_Usuario = ?";
-  let values = [email, username];
+  let query = "SELECT Id_Usuario, Email FROM usuario WHERE Email = ? ";
+  let values = [email];
 
   db.query(query, values, (err, result) => {
     if (err) {

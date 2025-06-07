@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Input, ConfigProvider, Button, Card, Typography, message } from "antd";
-import { UploadOutlined } from '@ant-design/icons';
-import "./perfil.css";
-import PUERTO from "../config";
 import axios from "axios";
+import PUERTO from "../config";
+import "./perfil.css";
 
 const { Title } = Typography;
 
 const CambiarContrasenia: React.FC = () => {
-
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
   const validatePassword = (password: string): boolean => {
@@ -23,21 +21,50 @@ const CambiarContrasenia: React.FC = () => {
     );
   };
 
-  const registro = async () => {
-    if (!validatePassword(password)) return message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
-    if (password !== confirmPassword) return message.error("Las contraseñas no coinciden.");
-  
-    const data = { password };
-    console.log("📤 Enviando datos al servidor:", data);
-  /**Aquí se necesita el token */
+  const handleSubmit = async () => {
+    const currentUser = localStorage.getItem("currentUser");
+          if (!currentUser) {
+            message.warning("No hay un usuario logueado actualmente.");
+            return;
+          }
+      
+          const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+          const user = usuarios[currentUser];
+      
+          if (!user) {
+            message.warning("Usuario no encontrado en los datos locales.");
+            return;
+          }
+      
+          // Parsear el ID del usuario como número
+          const userId = parseInt(currentUser, 10);
+    
+          if (isNaN(userId)) {
+            message.error("ID de usuario inválido.");
+            return;
+          }
+
+    if (!userId) {
+      return message.error("No se ha encontrado el usuario. Inicia sesión nuevamente.");
+    }
+
+    if (!validatePassword(password)) {
+      return message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
+    }
+
+    if (password !== confirmPassword) {
+      return message.error("Las contraseñas no coinciden.");
+    }
+
     try {
-      const response = await axios.post(`${PUERTO}/password`, data, { headers: { "Content-Type": "application/json" } });
-      console.log("✅ Respuesta del servidor:", response.data);
-      message.success("Contraseña correctamente enviada");
-  
+      const response = await axios.put(`${PUERTO}/password/${userId}`, { newPassword: password }, {
+        headers: { "Content-Type": "application/json" }
+      });
+
+      message.success("Contraseña actualizada correctamente.");
+      setTimeout(() => navigate("/perfil"), 2000);
     } catch (error) {
-      console.error("❌ Error en registro():", error);
-  
+      console.error("❌ Error al actualizar contraseña:", error);
       if (axios.isAxiosError(error)) {
         const errorMsg = error.response?.data?.message || "Error al cambiar contraseña.";
         message.error(errorMsg);
@@ -45,11 +72,6 @@ const CambiarContrasenia: React.FC = () => {
         message.error("Error inesperado al cambiar contraseña.");
       }
     }
-  };
-
-  const handleSubmit = () => {
-    registro();
-    /**Aquí debe ingresar */
   };
 
   return (
@@ -74,7 +96,6 @@ const CambiarContrasenia: React.FC = () => {
           }}
           bodyStyle={{ padding: "16px" }}
         >
-
           <Title level={4} style={{ textAlign: "center", color: "#669144" }}>
             Cambiar contraseña
           </Title>
@@ -92,14 +113,14 @@ const CambiarContrasenia: React.FC = () => {
 
           <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
             Confirmar Contraseña
-            </Title>
+          </Title>
 
           <Input.Password
             placeholder="Confirmar Contraseña"
             style={{ marginBottom: "16px", borderRadius: "8px" }}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+          />
 
           <Button
             type="primary"
@@ -109,7 +130,7 @@ const CambiarContrasenia: React.FC = () => {
               backgroundColor: "#669144",
               borderColor: "#669144",
             }}
-            onClick={() => navigate('/cambiarContrasenia')}
+            onClick={handleSubmit}
           >
             Cambiar contraseña
           </Button>
