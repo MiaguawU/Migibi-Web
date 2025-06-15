@@ -131,8 +131,21 @@ export default function EDreceta() {
         message.warning("No se encontró el id de la receta.");
         return;
       }
+      const currentUser = localStorage.getItem("currentUser");
+                  if (!currentUser) {
+                    message.warning("No hay un usuario logueado actualmente.");
+                    setLoading(false);
+                    return;
+                  }
+              
+                  const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+                  if (isNaN(userId)) {
+                    message.error("ID de usuario inválido.");
+                    setLoading(false);
+                    return;
+                  }
   
-      const response = await axios.get(`${PUERTO}/recetaCRUD/${id}`, {
+      const response = await axios.get(`${PUERTO}/recetaCRUD/${id}/${userId}`, {
         headers: { "Content-Type": "application/json" },
       });
   
@@ -154,9 +167,24 @@ export default function EDreceta() {
       } else {
         message.warning("No se encontró información de la receta.");
       }
-    } catch (error) {
-      console.error("Error al obtener receta:", error);
-      message.error("No se pudo cargar la receta.");
+    } catch (error: any) {
+      console.error("Error al actualizar receta:", error);
+    
+      // Verifica si hay una respuesta del servidor
+      if (error.response) {
+        const { status, data } = error.response;
+    
+        if (data?.error) {
+          // Mostrar mensaje enviado por el servidor
+          message.error(data.error);
+        } else {
+          // Si no hay mensaje específico, mostrar código de error
+          message.error(`Error del servidor: ${status}`);
+        }
+      } else {
+        // Error sin respuesta del servidor (por ejemplo, red desconectada)
+        message.error("Error de red o el servidor no respondió.");
+      }
     } finally {
       setLoading(false);
     }
@@ -193,44 +221,6 @@ export default function EDreceta() {
     }
   };
 
- 
-  const actualizar = async () => {
-    try {
-      if (!id) {
-        message.warning("No se encontró el id de la receta.");
-        return;
-      }
-  
-      // Crear un nuevo FormData
-      const datosForm = new FormData();
-      datosForm.append("nombre", formData.Nombre || ""); // Asegúrate de que formData.Nombre exista
-      datosForm.append("tiempo", formData.Tiempo?.format("HH:mm:ss") || "");
-      datosForm.append("porciones", String(formData.Porciones));
-      datosForm.append("calorias", String(formData.Calorias));
-      datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
-      datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
-
-  
-      const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-  
-      if (response.status === 200) {
-        message.success("Receta actualizada correctamente.");
-        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
-      } else {
-        message.error("No se pudo actualizar la receta.");
-      }
-    } catch (error) {
-      console.error("Error al actualizar receta:", error);
-      message.error("Hubo un problema al enviar los datos.");
-    }
-  };
-  
-  
-
-  
-
   
   const { TextArea } = Input;
 
@@ -248,10 +238,6 @@ export default function EDreceta() {
     setResetTrigger((prev) => !prev); // Notificar a componentes dependientes
   };
   
-  const onSubmit = async () => {
-    await actualizar();
-    setenviarDatos((prev) => !prev); 
-  };
   
   
   
@@ -407,8 +393,7 @@ export default function EDreceta() {
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                  <Button htmlType="submit"  className='btEn' onClick={onSubmit}><p className='tx2'>Enviar</p></Button>
-                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+                 
                 </div>
               </div>
               )}

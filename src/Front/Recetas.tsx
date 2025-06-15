@@ -12,8 +12,8 @@ interface CardData {
   id: number;
   title: string;
   portions: string;
-  calories: string; 
-  time: string; 
+  calories: string;
+  time: string;
   editar: boolean;
   image: string;
   Activo: number;
@@ -26,92 +26,86 @@ const Recetas: React.FC = (): JSX.Element => {
   const [filteredRecipes, setFilteredRecipes] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
-
-
   const navigate = useNavigate();
 
   const datosReceta = async () => {
-    setLoading(true);
-    try {
-      // Obtener el usuario actual desde el localStorage
-      const currentUser = localStorage.getItem("currentUser");
-      if (!currentUser) {
-        message.warning("No hay un usuario logueado actualmente.");
-        setLoading(false);
-        return;
-      }
-  
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-      const user = usuarios[currentUser];
-  
-      if (!user) {
-        message.warning("Usuario no encontrado en los datos locales.");
-        setLoading(false);
-        return;
-      }
-  
-      // Parsear el ID del usuario como número
-      const userId = parseInt(currentUser, 10);
-      setUserId(userId); // <--- Esto es nuevo
-
-      if (isNaN(userId)) {
-        message.error("ID de usuario inválido.");
-        setLoading(false);
-        return;
-      }
-  
-      // Obtener recetas del servidor
-      const response = await axios.get(`${PUERTO}/recetaGeneral`);
-      if (response.data) {
-        // Filtrar recetas activas y que coincidan con el usuario o sean predeterminadas
-        const recData = response.data
-          .filter(
-            (receta: any) =>
-              receta.Activo > 0 && (receta.Id_Usuario_Alta === userId || receta.Id_Usuario_Alta === 1)
-          )
-          .map((receta: any) => {
-            {/**const isDefault = receta.Id_Usuario_Alta === 1;
-            const puedeEditar = !isDefault || userId === 1; */}
-            const puedeEditar = !receta.Es_Default || userId === 1;
-          
-            return {
-              id: receta.Id_Receta || ' ',
-              title: receta.Nombre || ' ',
-              portions: receta.Porciones || ' ',
-              calories: String(receta.Calorias || '0'),
-              time: String(receta.Tiempo || '0'),
-              image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
-              Activo: receta.Activo,
-              Id_Usuario_Alta: receta.Id_Usuario_Alta,
-              editar: puedeEditar
-            };
-          });
-          
-  
-        // Actualizar el estado con las recetas filtradas
-        setRecipes(recData);
-        console.log("Recetas obtenidas exitosamente");
-      }
-    } catch (error) {
-      console.error("Error al obtener recetas", error);
-      message.error("No se pudo conectar con el servidor o ID de usuario inválido.");
-    } finally {
-      setLoading(false); // Asegurar que el estado de carga se detenga
+  setLoading(true);
+  try {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      setLoading(false);
+      return;
     }
-  };
-  
-  
+
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+    const user = usuarios[currentUser];
+    const parsedUserId = parseInt(currentUser, 10);
+
+    if (!user || isNaN(parsedUserId)) {
+      message.warning("Usuario no encontrado o ID inválido.");
+      setLoading(false);
+      return;
+    }
+
+    setUserId(parsedUserId);
+
+    // 🔹 Obtener rol del usuario
+    const resUsuario = await axios.get(`${PUERTO}/usuarios/${parsedUserId}`);
+    const rol = resUsuario.data[0]?.Id_Rol;
+    const esAdmin = rol === 2;
+
+    // 🔹 Obtener todas las recetas
+    const resRecetas = await axios.get(`${PUERTO}/recetaGeneral`);
+    const todasLasRecetas = resRecetas.data || [];
+
+    const recData: CardData[] = todasLasRecetas
+      .filter((receta: any) => {
+        const activa = receta.Activo > 0;
+        const esDefault = receta.Id_Usuario_Alta === 1;
+        const creadaPorUsuario = receta.Id_Usuario_Alta === parsedUserId;
+
+        if (esAdmin) return activa;
+        return activa && (esDefault || creadaPorUsuario); // solo sus recetas o por defecto
+      })
+      .map((receta: any) => {
+        const creadaPorUsuario = receta.Id_Usuario_Alta === parsedUserId;
+        const puedeEditar = esAdmin || creadaPorUsuario;
+
+        return {
+          id: receta.Id_Receta || 0,
+          title: receta.Nombre || '',
+          portions: receta.Porciones || '',
+          calories: String(receta.Calorias || '0'),
+          time: String(receta.Tiempo || '0'),
+          image: receta.Imagen_receta ? `${PUERTO}${receta.Imagen_receta}` : 'defRec.png',
+          Activo: receta.Activo,
+          Id_Usuario_Alta: receta.Id_Usuario_Alta,
+          editar: puedeEditar
+        };
+      });
+
+    setRecipes(recData);
+  } catch (error) {
+    console.error("Error al obtener recetas:", error);
+    message.error("No se pudo conectar con el servidor.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const eliminarReceta = async (id: number) => {
     try {
       const response = await axios.put(`${PUERTO}/recetaGeneral/${id}`);
       if (response.status === 200) {
         message.success(`Receta eliminada exitosamente.`);
-        datosReceta(); 
+        datosReceta();
+      } else {
+        message.error("No se pudo eliminar la receta.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al eliminar receta:", error);
-      message.error("No se pudo eliminar la receta.");
+      message.error(error?.response?.data?.message || "No se pudo eliminar la receta.");
     }
   };
 
@@ -200,22 +194,19 @@ const Recetas: React.FC = (): JSX.Element => {
             padding: '16px',
           }}
         >
-          {//si es default y el usuario no es igual a 1, envia editar=false
-          }
           {filteredRecipes.map((card, index) => (
             <RecipeCard
-            id={card.id}
-            key={index}
-            title={card.title}
-            portions={card.portions}
-            calories={card.calories}
-            time={card.time}
-            image={card.image}
-            editar={card.editar} 
-            onEdit={() => handleEdit(card.id)}
-            onDelete={() => eliminarReceta(card.id)}
-          />
-          
+              id={card.id}
+              key={index}
+              title={card.title}
+              portions={card.portions}
+              calories={card.calories}
+              time={card.time}
+              image={card.image}
+              editar={card.editar}
+              onEdit={() => handleEdit(card.id)}
+              onDelete={() => eliminarReceta(card.id)}
+            />
           ))}
         </div>
       </div>

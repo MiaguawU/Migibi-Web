@@ -35,7 +35,21 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
 
   const datosInstrucciones = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/proceso/${recetaId}`);
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+                    
+      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(`${PUERTO}/proED/${recetaId}/${userId}`);
       const proceso = response.data
         .filter((instruccion: any) => instruccion.Activo > 0) // Filtro de instrucciones con Activo > 0
         .map((instruccion: any) => ({

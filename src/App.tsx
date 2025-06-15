@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Menu, Button, Drawer } from 'antd';
+import { Menu, Button, Drawer, message } from 'antd';
 import type { MenuProps } from 'antd';
 import './Front/Estilos/Nav.css';
+import PUERTO from './config';
+import axios from "axios";
 import Modal from './Front/Modal';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
@@ -76,13 +78,45 @@ function App() {
     setTimeout(() => setMenuKey(prev => prev + 1), 100);
   }, []);
 
+  const rol = async () => {
+  try {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) return;
+
+    const userId = Number(currentUser); // en vez de hacer JSON.parse
+    if (!userId || isNaN(userId)) {
+      console.warn("ID de usuario inválido:", userId);
+      return;
+    }
+
+    console.log("currentUser:", currentUser);
+console.log("userId:", userId);
+
+    const response = await axios.get(`${PUERTO}/usuarios/${userId}`);
+    
+    if (response.status === 200 && Array.isArray(response.data)) {
+  const Id_Rol = response.data[0]?.Id_Rol;
+  console.log("Rol recibido:", Id_Rol);
+  setisAdmin(Id_Rol === 2);
+}
+ else {
+      console.warn("No se pudo obtener el rol del usuario");
+    }
+  } catch (error) {
+    console.error("Error al obtener el rol del usuario:", error);
+  }
+};
+
+
+
+
   useEffect(() => {
     const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");
     const currentUser = localStorage.getItem("currentUser");
     const idUsuario = Number(currentUser);
     const acceso = currentUser && usuariosLocal[currentUser] ? true : false;
     setHasAccess(acceso);
-    setisAdmin(idUsuario === 2 && acceso);
+    rol();
   }, []);
 
   const onLogin = (userData: any) => {

@@ -93,7 +93,7 @@ const processUserData = async (userData: UserData) => {
 
 // Obtener datos del usuario desde la URL y procesarlos si existen
 const userData = getUserDataFromURL();
-if (Object.keys(userData).length > 0) {
+if (userData.id && userData.username && userData.email) {
   processUserData(userData);
 }
 

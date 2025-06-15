@@ -1,5 +1,6 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `migibi`; 
+
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: migibi
@@ -445,7 +446,7 @@ CREATE TABLE `receta_instrucciones` (
   `Id_Receta_Instrucciones` int NOT NULL AUTO_INCREMENT,
   `Id_Receta` int NOT NULL,
   `Instruccion` varchar(3000) NOT NULL,
-  `Orden` int NOT NULL,
+  `Orden` int NOT NULL auto_increment,
   `Activo` tinyint(1) NOT NULL DEFAULT (1),
   `Id_Usuario_Alta` int NOT NULL,
   `Fecha_Alta` datetime NOT NULL,
@@ -720,6 +721,57 @@ LOCK TABLES `usuario_receta` WRITE;
 /*!40000 ALTER TABLE `usuario_receta` DISABLE KEYS */;
 /*!40000 ALTER TABLE `usuario_receta` ENABLE KEYS */;
 UNLOCK TABLES;
+
+DELIMITER $$
+
+CREATE PROCEDURE eliminarRecetasBasura()
+BEGIN
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE tabla VARCHAR(255);
+  DECLARE cur CURSOR FOR
+    SELECT C.TABLE_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS C
+    JOIN INFORMATION_SCHEMA.TABLES T ON C.TABLE_NAME = T.TABLE_NAME AND C.TABLE_SCHEMA = T.TABLE_SCHEMA
+    WHERE C.COLUMN_NAME = 'Id_Receta'
+      AND C.TABLE_SCHEMA = 'migibi'
+      AND T.TABLE_TYPE = 'BASE TABLE'       -- Solo tablas reales
+      AND C.TABLE_NAME NOT LIKE 'vw_%';     -- Evita vistas que empiezan con 'vw_'
+
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  -- Obtener los ids de recetas basura
+  DROP TEMPORARY TABLE IF EXISTS ids_receta_basura;
+  CREATE TEMPORARY TABLE ids_receta_basura (
+    id_receta INT
+  );
+
+  INSERT INTO ids_receta_basura (id_receta)
+  SELECT id_receta FROM receta WHERE Nombre = 'Receta_nueva' AND Activo = 0;
+
+  OPEN cur;
+
+  leer_loop: LOOP
+    FETCH cur INTO tabla;
+    IF done THEN
+      LEAVE leer_loop;
+    END IF;
+
+    SET @sql = CONCAT('DELETE FROM ', tabla, ' WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura)');
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+  END LOOP;
+
+  CLOSE cur;
+
+  -- Eliminar de la tabla Receta al final
+  DELETE FROM receta
+  WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura);
+
+END$$
+
+DELIMITER ;
+
 
 --
 -- Temporary view structure for view `vw_cat_alimento`

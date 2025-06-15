@@ -29,45 +29,46 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: { name: string }) => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) {
-      message.warning("No hay un usuario logueado actualmente.");
-      return;
-    }
+  const currentUser = localStorage.getItem("currentUser");
+  if (!currentUser) {
+    message.warning("No hay un usuario logueado actualmente.");
+    return;
+  }
 
-    const data = {
-      orden: 0, // Se actualizará después con la respuesta
-      instruccion: values.name,
-      Id_Usuario_Alta: Number(currentUser),
-    };
-
-    try {
-      const response = await axios.post(`${PUERTO}/proED/${recetaId}`, data, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.status === 200) {
-        message.success("Instrucción agregada correctamente.");
-        form.resetFields();
-
-        const nuevaInstruccion: Item = {
-          id: response.data.id,
-          name: values.name,
-          isChecked: false,
-          Activo: 1,
-          orden: response.data.orden || 1,
-        };
-
-        onSubmit(nuevaInstruccion);
-        onClose();
-      } else {
-        message.error("Error al agregar la instrucción.");
-      }
-    } catch (error) {
-      console.error("Error en la solicitud:", error);
-      message.error("Error al procesar la solicitud. Intenta de nuevo.");
-    }
+  const data = {
+    instruccion: values.name,
+    Id_Usuario_Alta: Number(currentUser),
+    // Ya no se envía 'orden' desde el cliente
   };
+
+  try {
+    const response = await axios.post(`${PUERTO}/proED/${recetaId}`, data, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.status === 200) {
+      message.success("Instrucción agregada correctamente.");
+      form.resetFields();
+
+      const nuevaInstruccion: Item = {
+        id: response.data.id,
+        name: values.name,
+        isChecked: false,
+        Activo: 1,
+        orden: response.data.orden || 1, // Lo tomamos del backend
+      };
+
+      onSubmit(nuevaInstruccion);
+      onClose();
+    } else {
+      message.error("Error al agregar la instrucción.");
+    }
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+    message.error("Error al procesar la solicitud. Intenta de nuevo.");
+  }
+};
+
 
   return (
     <ConfigProvider

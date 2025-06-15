@@ -131,8 +131,21 @@ export default function EDreceta() {
         message.warning("No se encontró el id de la receta.");
         return;
       }
+      const currentUser = localStorage.getItem("currentUser");
+                  if (!currentUser) {
+                    message.warning("No hay un usuario logueado actualmente.");
+                    setLoading(false);
+                    return;
+                  }
+              
+                  const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+                  if (isNaN(userId)) {
+                    message.error("ID de usuario inválido.");
+                    setLoading(false);
+                    return;
+                  }
   
-      const response = await axios.get(`${PUERTO}/recetaCRUD/${id}`, {
+      const response = await axios.get(`${PUERTO}/recetaCRUD/ed/${id}/${userId}`, {
         headers: { "Content-Type": "application/json" },
       });
   
@@ -154,14 +167,28 @@ export default function EDreceta() {
       } else {
         message.warning("No se encontró información de la receta.");
       }
-    } catch (error) {
-      console.error("Error al obtener receta:", error);
-      message.error("No se pudo cargar la receta.");
+    } catch (error: any) {
+      console.error("Error al actualizar receta:", error);
+    
+      // Verifica si hay una respuesta del servidor
+      if (error.response) {
+        const { status, data } = error.response;
+    
+        if (data?.error) {
+          // Mostrar mensaje enviado por el servidor
+          message.error(data.error);
+        } else {
+          // Si no hay mensaje específico, mostrar código de error
+          message.error(`Error del servidor: ${status}`);
+        }
+      } else {
+        // Error sin respuesta del servidor (por ejemplo, red desconectada)
+        message.error("Error de red o el servidor no respondió.");
+      }
     } finally {
       setLoading(false);
     }
   };
-  
 
   // Inicialización del componente
   useEffect(() => {
@@ -200,6 +227,19 @@ export default function EDreceta() {
         message.warning("No se encontró el id de la receta.");
         return;
       }
+      const currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+              message.warning("No hay un usuario logueado actualmente.");
+              setLoading(false);
+              return;
+            }
+        
+            const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+            if (isNaN(userId)) {
+              message.error("ID de usuario inválido.");
+              setLoading(false);
+              return;
+            }
   
       // Crear un nuevo FormData
       const datosForm = new FormData();
@@ -209,29 +249,38 @@ export default function EDreceta() {
       datosForm.append("calorias", String(formData.Calorias));
       datosForm.append("id_tipo_consumo", String(formData.id_Tipo));
       datosForm.append("imagen", formData.FileImagen || ""); // Archivo de imagen
+      datosForm.append("id_usu", String(userId));
 
   
       const response = await axios.put(`${PUERTO}/recetaCRUD/${id}`, datosForm, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-  
-      if (response.status === 200) {
-        message.success("Receta actualizada correctamente.");
-        setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen })); // Actualizar estado inicial
-      } else {
-        message.error("No se pudo actualizar la receta.");
-      }
-    } catch (error) {
-      console.error("Error al actualizar receta:", error);
-      message.error("Hubo un problema al enviar los datos.");
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  message.success("Receta actualizada correctamente.");
+  setRecetaInicial((prev) => ({ ...prev, Imagen: formData.Imagen }));
+
+} catch (error: any) {
+  console.error("Error al actualizar receta:", error);
+
+  // Verifica si hay una respuesta del servidor
+  if (error.response) {
+    const { status, data } = error.response;
+
+    if (data?.error) {
+      // Mostrar mensaje enviado por el servidor
+      message.error(data.error);
+    } else {
+      // Si no hay mensaje específico, mostrar código de error
+      message.error(`Error del servidor: ${status}`);
     }
+  } else {
+    // Error sin respuesta del servidor (por ejemplo, red desconectada)
+    message.error("Error de red o el servidor no respondió.");
+  }
+}
+
   };
-  
-  
-
-  
-
-  
+    
   const { TextArea } = Input;
 
   const [value, setValue] = useState('');

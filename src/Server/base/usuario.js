@@ -86,6 +86,26 @@ router.get("/", (req, res) => {
   );
 });
 
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  if (!id || !validator.isNumeric(id)) {
+    console.log(id)
+    return res.status(400).send("El ID del usuario es requerido y debe ser numérico");
+  }
+  db.query(
+    "SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        console.error("Error al obtener usuario:", err);
+        return res.status(500).send("Error al obtener usuario");
+      }
+      console.log(result)
+      res.json(result);
+    }
+  );
+});
+
 router.put('/:id', upload.single('foto_perfil'), async (req, res) => {
   console.log('🔹 req.body:', req.body);
   console.log('🔹 req.file:', req.file || 'No se subió imagen');

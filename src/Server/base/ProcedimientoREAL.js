@@ -2,6 +2,10 @@ const express = require("express");
 const Joi = require("joi"); // Asegúrate de tener Joi instalado
 const db = require("./connection");
 const router = express.Router();
+const util = require("util");
+
+// Asincronizar consultas de la base de datos
+const queryAsync = util.promisify(db.query).bind(db);
 
 // Esquema de validación con Joi
 const instruccionSchema = Joi.object({
@@ -10,7 +14,7 @@ const instruccionSchema = Joi.object({
 
 // Crear una nueva instrucción de receta (POST)
 router.post("/:id", async (req, res) => {
-  const { id } = req.params; // Id de la receta
+  const { id } = req.params; // ID de la receta
   const { instruccion, Id_Usuario_Alta } = req.body;
 
   // Validar entrada
@@ -19,62 +23,117 @@ router.post("/:id", async (req, res) => {
     return res.status(400).json({ error: error.details[0].message });
   }
 
-  const query2 = `
-        SELECT 
-        ri.Instruccion AS Nombre,
-        ri.Orden AS Orden,
-        ri.Id_Receta_Instrucciones AS id,
-        ri.Activo AS Activo
-      FROM receta_instrucciones ri
-      WHERE ri.Id_Receta = ?
-      ORDER BY ri.Orden DESC
-      LIMIT 1;
-
-`;
-
   // Fecha actual
   const hoy = new Date();
   const Fecha_Alta = hoy.toISOString().slice(0, 19).replace("T", " ");
 
-  // Query SQL para insertar una nueva instrucción
-  const query = `
-    INSERT INTO receta_instrucciones (Id_Receta, Instruccion, Orden, Id_Usuario_Alta, Fecha_Alta)
-    VALUES (?, ?, ?, ?, ?)
-  `;
-  
+  try {
 
-  // Ejecutar la consulta
-  db.query(query2, [id], (err1, result1) => {
-    if (err1) {
-      console.error("Error en la consulta:", err1);
-      return res.status(500).json({ error: "Error en la consulta de orden" });
+    const recetaAutorRes = await queryAsync(
+      `SELECT Id_Usuario_Alta FROM receta WHERE Id_Receta = ?`,
+      [id]
+    );
+
+    if (recetaAutorRes.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
     }
-  
-    // Obtener el último número de orden
-    const orden = result1.length > 0 ? result1[0].Orden + 1 : 1; // Si no hay registros, empieza en 1
-  
-    const values = [id, instruccion, orden, Id_Usuario_Alta, Fecha_Alta];
-  
-    db.query(query, values, (err, result) => {
-      if (err) {
-        console.error("Error al insertar instrucción:", err);
-        return res.status(500).json({ error: "Error al agregar la instrucción" });
-      }
-      res.json({ id: result.insertId, message: "Instrucción agregada con éxito" });
+
+    const idAutor = recetaAutorRes[0].Id_Usuario_Alta;
+
+    // Obtener rol del usuario que intenta acceder
+    const usuarioRes = await queryAsync(
+      `SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`,
+      [Id_Usuario_Alta]
+    );
+
+    if (usuarioRes.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const rol = usuarioRes[0].Id_Rol;
+
+    // Verificar permisos:
+    const esAutor = parseInt(Id_Usuario_Alta) === idAutor;
+    const esAdmin = rol === 2;
+
+    if (!esAutor && !esAdmin ) {
+      console.log("Acceso denegado, sin permisos");
+      return res.status(403).json({ error: "Acceso denegado, sin permisos" });
+    }
+    // Obtener el último número de orden para esa receta
+    const queryOrden = `
+      SELECT Orden
+      FROM receta_instrucciones
+      WHERE Id_Receta = ?
+      ORDER BY Orden DESC
+      LIMIT 1
+    `;
+    const ordenResult = await queryAsync(queryOrden, [id]);
+    const nuevoOrden = ordenResult.length > 0 ? ordenResult[0].Orden + 1 : 1;
+
+    // Insertar la nueva instrucción
+    const insertQuery = `
+      INSERT INTO receta_instrucciones (Id_Receta, Instruccion, Orden, Id_Usuario_Alta, Fecha_Alta)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    const insertValues = [id, instruccion, nuevoOrden, Id_Usuario_Alta, Fecha_Alta];
+    const result = await queryAsync(insertQuery, insertValues);
+
+    res.json({
+      id: result.insertId,
+      orden: nuevoOrden,
+      message: "Instrucción agregada con éxito"
     });
-  });
-  
-  
-  
+
+  } catch (err) {
+    console.error("Error al insertar instrucción:", err);
+    res.status(500).json({ error: "Error interno al agregar la instrucción" });
+  }
 });
 
 
+
 // Obtener todas las instrucciones de una receta específica (GET)
-router.get("/:id", (req, res) => {
-  const { id } = req.params; // Cambiado a "id", que es lo que llega en la URL
-  
-  const query = `
-    SELECT 
+router.get("/:id/:id_usu", async (req, res) => {
+  const { id, id_usu } = req.params;
+
+  try {
+    // Obtener autor de la receta
+    const recetaAutorRes = await queryAsync(
+      `SELECT Id_Usuario_Alta FROM receta WHERE Id_Receta = ?`,
+      [id]
+    );
+
+    if (recetaAutorRes.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
+    }
+
+    const idAutor = recetaAutorRes[0].Id_Usuario_Alta;
+
+    // Obtener rol del usuario que intenta acceder
+    const usuarioRes = await queryAsync(
+      `SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`,
+      [id_usu]
+    );
+
+    if (usuarioRes.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const rol = usuarioRes[0].Id_Rol;
+
+    // Verificar permisos:
+    const esAutor = parseInt(id_usu) === idAutor;
+    const esAdmin = rol === 2;
+
+    if (!esAutor && !esAdmin) {
+      console.log("Acceso denegado, sin permisos");
+      return res.status(403).json({ error: "Acceso denegado, sin permisos" });
+    }
+
+    // Obtener datos de la receta
+    const query1 = `
+      SELECT 
       ri.Instruccion AS Nombre,
       ri.Orden AS Orden,
       ri.Id_Receta_Instrucciones AS id,
@@ -82,15 +141,20 @@ router.get("/:id", (req, res) => {
     FROM receta_instrucciones ri
     WHERE ri.Id_Receta = ?
     ORDER BY ri.Orden ASC;
-  `;
+    `;
 
-  db.query(query, [id], (err, results) => {
-      if (err) {
-          console.error("Error al obtener instrucciones de receta:", err);
-          return res.status(500).send("Error al obtener las instrucciones");
-      }
-      res.json(results);
-  });
+    const recetaInfo = await queryAsync(query1, [id]);
+
+    if (recetaInfo.length === 0) {
+      return res.status(404).json({ error: "Procedimiento no encontrado" });
+    }
+
+    res.json(recetaInfo);
+
+  } catch (err) {
+    console.error("Error al obtener procedimiento:", err);
+    res.status(500).send("Error al obtener procedimiento");
+  }
 });
 
 

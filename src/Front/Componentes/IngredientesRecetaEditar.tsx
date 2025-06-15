@@ -35,7 +35,20 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
   // Función para obtener los ingredientes de la receta
   const datosAlimento = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/ingredientes/${recetaId}`);
+      const currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+              message.warning("No hay un usuario logueado actualmente.");
+              setLoading(false);
+              return;
+            }
+                          
+            const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+            if (isNaN(userId)) {
+              message.error("ID de usuario inválido.");
+              setLoading(false);
+              return;
+            }
+      const response = await axios.get(`${PUERTO}/ingED/${recetaId}/${userId}`);
       const ingredientes = response.data
         .filter((ingrediente: any) => ingrediente.Activo > 0) // Filtro dinámico
         .map((ingrediente: any) => ({
@@ -48,9 +61,25 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
         }));
       setItems(ingredientes);
       setTempDeleted([]); // Reinicia los ingredientes eliminados temporalmente
-    } catch (error) {
-      console.error("Error al obtener ingredientes:", error);
-    } finally {
+    } catch (error: any) {
+          console.error("Error al actualizar receta:", error);
+        
+          // Verifica si hay una respuesta del servidor
+          if (error.response) {
+            const { status, data } = error.response;
+        
+            if (data?.error) {
+              // Mostrar mensaje enviado por el servidor
+              message.error(data.error);
+            } else {
+              // Si no hay mensaje específico, mostrar código de error
+              message.error(`Error del servidor: ${status}`);
+            }
+          } else {
+            // Error sin respuesta del servidor (por ejemplo, red desconectada)
+            message.error("Error de red o el servidor no respondió.");
+          }
+        } finally {
       setLoading(false);
     }
   };

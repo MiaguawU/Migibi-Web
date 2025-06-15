@@ -86,7 +86,7 @@ let tempDatabase = {};
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Máximo 100 solicitudes por IP
+  max: 10000, // Máximo 100 solicitudes por IP
   message: "Demasiadas solicitudes desde esta IP, intenta más tarde."
 });
 

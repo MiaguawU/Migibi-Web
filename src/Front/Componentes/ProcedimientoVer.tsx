@@ -35,7 +35,21 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
 
   const datosInstrucciones = async () => {
     try {
-      const response = await axios.get(`${PUERTO}/proceso/${recetaId}`);
+      const currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) {
+        message.warning("No hay un usuario logueado actualmente.");
+        setLoading(false);
+        return;
+      }
+                    
+      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+      if (isNaN(userId)) {
+        message.error("ID de usuario inválido.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(`${PUERTO}/proceso/${recetaId}/${userId}`);
       const proceso = response.data
         .filter((instruccion: any) => instruccion.Activo > 0) // Filtro de instrucciones con Activo > 0
         .map((instruccion: any) => ({
@@ -49,10 +63,25 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
       setTempDeleted([]);
       setTempAdded([]);
       console.log("Instrucciones obtenidas exitosamente.");
-    } catch (error) {
-      console.error("Error al obtener instrucciones:", error);
-      message.error("No se pudo conectar con el servidor.");
-    } finally {
+    } catch (error: any) {
+          console.error("Error al actualizar receta:", error);
+        
+          // Verifica si hay una respuesta del servidor
+          if (error.response) {
+            const { status, data } = error.response;
+        
+            if (data?.error) {
+              // Mostrar mensaje enviado por el servidor
+              message.error(data.error);
+            } else {
+              // Si no hay mensaje específico, mostrar código de error
+              message.error(`Error del servidor: ${status}`);
+            }
+          } else {
+            // Error sin respuesta del servidor (por ejemplo, red desconectada)
+            message.error("Error de red o el servidor no respondió.");
+          }
+        }finally {
       setLoading(false);
     }
   };

@@ -2,6 +2,10 @@ const express = require('express');
 const db = require('./connection');
 const router = express.Router();
 const Joi = require("joi");
+const util = require("util");
+
+// Asincronizar consultas de la base de datos
+const queryAsync = util.promisify(db.query).bind(db);
 
 // Esquema de validación con Joi
 const recetaInstruccionSchema = Joi.object({
@@ -44,12 +48,47 @@ router.post("/", (req, res) => {
 });
 
 // Obtener todas las instrucciones de una receta específica
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-  if (!/^\d+$/.test(id)) return res.status(400).send("ID inválido");
+router.get("/:id/:id_usu", async (req, res) => {
+  const { id, id_usu } = req.params;
 
-  const query = `
-    SELECT 
+  try {
+    // Obtener autor de la receta
+    const recetaAutorRes = await queryAsync(
+      `SELECT Id_Usuario_Alta FROM receta WHERE Id_Receta = ?`,
+      [id]
+    );
+
+    if (recetaAutorRes.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
+    }
+
+    const idAutor = recetaAutorRes[0].Id_Usuario_Alta;
+
+    // Obtener rol del usuario que intenta acceder
+    const usuarioRes = await queryAsync(
+      `SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`,
+      [id_usu]
+    );
+
+    if (usuarioRes.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const rol = usuarioRes[0].Id_Rol;
+
+    // Verificar permisos:
+    const esAutor = parseInt(id_usu) === idAutor;
+    const esAdmin = rol === 2;
+    const recetaEsPublica = idAutor === 1;
+
+    if (!esAutor && !esAdmin && !recetaEsPublica) {
+      console.log("Acceso denegado, sin permisos");
+      return res.status(403).json({ error: "Acceso denegado, sin permisos" });
+    }
+
+    // Obtener datos de la receta
+    const query1 = `
+      SELECT 
       ri.Instruccion AS Nombre,
       ri.Orden AS Orden,
       ri.Id_Receta_Instrucciones AS id,
@@ -57,16 +96,22 @@ router.get("/:id", (req, res) => {
     FROM receta_instrucciones ri
     WHERE ri.Id_Receta = ?
     ORDER BY ri.Orden ASC;
-  `;
+    `;
 
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error("Error al obtener instrucciones de receta:", err);
-      return res.status(500).send("Error al obtener las instrucciones");
+    const recetaInfo = await queryAsync(query1, [id]);
+
+    if (recetaInfo.length === 0) {
+      return res.status(404).json({ error: "Procedimiento no encontrado" });
     }
-    res.json(results);
-  });
+
+    res.json(recetaInfo);
+
+  } catch (err) {
+    console.error("Error al obtener procedimiento:", err);
+    res.status(500).send("Error al obtener procedimiento");
+  }
 });
+
 
 // Actualizar una instrucción de receta
 router.put("/:id", (req, res) => {

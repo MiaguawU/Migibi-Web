@@ -95,7 +95,6 @@ router.post("/", (req, res, next) => {
 });
 
 // Endpoint: Actualizar una receta
-// Endpoint: Actualizar una receta
 router.put("/:id", (req, res) => {
   upload.single("imagen")(req, res, async (err) => {
     if (err) {
@@ -104,40 +103,42 @@ router.put("/:id", (req, res) => {
     }
 
     const { id } = req.params;
-    const { nombre, id_tipo_consumo, tiempo, porciones, calorias } = req.body;
+    const { nombre, id_tipo_consumo, tiempo, porciones, calorias, id_usu } = req.body;
 
-    // Validar datos enviados por el cliente
-    const { error } = recetaSchema.validate({
-      nombre,
-      id_tipo_consumo,
-      tiempo,
-      calorias,
-      porciones,
-    });
-
+    // Validar datos
+    const { error } = recetaSchema.validate({ nombre, id_tipo_consumo, tiempo, calorias, porciones });
     if (error) {
       console.error("Error en la validación:", error.details[0].message);
       return res.status(400).json({ error: error.details[0].message });
     }
 
     try {
-      // Verificar si la receta existe y obtener su imagen actual
-      const selectQuery = `SELECT Imagen_receta FROM receta WHERE Id_Receta = ?`;
-      const [receta] = await new Promise((resolve, reject) =>
-        db.query(selectQuery, [id], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        })
-      );
-
-      if (!receta) {
+      // Obtener usuario que creó la receta
+      const recetaAutorRes = await queryAsync(`SELECT Id_Usuario_Alta FROM receta WHERE Id_Receta = ?`, [id]);
+      if (recetaAutorRes.length === 0) {
         return res.status(404).json({ error: "Receta no encontrada" });
       }
+      const idAutor = recetaAutorRes[0].Id_Usuario_Alta;
 
-      // Determinar la imagen a usar
-      const nuevaImagen = req.file ? `/imagenes/${req.file.filename}` : receta.Imagen_receta;
+      // Obtener rol del usuario que intenta actualizar
+      const usuarioRes = await queryAsync(`SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`, [id_usu]);
+      if (usuarioRes.length === 0) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      const rol = usuarioRes[0].Id_Rol;
 
-      // Actualizar la receta
+      // Verificar permiso (autor o admin)
+      if (parseInt(id_usu) !== idAutor && rol !== 2) {
+        console.log("Acceso denegado, sin permisos");
+        return res.status(403).json({ error: "Acceso denegado, sin permisos" });
+      }
+
+      // Obtener imagen actual si no se sube una nueva
+      const recetaActualRes = await queryAsync(`SELECT Imagen_receta FROM receta WHERE Id_Receta = ?`, [id]);
+      const recetaActual = recetaActualRes[0];
+      const nuevaImagen = req.file ? `/imagenes/${req.file.filename}` : recetaActual.Imagen_receta;
+
+      // Actualizar receta
       const updateQuery = `
         UPDATE receta 
         SET 
@@ -150,28 +151,15 @@ router.put("/:id", (req, res) => {
           Activo = 1
         WHERE Id_Receta = ?
       `;
-
       const values = [nombre, id_tipo_consumo, tiempo, porciones, calorias, nuevaImagen, id];
+      await queryAsync(updateQuery, values);
 
-      console.log("Valores para la actualización:", values);
+      // Eliminar recetas basura
+      
+      const deleteQuery = `CALL eliminarRecetasBasura();`;
+      await queryAsync(deleteQuery);
 
-      db.query(updateQuery, values, async (err, result) => {
-        if (err) {
-          console.error("Error al actualizar receta:", err);
-          return res.status(500).json({ error: "Error al actualizar receta" });
-        }
-
-        // 🔥 Eliminar recetas basura después del UPDATE
-        try {
-          const deleteQuery = `DELETE FROM receta WHERE Nombre = 'Receta_nueva' AND Activo = 0`;
-          await queryAsync(deleteQuery);
-          console.log("Recetas basura eliminadas correctamente.");
-        } catch (deleteError) {
-          console.error("Error al eliminar recetas basura:", deleteError);
-        }
-
-        res.json({ message: "Receta actualizada con éxito" });
-      });
+      res.json({ message: "Receta actualizada con éxito" });
     } catch (err) {
       console.error("Error al manejar la solicitud de actualización:", err);
       res.status(500).json({ error: "Error interno del servidor" });
@@ -204,46 +192,135 @@ router.delete("/:id", (req, res) => {
   });
 });
 
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
+router.get("/:id/:id_usu", async (req, res) => {
+  const { id, id_usu } = req.params;
 
-  //nombre receta
-  //imagen
-  //tiempo
-  //tipo
-  //porciones
-  //calorias
- 
-  const query1 = `
-        SELECT
-            r.Nombre AS Nombre,
-            r.Calorias AS Calorias,
-            r.Id_Tipo_Consumo AS id_Tipo,
-            r.Imagen_receta AS Imagen,
-            r.Tiempo AS Tiempo,
-            r.Porciones 
-        FROM
-            receta r
-        WHERE
-            r.Id_Receta = ?;`;
+  try {
+    // Obtener autor de la receta
+    const recetaAutorRes = await queryAsync(
+      `SELECT Id_Usuario_Alta FROM receta WHERE Id_Receta = ?`,
+      [id]
+    );
 
-
-      console.log("id recibido");
- 
-  db.query(query1, [id], (err1, result1) => {
-    if (err1) {
-      console.error("Error al obtener receta:", err1);
-      return res.status(500).send("Error al obtener receta");
+    if (recetaAutorRes.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
     }
 
-    if (result1.length === 0) {
-      return res.status(404).send("Receta no encontrada");
+    const idAutor = recetaAutorRes[0].Id_Usuario_Alta;
+
+    // Obtener rol del usuario que intenta acceder
+    const usuarioRes = await queryAsync(
+      `SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`,
+      [id_usu]
+    );
+
+    if (usuarioRes.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
-    console.log("receta enviada", result1);
-    res.json(result1)
-  });
+
+    const rol = usuarioRes[0].Id_Rol;
+
+    // Verificar permisos:
+    const esAutor = parseInt(id_usu) === idAutor;
+    const esAdmin = rol === 2;
+    const recetaEsPublica = idAutor === 1;
+
+    if (!esAutor && !esAdmin && !recetaEsPublica) {
+      console.log("Acceso denegado, sin permisos");
+      return res.status(403).json({ error: "Acceso denegado, sin permisos" });
+    }
+
+    // Obtener datos de la receta
+    const query1 = `
+      SELECT
+        r.Nombre AS Nombre,
+        r.Calorias AS Calorias,
+        r.Id_Tipo_Consumo AS id_Tipo,
+        r.Imagen_receta AS Imagen,
+        r.Tiempo AS Tiempo,
+        r.Porciones
+      FROM receta r
+      WHERE r.Id_Receta = ?;
+    `;
+
+    const recetaInfo = await queryAsync(query1, [id]);
+
+    if (recetaInfo.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
+    }
+
+    console.log("Receta enviada:", recetaInfo);
+    res.json(recetaInfo);
+
+  } catch (err) {
+    console.error("Error al obtener receta:", err);
+    res.status(500).send("Error al procesar la solicitud");
+  }
 });
 
+router.get("/ed/:id/:id_usu", async (req, res) => {
+  const { id, id_usu } = req.params;
 
+  try {
+    // Obtener autor de la receta
+    const recetaAutorRes = await queryAsync(
+      `SELECT Id_Usuario_Alta FROM receta WHERE Id_Receta = ?`,
+      [id]
+    );
+
+    if (recetaAutorRes.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
+    }
+
+    const idAutor = recetaAutorRes[0].Id_Usuario_Alta;
+
+    // Obtener rol del usuario que intenta acceder
+    const usuarioRes = await queryAsync(
+      `SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?`,
+      [id_usu]
+    );
+
+    if (usuarioRes.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const rol = usuarioRes[0].Id_Rol;
+
+    // Verificar permisos:
+    const esAutor = parseInt(id_usu) === idAutor;
+    const esAdmin = rol === 2;
+
+    if (!esAutor && !esAdmin ) {
+      console.log("Acceso denegado, sin permisos");
+      return res.status(403).json({ error: "Acceso denegado, sin permisos" });
+    }
+
+    // Obtener datos de la receta
+    const query1 = `
+      SELECT
+        r.Nombre AS Nombre,
+        r.Calorias AS Calorias,
+        r.Id_Tipo_Consumo AS id_Tipo,
+        r.Imagen_receta AS Imagen,
+        r.Tiempo AS Tiempo,
+        r.Porciones
+      FROM receta r
+      WHERE r.Id_Receta = ?;
+    `;
+
+    const recetaInfo = await queryAsync(query1, [id]);
+
+    if (recetaInfo.length === 0) {
+      return res.status(404).json({ error: "Receta no encontrada" });
+    }
+
+    console.log("Receta enviada:", recetaInfo);
+    res.json(recetaInfo);
+
+  } catch (err) {
+    console.error("Error al obtener receta:", err);
+    res.status(500).send("Error al procesar la solicitud");
+  }
+});
 
 module.exports = router;
