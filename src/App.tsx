@@ -11,10 +11,6 @@ import Perfil from './Front/Perfil';
 import Caducar from './Front/Componentes/PorCaducar';
 import Conocenos from './Front/Conocenos';
 import Contactanos from './Front/contactanos';
-import Formulario from './Front/Formulario';
-import Formulario2 from './Front/Formulario2';
-
-
 import Hoy from './Front/Hoy';
 import Plan1 from './Front/Plan1';
 import Plan2 from './Front/Plan2';
@@ -31,29 +27,23 @@ import ProcRecetaEditar from './Front/Componentes/ProcedimientoEditar';
 import InstruccionModal from './Front/Componentes/InstruccionModal';
 import Ingrediente from './Front/Componentes/IngredienteModal';
 import { useSession } from "./Front/hook/useSession";
+import Terminos from './Front/Términos_Condiciones';
+import AvisoPriv from './Front/AvisoPriv';
+
+
+
+
 
 type ItemType = Required<MenuProps>['items'][number];
 
 const mainItems: ItemType[] = [
   { label: <Link to="/"><img src={btInicio} alt="Inicio" className="img-inicio" /></Link>, key: 'inicio' },
-<<<<<<< HEAD
-  { label: <Link to="/conocenos">Conócenos</Link>, key: 'conocenos' },
-  { label: <Link to="/contactanos">Contáctanos</Link>, key: 'contactanos' },
-  { label: <Link to="/formulario">Formulario</Link>, key: 'formulario' },
-  { label: <Link to="/formulario2">Formulario2</Link>, key: 'formulario2' },
-
-  { label: <Link to="/hoy">Hoy</Link>, key: 'hoy' },
-  { label: <Link to="/plan1">Plan</Link>, key: 'plan' },
-  { label: <Link to="/recetas">Recetas</Link>, key: 'recetas' },
-  { label: <Link to="/refri">Refri</Link>, key: 'refri' },
-=======
   { label: <Link to="/conocenos" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Conócenos</Link>, key: 'conocenos' },
   { label: <Link to="/hoy" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Hoy</Link>, key: 'hoy' },
   { label: <Link to="/plan" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Recetas</Link>, key: 'recetas' },
   { label: <Link to="/refri" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Refri</Link>, key: 'refri' },
   { label: <Link to="/modal" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Modal</Link>, key: 'modal' },
->>>>>>> isis2
 ];
 
 const profileItem: ItemType[] = [
@@ -122,29 +112,6 @@ function App() {
         )}
       </header>
 
-<<<<<<< HEAD
-        <main>
-          <Routes>
-            <Route path="/" element={<Inicio />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/conocenos" element={<Conocenos />} />
-            <Route path="/contactanos" element={<Contactanos />} />
-            <Route path="/formulario" element={<Formulario />} />
-            <Route path="/formulario2" element={<Formulario2 />} />
-
-
-            <Route path="/hoy" element={<Hoy />} />
-            <Route path="/plan1" element={<Plan1 />} />
-            <Route path="/plan2" element={<Plan2 />} />
-            <Route path="/recetas" element={<Recetas />} />
-            <Route path="/refri" element={<Refri />} />
-            <Route path="/edReceta" element={<EDreceta />} />
-            <Route path="/acceder" element={<Acceder />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
-=======
       <main>
         <Routes>
           <Route path="/" element={<Inicio />} />
@@ -159,10 +126,13 @@ function App() {
           <Route path="/acceder" element={<AuthForm onLogin={onLogin} />} />
           <Route path="/verR" element={<VerR />} />
           <Route path="/modal" element={<Modal />} />
+          <Route path="/terminos" element={<Terminos />} />
+          <Route path="/aviso" element={<AvisoPriv />} />
+
+
         </Routes>
       </main>
     </MainLayout>
->>>>>>> isis2
   );
 }
 

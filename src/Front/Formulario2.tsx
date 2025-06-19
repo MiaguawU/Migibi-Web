@@ -101,8 +101,4 @@ export default function Formulario2() {
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> isis2

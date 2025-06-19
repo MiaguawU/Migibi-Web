@@ -26,7 +26,7 @@
   }
 
   .btUp:hover{
-    border-color: #3E7E1E !important;
+    border-color: #44b50b !important;
   }
   .receta {
     display: flex;
@@ -41,7 +41,7 @@
     justify-content: space-around;
   }
 .nC{
-    border-color: #3E7E1E;
+    border-color: #7e1e68;
     right: 10px;
 }
 
@@ -186,7 +186,7 @@ p,h3{
 
 .btUp{
     border: 1px solid;
-    border-color: #3E7E1E;
+    border-color: #731e7e;
     background-color: #CEDFAC;
     max-width: 46px;
     max-height: 30px;
@@ -199,7 +199,7 @@ p,h3{
 .btEn, .btEn2{
     background-color: #CAE2B5 !important;
     border: 1px solid;
-    border-color:#3E7E1E !important;
+    border-color:#522678 !important;
 }
 
 .ing {

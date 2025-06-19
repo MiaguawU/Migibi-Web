@@ -225,8 +225,4 @@ const Formulario = () => {
   );
 };
 
-<<<<<<< HEAD
 export default Formulario;
-=======
-export default Formulario;
->>>>>>> isis2
