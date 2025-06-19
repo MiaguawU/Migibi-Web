@@ -39,7 +39,7 @@ const recuperar = require("./base/Recuperar_Contrasena");
 const rateLimit = require("express-rate-limit");
 const planes = require("./base/Planes");
 const usuario_Alimento = require("./base/usuario_cat_alimento");
-
+const { OAuth2Client } = require('google-auth-library');
 
 dotenv.config();
 
@@ -170,6 +170,87 @@ app.get(
     }
   }
 );
+
+const client = new OAuth2Client();
+
+app.post('/auth/mobile/google', async (req, res) => {
+  console.log('Cuerpo recibido:', req.body);
+  const { id_token } = req.body;
+
+  if (!id_token) {
+    return res.status(400).json({ error: 'id_token no recibido' });
+  }
+
+  try {
+    const ticket = await client.verifyIdToken({
+  idToken: id_token,
+  audience: [
+    process.env.CLIENT_ID_ANDROID,
+    process.env.CLIENT_ID
+  ],
+});
+
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const nombre = payload.name;
+    const fotoPerfil = payload.picture;
+
+    // Luego sigue la lógica que ya tienes para registrar o recuperar usuario:
+    db.query("SELECT * FROM usuario WHERE Email = ?", [email], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'DB error' });
+
+      if (results.length > 0) {
+        const user = results[0];
+        return res.json({
+          id: user.Id_Usuario,
+          username: user.Nombre_Usuario,
+          email: user.Email,
+          foto_perfil: user.foto_perfil,
+          Cohabitantes: user.Cohabitantes,
+          message: "Sesión iniciada con éxito",
+        });
+      } else {
+        // Crear nuevo usuario como ya haces:
+        const password = generatePassword();
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const validation = userSchema.validate({
+          nombre,
+          email,
+          fotoPerfil,
+          esGmail: 1,
+          contrasena: password,
+        });
+
+        if (validation.error) {
+          return res.status(400).json({ error: 'Datos inválidos' });
+        }
+
+        const query = `
+          INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena, Id_Rol) 
+          VALUES (?, ?, ?, ?, ?, 1)
+        `;
+        db.query(query, [nombre, email, fotoPerfil, 1, hashedPassword], (insertErr, result) => {
+          if (insertErr) return res.status(500).json({ error: 'Error creando usuario' });
+
+          return res.json({
+            id: result.insertId,
+            username: nombre,
+            email,
+            foto_perfil: fotoPerfil,
+            Cohabitantes: null,
+            message: "Usuario registrado correctamente",
+          });
+        });
+      }
+    });
+
+  } catch (err) {
+    console.error('Error verificando token:', err);
+    res.status(401).json({ error: 'Token inválido' });
+  }
+});
 
 //modificar recetas
 app.use("/recetaGeneral", recetaGeneral);

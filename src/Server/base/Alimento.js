@@ -113,6 +113,27 @@ function formatFechaCaducidad(fecha) {
   }
 }
 
+//informacion escaneo
+router.post('/scanner', async (req, res) => {
+  const { codigo } = req.body;
+  const data = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`).then(r => r.json());
+
+  if (data.status === 1) {
+    const nombre = data.product.product_name || '';
+    const marca = data.product.brands || '';
+    const nombreCompleto = `${nombre} ${marca}`.trim(); // une ambos con espacio
+
+    res.send({
+      mensaje: 'Alimento encontrado',
+      nombreCompleto: nombreCompleto
+    });
+  } else {
+    res.send({
+      mensaje: 'Código no encontrado',
+      nombreCompleto: null
+    });
+  }
+});
 
 // Agregar un alimento
 router.post("/original", async (req, res) => {
