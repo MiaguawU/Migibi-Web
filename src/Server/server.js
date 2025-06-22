@@ -65,6 +65,7 @@ const allowedOrigins = [
   process.env.FRONTM,
   process.env.FRONTEND_URL,
   process.env.FRONTM2, // si estás usando Expo Go en un dispositivo físico
+  process.env.FRONT_APK,
 ];
 
 app.use(cors({
@@ -106,6 +107,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(express.json({ limit: '50mb' })); // For JSON payloads
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Rutas de usuarios
 app.use("/usuarios", usuarioRouter);
@@ -130,7 +133,8 @@ const getRedirectUrl = (origin) => {
   const allowedRedirects = {
     [process.env.FRONTM]: process.env.FRONTM,
     [process.env.FRONTEND_URL]: process.env.FRONTEND_URL,
-    [process.env.FRONTM2]: process.env.FRONTM2
+    [process.env.FRONTM2]: process.env.FRONTM2,
+    [process.env.FRONT_APK]: process.env.FRONT_APK
   };
   
 

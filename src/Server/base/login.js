@@ -89,6 +89,11 @@ router.post("/", async (req, res) => {
         <p>Alguien ha iniciado sesión en tu cuenta de <strong>Migibi Eats</strong>.</p>
         <p>Si no fuiste tú, por favor <strong>contacta con soporte inmediatamente</strong>.</p>
         <p>Gracias por usar nuestra app.</p>
+        <p>Ya que esta utilizando migibi eats, le pedimos por favor que lea los terminos</p>
+        <p>y condiciones de nustro servicio y los de la plataforma fatsecret, en caso de que no cumpla,</p>
+        <p>la responsabilidad cae en usted.</p>
+        <a href="https://platform.fatsecret.com/terms">Fatsecret</a>
+        <a href="http://localhost:3000/">Migibi eats</a>
         <hr/>
         <small>Este correo se envió automáticamente para tu seguridad.</small>
       `,

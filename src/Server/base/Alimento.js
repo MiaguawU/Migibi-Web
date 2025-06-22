@@ -5,6 +5,8 @@ const path = require("path");
 const db = require("./connection");
 const util = require("util");
 const Joi = require("joi");
+const axios = require('axios');
+const sharp = require('sharp');
 
 const router = express.Router();
 const BASE_IMAGE_URL = process.env.SERVER_PORT; // URL base del servidor
@@ -115,25 +117,150 @@ function formatFechaCaducidad(fecha) {
 
 //informacion escaneo
 router.post('/scanner', async (req, res) => {
-  const { codigo } = req.body;
-  const data = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`).then(r => r.json());
+    const { codigo } = req.body;
+    try {
+        const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
+        const data = await response.json();
 
-  if (data.status === 1) {
-    const nombre = data.product.product_name || '';
-    const marca = data.product.brands || '';
-    const nombreCompleto = `${nombre} ${marca}`.trim(); // une ambos con espacio
+        if (data.status === 1) {
+            const nombre = data.product.product_name || '';
+            const marca = data.product.brands || '';
+            const nombreCompleto = `${nombre} ${marca}`.trim();
 
-    res.send({
-      mensaje: 'Alimento encontrado',
-      nombreCompleto: nombreCompleto
-    });
-  } else {
-    res.send({
-      mensaje: 'Código no encontrado',
-      nombreCompleto: null
-    });
-  }
+            console.log('Sending to front:', nombreCompleto); // Confirm what's being sent
+
+            res.status(200).json({ // Use .json() and set status explicitly for clarity
+                mensaje: 'Alimento encontrado',
+                nombreCompleto: nombreCompleto
+            });
+        } else {
+            res.status(404).json({ // Use 404 for not found
+                mensaje: 'Código no encontrado',
+                nombreCompleto: null
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).json({ // 500 for server errors
+            mensaje: 'Error interno del servidor al buscar el producto',
+            nombreCompleto: null,
+            error: error.message
+        });
+    }
 });
+
+//informacion renocer imagen
+const FATSECRET_ACCESS_TOKEN = 'TU_ACCESS_TOKEN_DE_FATSECRET_AQUI'; // ¡REEMPLAZA ESTO CON TU TOKEN REAL!
+
+// Información para reconocer imagen
+router.post('/recognize-food-image', async (req, res) => {
+    // Solo esperamos image_b64 del frontend.
+    const { image_b64 } = req.body;
+
+    if (!image_b64) {
+        return res.status(400).json({ mensaje: 'No se proporcionó ninguna imagen Base64.' });
+    }
+
+    try {
+        // Convierte la Base64 a Buffer para el procesamiento con Sharp
+        const imageBuffer = Buffer.from(image_b64, 'base64');
+
+        // Redimensionar y optimizar la imagen antes de enviarla a FatSecret
+        const processedImageB64 = await sharp(imageBuffer)
+            .resize(512, 512, {
+                fit: 'inside',
+                withoutEnlargement: true
+            })
+            .webp({ quality: 80 }) // Puedes usar .jpeg({ quality: 80 }) o .png() si prefieres
+            .toBuffer()
+            .then(buffer => buffer.toString('base64')); // Convertir de nuevo a Base64
+
+        console.log('Tamaño de la imagen Base64 procesada:', processedImageB64.length);
+        if (processedImageB64.length > 1148549) {
+            console.warn('Advertencia: La imagen Base64 excede el límite de 1.09 MB. La solicitud a FatSecret podría fallar.');
+        }
+
+        // Prepara el cuerpo de la solicitud para FatSecret
+        const fatSecretRequestBody = {
+            image_b64: processedImageB64,
+            region: "MX",          // Fijo para México
+            language: "es",        // Fijo para español
+            include_food_data: false, // Establecido en `false` si solo quieres el nombre
+            eaten_foods: []       // Dejar vacío si no usas esta funcionalidad
+        };
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${FATSECRET_ACCESS_TOKEN}`
+        };
+
+        console.log('Enviando solicitud a FatSecret...');
+        const fatSecretResponse = await axios.post(
+            'https://platform.fatsecret.com/rest/image-recognition/v2',
+            fatSecretRequestBody,
+            { headers }
+        );
+
+        // --- Procesamiento de la respuesta de FatSecret ---
+        if (fatSecretResponse.data && fatSecretResponse.data.food_response && fatSecretResponse.data.food_response.length > 0) {
+            const recognizedFoodsDetailed = [];
+
+            // Agrupar y contar los alimentos detectados
+            const foodCounts = {};
+            fatSecretResponse.data.food_response.forEach(foodItem => {
+                if (foodItem.food_entry_name) {
+                    const name = foodItem.food_entry_name;
+                    foodCounts[name] = (foodCounts[name] || 0) + 1;
+                }
+            });
+
+            for (const name in foodCounts) {
+                recognizedFoodsDetailed.push({ name: name, quantity: foodCounts[name] });
+            }
+
+            console.log('Alimentos reconocidos para el frontend:', recognizedFoodsDetailed);
+
+            res.status(200).json({
+                mensaje: 'Alimentos encontrados',
+                recognizedFoodsDetailed: recognizedFoodsDetailed
+            });
+
+        } else {
+            console.log('No se detectaron alimentos en la imagen.');
+            res.status(200).json({ // 200 OK si la operación fue exitosa pero no se encontró nada
+                mensaje: 'No se detectaron alimentos en la imagen.',
+                recognizedFoodsDetailed: []
+            });
+        }
+
+    } catch (error) {
+        console.error('Error al procesar la imagen para FatSecret:', error.response ? error.response.data : error.message);
+
+        let errorMessage = 'Error al reconocer la imagen de alimentos con FatSecret.';
+        let statusCode = 500;
+
+        // Comprobación específica para errores de Axios
+        if (axios.isAxiosError(error) && error.response) {
+            if (error.response.status === 401) { // Unauthorized
+                errorMessage = 'Error de autenticación con FatSecret. Verifica tu Access Token.';
+                statusCode = 401;
+            } else if (error.response.data && error.response.data.message) {
+                 // Capturar mensajes de error de FatSecret como el "Error 211"
+                errorMessage = `Error de FatSecret: ${error.response.data.message}`;
+                statusCode = error.response.status; // Usa el status devuelto por FatSecret
+            } else {
+                errorMessage = `Error de la API de FatSecret: ${error.response.status} - ${JSON.stringify(error.response.data)}`;
+                statusCode = error.response.status;
+            }
+        }
+
+        res.status(statusCode).json({
+            mensaje: errorMessage,
+            recognizedFoodsDetailed: []
+        });
+    }
+});
+
 
 // Agregar un alimento
 router.post("/original", async (req, res) => {
