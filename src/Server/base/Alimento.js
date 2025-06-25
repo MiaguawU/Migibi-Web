@@ -6,10 +6,10 @@ const db = require("./connection");
 const util = require("util");
 const Joi = require("joi");
 const axios = require('axios');
+const dotenv = require("dotenv");
 const sharp = require('sharp');
 
 const router = express.Router();
-const BASE_IMAGE_URL = process.env.SERVER_PORT; // URL base del servidor
 
 // Validación de datos con Joi
 const alimentoSchema = Joi.object({
@@ -150,7 +150,7 @@ router.post('/scanner', async (req, res) => {
 });
 
 //informacion renocer imagen
-const FATSECRET_ACCESS_TOKEN = 'TU_ACCESS_TOKEN_DE_FATSECRET_AQUI'; // ¡REEMPLAZA ESTO CON TU TOKEN REAL!
+const FATSECRET_ACCESS_TOKEN = process.env.ID_FAT; // ¡REEMPLAZA ESTO CON TU TOKEN REAL!
 
 // Información para reconocer imagen
 router.post('/recognize-food-image', async (req, res) => {
@@ -200,6 +200,7 @@ router.post('/recognize-food-image', async (req, res) => {
             fatSecretRequestBody,
             { headers }
         );
+        console.log(fatSecretResponse);
 
         // --- Procesamiento de la respuesta de FatSecret ---
         if (fatSecretResponse.data && fatSecretResponse.data.food_response && fatSecretResponse.data.food_response.length > 0) {

@@ -140,8 +140,6 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-  
-
   const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
     const nombre = alimento.ingrediente.toLowerCase();
     const tipo = alimento.Tipo.toLowerCase();
@@ -153,7 +151,6 @@ export default function Inicio() {
       alimento.cantidad > 0 && alimento.Activo > 0
     );
   });  
-
   
   return (
     <ConfigProvider

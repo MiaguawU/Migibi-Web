@@ -107,8 +107,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.json({ limit: '50mb' })); // For JSON payloads
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '500tb' })); // Permite payloads JSON de hasta 500 MB
+app.use(express.urlencoded({ limit: '500tb', extended: true }));
 
 // Rutas de usuarios
 app.use("/usuarios", usuarioRouter);
@@ -141,6 +141,13 @@ const getRedirectUrl = (origin) => {
   return allowedRedirects[origin] || "http://localhost:3000";
 };
 
+const GOOGLE_CLIENT_ID_WEB_FOR_VERIFICATION = process.env.CLIENT_ID;
+
+if (!GOOGLE_CLIENT_ID_WEB_FOR_VERIFICATION) {
+  console.error("ERROR: La variable de entorno CLIENT_ID (WEB) no está definida. Necesaria para verificar ID Tokens.");
+  process.exit(1);
+}
+const client = new OAuth2Client(GOOGLE_CLIENT_ID_WEB_FOR_VERIFICATION);
 
 // Ruta de callback después de la autenticación con Google
 app.get(
@@ -175,37 +182,53 @@ app.get(
   }
 );
 
-const client = new OAuth2Client();
-
 app.post('/auth/mobile/google', async (req, res) => {
-  console.log('Cuerpo recibido:', req.body);
+  console.log('Cuerpo recibido para /auth/mobile/google:', req.body);
   const { id_token } = req.body;
 
   if (!id_token) {
-    return res.status(400).json({ error: 'id_token no recibido' });
+    return res.status(400).json({ error: 'ID Token no recibido.' });
   }
 
   try {
+    // 1. Verificar el ID Token con Google
     const ticket = await client.verifyIdToken({
-  idToken: id_token,
-  audience: [
-    process.env.CLIENT_ID_ANDROID,
-    process.env.CLIENT_ID
-  ],
-});
-
+      idToken: id_token,
+      // La audiencia debe ser tu CLIENT_ID de TIPO WEB
+      // Usamos la variable que definimos arriba, que según tu indicación,
+      // es process.env.CLIENT_ID
+      audience: GOOGLE_CLIENT_ID_WEB_FOR_VERIFICATION,
+    });
 
     const payload = ticket.getPayload();
+    if (!payload) {
+        return res.status(500).json({ error: 'No se pudo obtener el payload del ID Token.' });
+    }
+
     const email = payload.email;
     const nombre = payload.name;
     const fotoPerfil = payload.picture;
+    const googleId = payload.sub; // El 'sub' es el ID de usuario único de Google
 
-    // Luego sigue la lógica que ya tienes para registrar o recuperar usuario:
+    // 2. Lógica para encontrar o crear el usuario en tu base de datos
+    // Asegúrate de que `db`, `bcrypt`, `userSchema`, y `generatePassword`
+    // estén correctamente importados o disponibles en este ámbito.
+    // Si no lo están, agrégalos al inicio del archivo o pásalos.
+    // const db = require("./base/connection"); // Ejemplo de importación si no está
+    // const bcrypt = require("bcrypt");
+    // const userSchema = Joi.object({ /* ... */ }); // Asegúrate de que userSchema esté definido
+    // function generatePassword() { /* ... */ } // Asegúrate de que generatePassword esté definido
+
     db.query("SELECT * FROM usuario WHERE Email = ?", [email], async (err, results) => {
-      if (err) return res.status(500).json({ error: 'DB error' });
+      if (err) {
+        console.error("Error en DB al buscar usuario:", err);
+        return res.status(500).json({ error: 'Error interno del servidor al buscar usuario.' });
+      }
 
       if (results.length > 0) {
         const user = results[0];
+        // Aquí puedes actualizar la foto de perfil o el nombre si es necesario
+        // y luego enviar la respuesta al cliente
         return res.json({
           id: user.Id_Usuario,
           username: user.Nombre_Usuario,
@@ -215,7 +238,6 @@ app.post('/auth/mobile/google', async (req, res) => {
           message: "Sesión iniciada con éxito",
         });
       } else {
-        // Crear nuevo usuario como ya haces:
         const password = generatePassword();
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -228,15 +250,19 @@ app.post('/auth/mobile/google', async (req, res) => {
         });
 
         if (validation.error) {
-          return res.status(400).json({ error: 'Datos inválidos' });
+          console.error("Error de validación de esquema Joi para nuevo usuario:", validation.error.details);
+          return res.status(400).json({ error: 'Datos de usuario inválidos', details: validation.error.details });
         }
 
         const query = `
-          INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena, Id_Rol) 
+          INSERT INTO usuario (Nombre_Usuario, Email, foto_perfil, Es_Gmail, Contrasena, Id_Rol)
           VALUES (?, ?, ?, ?, ?, 1)
         `;
         db.query(query, [nombre, email, fotoPerfil, 1, hashedPassword], (insertErr, result) => {
-          if (insertErr) return res.status(500).json({ error: 'Error creando usuario' });
+          if (insertErr) {
+            console.error('Error creando nuevo usuario en DB:', insertErr);
+            return res.status(500).json({ error: 'Error interno del servidor al crear usuario.' });
+          }
 
           return res.json({
             id: result.insertId,
@@ -251,8 +277,8 @@ app.post('/auth/mobile/google', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Error verificando token:', err);
-    res.status(401).json({ error: 'Token inválido' });
+    console.error('Error al verificar ID Token de Google:', err);
+    res.status(401).json({ error: 'Token inválido o expirado.', details: err.message });
   }
 });
 
