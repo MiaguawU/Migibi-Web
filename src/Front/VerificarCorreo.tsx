@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Input, ConfigProvider, Button, Card, Typography, message } from "antd";
-import { LockFilled } from '@ant-design/icons';
+import { MailFilled } from '@ant-design/icons';
 import { customColors } from '../Front/Estilos/colores';
 import "./perfil.css";
 import PUERTO from "../config";
@@ -9,48 +9,56 @@ import axios from "axios";
 
 const { Title } = Typography;
 
-const CambiarContrasenia: React.FC = () => {
+const VerificarCorreo: React.FC = () => {
 
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const navigate = useNavigate();
+    const [email, setEmail] = useState<string>('');
+    const navigate = useNavigate();
 
-  const validatePassword = (password: string): boolean => {
-    return (
-      password.length >= 8 &&
-      (password.match(/[A-Z]/g) || []).length >= 2 &&
-      (password.match(/[a-z]/g) || []).length >= 2 &&
-      (password.match(/[0-9]/g) || []).length >= 2
-    );
+  const correctEmailFormat = (email: string): string => {
+    // Elimina espacios en blanco, corrige errores menores como "@gmial.com" → "@gmail.com"
+    return email
+      .trim()
+      .replace(/\s+/g, '') // Elimina espacios
+      .replace(/@gmai\.com$/, '@gmail.com') // Corrige errores comunes
+      .toLowerCase(); // Normaliza a minúsculas
   };
 
+    const handleSubmit = () => {
+        setEmail(correctEmailFormat(email));
+        registro();
+        /**Aquí debe ingresar */
+    };
+
+    const validateEmailFormat = (email: string): boolean => {
+        // Expresión regular para validar correos de Gmail correctamente formateados
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        return gmailRegex.test(email);
+    };
+
+    //aquí no tengo ni idea de qué hacer :D
   const registro = async () => {
-    if (!validatePassword(password)) return message.error("La contraseña debe tener al menos 8 caracteres, incluyendo 2 mayúsculas, 2 minúsculas y 2 números.");
-    if (password !== confirmPassword) return message.error("Las contraseñas no coinciden.");
+    if (!validateEmailFormat(email)) return message.error("Ingrese un correo de Gmail válido.");
   
-    const data = { password };
+    const data = { email };
     console.log("📤 Enviando datos al servidor:", data);
-  /**Aquí se necesita el token */
+  
     try {
-      const response = await axios.post(`${PUERTO}/password`, data, { headers: { "Content-Type": "application/json" } });
+      const response = await axios.post(`${PUERTO}/registro`, data, { headers: { "Content-Type": "application/json" } });
       console.log("✅ Respuesta del servidor:", response.data);
-      message.success("Contraseña correctamente enviada");
+  
+      localStorage.setItem("user", JSON.stringify(response.data));
+      message.success("Correo de confirmacion enviado");
   
     } catch (error) {
       console.error("❌ Error en registro():", error);
   
       if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message || "Error al cambiar contraseña.";
+        const errorMsg = error.response?.data?.message || "Error al registrar.";
         message.error(errorMsg);
       } else {
-        message.error("Error inesperado al cambiar contraseña.");
+        message.error("Error inesperado al registrar.");
       }
     }
-  };
-
-  const handleSubmit = () => {
-    registro();
-    /**Aquí debe ingresar */
   };
 
   return (
@@ -96,32 +104,25 @@ const CambiarContrasenia: React.FC = () => {
         >
 
           <Title level={3} style={{ textAlign: "center", color: customColors.colorFrio3 }}>
-            Cambiar contraseña
+            Verificar Correo
           </Title>
 
           <Title level={5} style={{ textAlign: "center", color: customColors.colorFuerteCalido, fontWeight: 'light' }}>
-            Por favor, escriba su nueva contraseña.
+            Le enviaremos un correo para verificar su identidad.
           </Title>
 
-          <Input.Password
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            prefix={<LockFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
-          />
-
-          <Input.Password
-            placeholder="Confirmar Contraseña"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            prefix={<LockFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
+          <Input
+            placeholder={"Correo Electrónico"}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            prefix={<MailFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
           />
 
           <Button
             type="primary" className='poppins-semibold'
-            onClick={() => navigate('/cambiarContrasenia')}
+            onClick={handleSubmit}
           >
-            Cambiar contraseña
+            Enviar correo
           </Button>
 
         </Card>
@@ -130,4 +131,4 @@ const CambiarContrasenia: React.FC = () => {
   );
 };
 
-export default CambiarContrasenia;
+export default VerificarCorreo;

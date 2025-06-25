@@ -8,6 +8,7 @@ const { TextArea } = Input;
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
+  index: number;
   recetaId: number;
   onSubmit: (newInstruction: Item) => void;
 }
@@ -25,7 +26,7 @@ const formItemLayout = {
   wrapperCol: { xs: { span: 24 }, sm: { span: 14 } },
 };
 
-const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubmit }) => {
+const InsModal: React.FC<FormModalProps> = ({ visible, onClose, index, recetaId, onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: { name: string }) => {
@@ -55,7 +56,7 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
           name: values.name,
           isChecked: false,
           Activo: 1,
-          orden: response.data.orden || 1,
+          orden: response.data.orden || index,
         };
 
         onSubmit(nuevaInstruccion);

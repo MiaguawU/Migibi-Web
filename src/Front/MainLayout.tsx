@@ -6,6 +6,8 @@ import {
   WhatsAppOutlined,
   FacebookOutlined,
 } from "@ant-design/icons";
+import './Estilos/MainLayout.css';
+//Aquí queremos importar el MainLayout.css y comprobar si funciona
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -13,7 +15,7 @@ const { Title, Text } = Typography;
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const footerStyle = {
     container: {
-      backgroundColor: "#6E9A65",
+      backgroundColor: "#336733",
       padding: "40px 200px",
       "@media (max-width: 768px)": {
         padding: "20px 100px", // Cambia el color en pantallas pequeñas
@@ -34,7 +36,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </Content>
 
       {/* Pie de página */}
-      <Footer style={{ backgroundColor: "#6E9A65", padding: "40px 200px" }}>
+      <Footer style={{ backgroundColor: "#336733"}}>
         <Row justify="center" gutter={[32, 32]}>
           {/* Sección Inicio */}
           <Col xs={24} sm={12} md={6}>

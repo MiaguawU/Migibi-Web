@@ -192,6 +192,7 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
       
       <InsModal
         visible={isModalOpen}
+        index = {items.length + 1}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleNewInstruction}  // Aquí pasamos la función corregida
         recetaId={recetaId}
