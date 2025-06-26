@@ -180,33 +180,35 @@ const Inicio = () => {
 
   return (  
     <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: '#00b96b',
-          borderRadius: 10,
-          colorBgContainer: '#CAE2B5',
-        },
-        components: {
-          Select: {
-            optionActiveBg: '#CAE2B5',
-            algorithm: true
-          }
-        }
-      }}
-    >
+  theme={{
+    token: {
+      colorPrimary: '#00b96b',
+      borderRadius: 10,
+      colorBgContainer: '#CEFF77',  // ✅ CAMBIO
+    },
+    components: {
+      Select: {
+        optionActiveBg: '#CEFF77',  // ✅ CAMBIO
+        algorithm: true
+      }
+    }
+  }}
+>
       <div style={{ paddingLeft: '15px', paddingRight: '15px' }}>
         <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex'}}>
           <div style={{height: '100%', display: 'flex', alignItems: 'center', padding: '15px'}}>
             <ConfigProvider
-            theme={{
-              token: {
-                fontFamily: "Jomhuria, Serif",
-                fontSize: 40,
-                colorText: "#6B8762",
-                colorPrimary: '#00b96b',
-                borderRadius: 10,
-                colorBgContainer: '#CAE2B5',
-              }}}>
+  theme={{
+    token: {
+      fontFamily: "Jomhuria, Serif",
+      fontSize: 40,
+      colorText: "#244C24",       // ✅ CAMBIO
+      colorPrimary: '#00b96b',
+      borderRadius: 10,
+      colorBgContainer: '#CEFF77' // ✅ CAMBIO
+    }
+  }}
+>
               <Button
                 key={`AgregarNuevoPlan`}
                 style={{height: "40px", margin: '10px', marginTop: '5px',}}
@@ -214,6 +216,9 @@ const Inicio = () => {
                 Agregar receta
               </Button>
               </ConfigProvider>
+
+
+              
               {/**
                * 
             <img src={imgdesayuno} style={{height: '100px'}} />
@@ -240,15 +245,18 @@ const Inicio = () => {
           <div key={index}>
             <div style={{backgroundColor: '#D3E2B4', height: '45px', borderRadius: '10px', display: "flex", alignItems: "center", flexWrap: "wrap"}}>
               <div style={{margin: '10px', marginTop: '5px', alignItems: 'center'}}>
-                <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071'}}>{formatoFechaLegible(dia.fecha)}</a>      
+                <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#244C24'}}>
+                  {formatoFechaLegible(dia.fecha)}
+                </a>      
               </div>
             </div>
             <br /><br />
             {dia.comidas.map((comida, index) => (
               <div key={index}>
                 <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}>
-                  <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071'}}>{comida.comida}</a>
-
+                  <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#244C24'}}>
+  {comida.comida}
+</a>
                   <div>
                     <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px'}}>
                     {comida.recetas.length > 0 ? (
@@ -268,15 +276,17 @@ const Inicio = () => {
                     ) : (
                       
                     <ConfigProvider
-                    theme={{
-                      token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 40,
-                        colorText: "#8BA577",
-                        colorPrimary: '#00b96b',
-                        borderRadius: 10,
-                        colorBgContainer: '#CAE2B5',
-                      }}}>
+                      theme={{
+                        token: {
+                          fontFamily: "Jomhuria, Serif",
+                          fontSize: 40,
+                          colorText: "#244C24",       // ✅ CAMBIO
+                          colorPrimary: '#00b96b',
+                          borderRadius: 10,
+                          colorBgContainer: '#CEFF77' // ✅ CAMBIO
+                        }
+                      }}
+                    >
                       <Button
                         key={`add-recipe-${dia.id}-${comida.comida}`}
                         style={{height: "40px"}}

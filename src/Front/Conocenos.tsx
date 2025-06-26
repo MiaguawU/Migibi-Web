@@ -24,30 +24,34 @@ const Inicio: React.FC = () => {
   }, [location]);
 
   return (
-    <section style={{ padding: "50px" }}>
+    <section className="raleway-forzado" style={{ padding: "50px", backgroundColor: "#F9FFF0" }}>
+
       {/* ¿Quiénes somos? */}
       <h1 style={{ fontSize: "64px", fontWeight: "bold", color: "#6B8762" }}>
         ¿Quiénes somos?
       </h1>
       <Row gutter={[16, 16]} align="middle">
-        <Col xs={24} md={12}>
-          <p
-            style={{
-              marginTop: "4px",
-              fontSize: "36px",
-              lineHeight: "1.5",
-              maxWidth: "570px",
-              textAlign: "left",
-            }}
-          >
-            Migibi es un proyecto innovador desarrollado por Cincode, diseñado
-            para revolucionar la gestión de alimentos perecederos. Con nuestro
-            enfoque en tecnología y sostenibilidad, buscamos reducir el
-            desperdicio de comida, optimizar el inventario y brindar
-            herramientas prácticas tanto a negocios como a personas en su día a
-            día.
-          </p>
-        </Col>
+  <Col xs={24} md={12}>
+    <div
+      style={{
+        backgroundColor: "#f0f7e4",
+        padding: "40px",
+        borderRadius: "8px",
+        color: "#244C24",
+        fontFamily: "'Raleway', sans-serif",
+        fontSize: "18px",
+        lineHeight: "1.8",
+        boxShadow: "0 0 10px rgba(0, 0, 0, 0.03)", // opcional para resaltar un poco
+      }}
+    >
+      Migibi es un proyecto innovador desarrollado por Cincode, diseñado
+      para revolucionar la gestión de alimentos perecederos. Con nuestro
+      enfoque en tecnología y sostenibilidad, buscamos reducir el
+      desperdicio de comida, optimizar el inventario y brindar
+      herramientas prácticas tanto a negocios como a personas en su día a
+      día.
+    </div>
+  </Col>
         <Col xs={24} md={12}>
           <img
             src={imagefru}
@@ -74,15 +78,18 @@ const Inicio: React.FC = () => {
 <Row gutter={[16, 16]} justify="center">
   <Col xs={24} md={8}>
     <Card
-      style={{
-        borderRadius: "8px",
-        backgroundColor: "#D3E2B4",
-        padding: "20px",
-        height: "100%",
-      }}
-    >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
+
       <h2 id="proposito" style={{ color: "#6B8762" }}>Propósito</h2>
-      <p style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
+      <p style={{ color: "#6B8762", lineHeight: "1.8" }}>
         Impulsar el uso consciente y responsable de los alimentos mediante tecnología
         que permita reducir el desperdicio y facilitar su gestión tanto en hogares como
         en negocios.
@@ -92,13 +99,15 @@ const Inicio: React.FC = () => {
 
   <Col xs={24} md={8}>
     <Card
-      style={{
-        borderRadius: "8px",
-        backgroundColor: "#D3E2B4",
-        padding: "20px",
-        height: "100%",
-      }}
-    >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
       <h2 id="mision" style={{ color: "#6B8762" }}>Misión</h2>
       <p style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
         Desarrollar soluciones digitales innovadoras que optimicen la manera en que
@@ -110,13 +119,15 @@ const Inicio: React.FC = () => {
 
   <Col xs={24} md={8}>
     <Card
-      style={{
-        borderRadius: "8px",
-        backgroundColor: "#D3E2B4",
-        padding: "20px",
-        height: "100%",
-      }}
-    >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
       <h2 id="vision" style={{ color: "#6B8762" }}>Visión</h2>
       <p style={{ color: "#3E7E1E", lineHeight: "1.8" }}>
         Ser una plataforma líder a nivel global en gestión inteligente de alimentos,
@@ -150,13 +161,15 @@ const Inicio: React.FC = () => {
       <Row gutter={40} style={{ width: "100%" }}>
         <Col xs={24} sm={24} md={12} lg={12}>
           <Card
-            style={{
-              backgroundColor: "#D3E2B4",
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-            }}
-          >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
             <div style={{ flex: 1 }}>
               <h2 style={{ color: "#3E7E1E" }}>Generales</h2>
               <ul style={{ color: "#3E7E1E" }}>
@@ -186,13 +199,15 @@ const Inicio: React.FC = () => {
         </Col>
         <Col xs={24} sm={24} md={12} lg={12}>
           <Card
-            style={{
-              backgroundColor: "#D3E2B4",
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-            }}
-          >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
             <div style={{ flex: 1 }}>
               <h2 style={{ color: "#3E7E1E" }}>Particulares</h2>
               <ul style={{ color: "#3E7E1E" }}>
@@ -223,13 +238,15 @@ const Inicio: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card
-            style={{
-              borderRadius: "8px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              backgroundColor: "#D3E2B4",
-              padding: "20px",
-            }}
-          >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
             <h1
               id="valoresss"
               style={{
@@ -304,13 +321,16 @@ const Inicio: React.FC = () => {
       {/* Filosofía y Políticas */}
       <Row gutter={[16, 16]} justify="center">
         <Col xs={24} md={12}>
-          <Card
-            style={{
-              borderRadius: "8px",
-              backgroundColor: "#D3E2B4",
-              padding: "20px",
-            }}
-          >
+         <Card
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
             <h2 id="filosofiaaa" style={{ color: "#6B8762" }}>
               Filosofía
             </h2>
@@ -323,12 +343,15 @@ const Inicio: React.FC = () => {
         </Col>
         <Col xs={24} md={12}>
           <Card
-            style={{
-              borderRadius: "8px",
-              backgroundColor: "#D3E2B4",
-              padding: "20px",
-            }}
-          >
+  style={{
+    fontFamily: "'Raleway', sans-serif", // ¡Esto es clave!
+    borderRadius: "8px",
+    backgroundColor: "#B3D86E",
+    padding: "20px",
+    height: "100%",
+  }}
+>
+
             <h2 id="politicasss" style={{ color: "#6B8762" }}>
               Políticas
             </h2>

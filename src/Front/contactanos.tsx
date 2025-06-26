@@ -34,7 +34,7 @@ const ContactPage: React.FC = () => {
         >
           <div
             style={{
-              border: "2px solid #3E7E1E",
+              border: "2px solid #",
               borderRadius: "8px",
               padding: "20px",
               backgroundColor: "#D3E2B4",

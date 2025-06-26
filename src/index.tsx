@@ -10,6 +10,14 @@ import 'antd/dist/reset.css';
 import { BrowserRouter } from 'react-router-dom';
 import PUERTO from './config';
 import { useState, useEffect } from "react";
+import './index.css';
+
+
+import './index.css';
+
+
+
+
 
 const INACTIVITY_LIMIT = 30 * 60 * 1000; // 1 hora en milisegundos
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps } from 'antd';
-import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps, notification } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
 import moment from 'moment';
@@ -36,11 +36,11 @@ const formItemLayout = {
 
 const props: UploadProps = {
   beforeUpload: (file) => {
-    const isIMG = file.type === 'image/png';
-    if (!isIMG) {
-      message.error(`${file.name} no es un archivo de imagen`);
+    const isImage = file.type.startsWith('image/');
+    if (!isImage) {
+      message.error(`${file.name} no es un archivo de imagen válido`);
     }
-    return isIMG || Upload.LIST_IGNORE;
+    return isImage || Upload.LIST_IGNORE;
   },
   onChange: (info) => {
     console.log(info.fileList);
@@ -52,20 +52,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
   const [Tipos, setTipos] = useState<Tipo[]>([]);  
   const [Unidades, setUnidad] = useState<Unidad[]>([]); 
 
-  const props: UploadProps = {
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image/'); // Verifica que sea cualquier tipo de imagen
-      if (!isImage) {
-        message.error(`${file.name} no es un archivo de imagen válido`);
-      }
-      return isImage || Upload.LIST_IGNORE;
-    },
-    onChange: (info) => {
-      console.log(info.fileList);
-    },
-  };
-  
-
   useEffect(() => {
     if (visible) {
       obtenerTipos();
@@ -73,7 +59,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
       if (alimentoId) {
         obtenerAlimento();
       } else {
-        form.resetFields(); // Limpia el formulario si no hay alimentoId
+        form.resetFields();
       }
     }
   }, [visible, alimentoId]);
@@ -83,8 +69,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
     try {
       const response = await axios.get(`${PUERTO}/alUn/${alimentoId}`);
       const alimento = response.data;
-  
-      // Configurar valores del formulario
       form.setFieldsValue({
         name: alimento.Nombre,
         expirationDate: alimento.Fecha ? moment(alimento.Fecha, "YYYY-MM-DD") : null,
@@ -96,7 +80,6 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
       message.error("No se pudo cargar el alimento.");
     }
   };
-  
 
   const obtenerTipos = async () => {
     try {
@@ -106,6 +89,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
       message.error("No se pudieron cargar los tipos.");
     }
   };
+
   const obtenerUnidad = async () => {
     try {
       const response = await axios.get(`${PUERTO}/unidad`);
@@ -114,73 +98,69 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }
       message.error("No se pudieron cargar las unidades.");
     }
   };
-  const handleSubmit = async (values: any) => {
 
+  const handleSubmit = async (values: any) => {
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
       message.warning("No hay un usuario logueado actualmente.");
       return;
     }
-  
     const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
     const user = usuarios[currentUser];
-  
     if (!user) {
       message.warning("Usuario no encontrado en los datos locales.");
       return;
     }
-  
-    const formData = new FormData();
-        formData.append('nombre', values.name);
-        formData.append('tipo', values.type);
-        formData.append('id_unidad', values.unit);
-        formData.append('cantidad', values.quantity);
-        formData.append('fecha_caducidad', values.expirationDate ? values.expirationDate.format("YYYY-MM-DD") : ''); // Formatear la fecha
-        formData.append('Id_Usuario_Alta', currentUser);
 
-  
+    const formData = new FormData();
+    formData.append('nombre', values.name);
+    formData.append('tipo', values.type);
+    formData.append('id_unidad', values.unit);
+    formData.append('cantidad', values.quantity);
+    formData.append('fecha_caducidad', values.expirationDate ? values.expirationDate.format("YYYY-MM-DD") : '');
+    formData.append('Id_Usuario_Alta', currentUser);
+
     if (values.imgsrc && values.imgsrc.file) {
       formData.append('image', values.imgsrc.file.originFileObj);
-    } else { 
-      
     }
-    
+
     try {
-      const response = await axios.put(`${PUERTO}/alimento/${alimentoId}`, formData, {
+      await axios.put(`${PUERTO}/alimento/${alimentoId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      message.success('Producto actualizado');
+      notification.success({
+        message: 'Guardado correctamente',
+        description: 'El producto ha sido actualizado con éxito.',
+        placement: 'topRight',
+        duration: 3,
+      });
       form.resetFields();
-    } catch (error: any)  {
-          console.error("Error en la solicitud:", error);
-    
-        if (error.response) {
-              if (error.response.data && error.response.data.error) {
-                message.error(error.response.data.error); // Muestra el mensaje de error del backend
-              } else {
-                message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
-              }
-            } else {
-              message.error('Error de conexión con el servidor.');
-            }
+    } catch (error: any) {
+      console.error("Error en la solicitud:", error);
+      if (error.response) {
+        if (error.response.data && error.response.data.error) {
+          message.error(error.response.data.error);
+        } else {
+          message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
         }
+      } else {
+        message.error('Error de conexión con el servidor.');
+      }
+    }
   };
-  
 
   const handleFinish = (values: any) => {
     handleSubmit(values);
     obtenerAlimento();
   };
 
-  
-
   return (
     <ConfigProvider
       theme={{
         token: {
           colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
+          colorBgContainer: '#CEFF77',
+          colorText: '#244C24',
           colorPrimary: '#3E7E1E',
         },
         components: {
