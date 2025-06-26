@@ -29,20 +29,20 @@ label {
 
 /* Estilo general de los ítems del menú */
 .custom-menu .ant-menu-item {
-  background-color: #6E9A65 !important;  /* Fondo transparente */
+  background-color: #9ED340 !important;  /* Fondo transparente */
   color: white;  /* Texto blanco */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .custom-menu .ant-menu-item:hover {
-  background-color: #81c784 !important;  /* Fondo verde claro */
+  background-color: #9ED340 !important;  /* Fondo verde claro */
 }
 
 /* Fondo del ítem cuando está seleccionado */
 .custom-menu .ant-menu-item-selected {
-  background-color: #6E9A65 !important;  /* Fondo igual que el nav */
-  color: #CDFFAD !important;  /* Texto en verde claro para el seleccionado */
-  border-bottom: 2px solid #B3CD8F;  /* Línea verde clara debajo */
+  background-color: #9ED340 !important;  /* Fondo igual que el nav */
+  color: #9ED340 !important;  /* Texto en verde claro para el seleccionado */
+  border-bottom: 2px solid #9ED340;  /* Línea verde clara debajo */
 }
 
 /* Estilo para enlaces dentro de los ítems */

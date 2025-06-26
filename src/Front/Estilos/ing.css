@@ -1,13 +1,15 @@
 .img{
     max-width: 40px;
     max-height: 40px;
-    position: absolute;
+    position: relative;
+    /*top: 10px; de Cam*/
+
 }
 .jomhuria-regular {
-    font-family: "Jomhuria", serif;
-    font-weight: 300;
-    font-style: normal;
-  }
+  font-family: "Jomhuria", serif;
+  font-weight: 300;
+  font-style: normal;
+}
 .btAg{
     position: absolute;
     bottom: 10px;
@@ -20,11 +22,11 @@
 }
 
 .card-title {
-    color: #638552;  /* Color que desees para el título */
-    font-size: 30px; 
-    font-family: 'Jomhuria';
-    font-weight: normal;
-  }
+  color: #638552;  /* Color que desees para el título */
+  font-size: 30px; 
+  font-family: 'Jomhuria';
+  font-weight: normal;
+}
 /* Estilos generales para el Card */
 .card-container {
   width: 100%;

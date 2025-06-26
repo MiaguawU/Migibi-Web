@@ -24,6 +24,9 @@ import Usuarios from './Front/Usuarios';
 import Cat_Alimentos from './Front/Cat_Alimentos';
 import Catalogos from './Front/Catalogos';
 import CambiarContrasenia from './Front/CambiarContrasenia';
+import Terminos from './Front/Términos_Condiciones';
+import AvisoPriv from './Front/AvisoPriv';
+
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -156,6 +159,10 @@ function App() {
           <Route path="/catalogos" element={<Catalogos />} />
           <Route path="/recetaVis" element={<RecetaVIS />} />
           <Route path="/cambiarContrasenia" element={<CambiarContrasenia />} />
+          <Route path="/terminos" element={<Terminos />} />
+          <Route path="/aviso" element={<AvisoPriv />} />
+
+
         </Routes>
       </main>
     </MainLayout>

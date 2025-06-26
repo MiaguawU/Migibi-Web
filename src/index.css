@@ -12,3 +12,35 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* index.css */
+
+body {
+  font-family: 'Raleway', sans-serif;
+  color: #3E7E1E;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  color: #6B8762;
+  margin-bottom: 10px;
+}
+
+p, li {
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* Solo se aplicará donde se use la clase .raleway-forzado */
+.raleway-forzado, .raleway-forzado * {
+  font-family: 'Raleway', sans-serif !important;
+  color: #3E7E1E;
+}
+
+
+
+

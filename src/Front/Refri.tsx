@@ -6,7 +6,9 @@ import ProductModal from './Componentes/AlimentoAgregar';
 import { AutoComplete, Input, Button, ConfigProvider, Card, Space, Tooltip, message, Spin } from 'antd';
 import { CameraOutlined, WarningOutlined, DeleteOutlined, EditOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import ModalEd from './Componentes/AlimentoEditar';
-import ModalCon from './Componentes/AlimentoConsumir';
+import ModalCon from './Componentes/AlimentoConsumir';import { notification } from 'antd';
+import guardadoImg from '../assets/Guardado.png'; // Asegúrate que esté ahí
+
 const { Meta } = Card;
 
 interface CardData {
@@ -59,17 +61,17 @@ export default function Inicio() {
         setLoading(false);
         return;
       }
-  
-      const userId = parseInt(currentUser, 10); // Asegurarse de convertir a número
+
+      const userId = parseInt(currentUser, 10);
       if (isNaN(userId)) {
         message.error("ID de usuario inválido.");
         setLoading(false);
         return;
       }
-  
+
       const response = await axios.get(`${PUERTO}/alimento/${userId}`);
       const { Perecedero, NoPerecedero } = response.data;
-  
+
       if (Array.isArray(Perecedero) && Array.isArray(NoPerecedero)) {
         const perecederos = Perecedero.filter(
           (alimento) => alimento.Id_Usuario_Alta === userId
@@ -77,15 +79,10 @@ export default function Inicio() {
           const fechaCaducidad = alimento.Fecha_Caducidad ? new Date(alimento.Fecha_Caducidad) : null;
           const caducidadPasada = fechaCaducidad && fechaCaducidad < new Date();
           const diasRestantes = fechaCaducidad
-            ? Math.max(
-                0,
-                Math.ceil(
-                  (fechaCaducidad.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-                )
-              )
+            ? Math.max(0, Math.ceil((fechaCaducidad.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
             : 'No definida';
           const fecha = fechaCaducidad ? fechaCaducidad.toLocaleDateString() : 'Fecha no disponible';
-  
+
           return {
             id: alimento.id || ' ',
             ingrediente: alimento.Nombre || ' ',
@@ -100,7 +97,7 @@ export default function Inicio() {
             Id_Usuario_Alta: alimento.Id_Usuario_Alta,
           };
         });
-  
+
         const noPerecederos = NoPerecedero.filter(
           (alimento) => alimento.Id_Usuario_Alta === userId
         ).map((alimento) => ({
@@ -116,7 +113,7 @@ export default function Inicio() {
           Activo: alimento.Activo,
           Id_Usuario_Alta: alimento.Id_Usuario_Alta,
         }));
-  
+
         setAlimentosPerecederos(perecederos);
         setAlimentosNoPerecederos(noPerecederos);
         console.log("Alimentos obtenidos exitosamente");
@@ -130,7 +127,6 @@ export default function Inicio() {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     datosAlimento();
@@ -140,32 +136,28 @@ export default function Inicio() {
     setSearchTerm(value.toLowerCase());
   };
 
-  
-
   const filteredAlimentos = [...alimentosPerecederos, ...alimentosNoPerecederos].filter((alimento) => {
     const nombre = alimento.ingrediente.toLowerCase();
     const tipo = alimento.Tipo.toLowerCase();
     const cantidad = alimento.cantidad.toString();
     return (
-      (nombre.includes(searchTerm) ||
-        tipo.includes(searchTerm) ||
-        cantidad.includes(searchTerm)) &&
+      (nombre.includes(searchTerm) || tipo.includes(searchTerm) || cantidad.includes(searchTerm)) &&
       alimento.cantidad > 0 && alimento.Activo > 0
     );
-  });  
+  });
 
-  
   return (
     <ConfigProvider
       theme={{
         token: {
           colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBgContainer: '#CAE2B5',
+          colorBgContainer: '#CEFF77',
+          colorText: '#244C24',
         },
         components: {
           Select: {
-            optionActiveBg: '#CAE2B5',
+            optionActiveBg: '#CEFF77',
             algorithm: true,
           },
         },
@@ -180,7 +172,7 @@ export default function Inicio() {
             onChange={(e) => handleSearch(e.target.value)}
             style={{ width: '60%' }}
           />
-          <Button style={{ color: '#3E7E1E', backgroundColor: '#CAE2B5' }} onClick={() => setIsModalOpen(true)}>Agregar</Button>
+          <Button style={{ color: '#244C24', backgroundColor: '#CEFF77' }} onClick={() => setIsModalOpen(true)}>Agregar</Button>
         </div>
       </div>
 
@@ -189,26 +181,25 @@ export default function Inicio() {
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
-          <PorCaducar onUpdate={datosAlimento} />
+            <PorCaducar onUpdate={datosAlimento} />
             {filteredAlimentos.map((card, index) => (
               <Card
                 key={index}
                 hoverable
                 style={{
-                  border: '1px solid #3E7E1E',
+                  border: '1px solid #244C24',
                   borderRadius: '10px',
                   overflow: 'hidden',
                 }}
               >
-                
-                <span style={{fontSize: 30, color: '#86A071', fontFamily: 'Jomhuria, sans-serif'}}>
+                <span style={{fontSize: 30, color: '#244C24', fontFamily: 'Jomhuria, sans-serif'}}>
                   <img alt={card.image} src={card.image} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }} />
                   <Meta
-                    title={<span style={{ fontSize: '30px', color: '#86A071', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
+                    title={<span style={{ fontSize: '30px', color: '#244C24', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
                     description={`${card.cantidad} ${card.abreviatura}`}
                     style={{ marginTop: '10px' }}
                   />
-                  <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#86A071' }}>
+                  <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#244C24' }}>
                     {card.fecha}
                   </div>
                   <div style={{display: 'flex', justifyContent: 'space-between'}}>
@@ -232,19 +223,18 @@ export default function Inicio() {
                 </span>
               </Card>
             ))}
-            {/* Modal externo para agregar producto */}
             <ProductModal
               visible={isModalOpen}
               onClose={() => {
                 setIsModalOpen(false);
-                datosAlimento(); // Llamar para refrescar los datos después de agregar
+                datosAlimento();
               }}
             />
             <ModalEd
               visible={edAlimento !== null}
               onClose={() => {
                 setEdAlimento(null);
-                datosAlimento(); // Llamar para refrescar los datos después de editar
+                datosAlimento();
               }}
               stockId={edAlimento}
             />

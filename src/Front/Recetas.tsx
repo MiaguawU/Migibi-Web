@@ -6,6 +6,7 @@ import axios from 'axios';
 import PUERTO from '../config';
 import RecipeCard from './Componentes/RecetaCard';
 
+
 const { Search } = Input;
 
 interface CardData {
@@ -27,30 +28,27 @@ const Recetas: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
 
-
   const navigate = useNavigate();
 
   const datosReceta = async () => {
     setLoading(true);
     try {
-      // Obtener el usuario actual desde el localStorage
       const currentUser = localStorage.getItem("currentUser");
       if (!currentUser) {
         message.warning("No hay un usuario logueado actualmente.");
         setLoading(false);
         return;
       }
-  
+
       const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
       const user = usuarios[currentUser];
-  
+
       if (!user) {
         message.warning("Usuario no encontrado en los datos locales.");
         setLoading(false);
         return;
       }
-  
-      // Parsear el ID del usuario como número
+
       const userId = parseInt(currentUser, 10);
       setUserId(userId); // <--- Esto es nuevo
 
@@ -59,15 +57,14 @@ const Recetas: React.FC = (): JSX.Element => {
         setLoading(false);
         return;
       }
-  
-      // Obtener recetas del servidor
+
       const response = await axios.get(`${PUERTO}/recetaGeneral`);
       if (response.data) {
-        // Filtrar recetas activas y que coincidan con el usuario o sean predeterminadas
         const recData = response.data
           .filter(
             (receta: any) =>
-              receta.Activo > 0 && (receta.Id_Usuario_Alta === userId || receta.Id_Usuario_Alta === 1)
+              receta.Activo > 0 &&
+              (receta.Id_Usuario_Alta === userId || receta.Id_Usuario_Alta === 1)
           )
           .map((receta: any) => {
             {/**const isDefault = receta.Id_Usuario_Alta === 1;
@@ -96,18 +93,16 @@ const Recetas: React.FC = (): JSX.Element => {
       console.error("Error al obtener recetas", error);
       message.error("No se pudo conectar con el servidor o ID de usuario inválido.");
     } finally {
-      setLoading(false); // Asegurar que el estado de carga se detenga
+      setLoading(false);
     }
   };
-  
-  
 
   const eliminarReceta = async (id: number) => {
     try {
       const response = await axios.put(`${PUERTO}/recetaGeneral/${id}`);
       if (response.status === 200) {
         message.success(`Receta eliminada exitosamente.`);
-        datosReceta(); 
+        datosReceta();
       }
     } catch (error) {
       console.error("Error al eliminar receta:", error);
@@ -147,22 +142,29 @@ const Recetas: React.FC = (): JSX.Element => {
           token: {
             colorPrimary: '#00b96b',
             borderRadius: 10,
-            colorBgContainer: '#CAE2B5',
+            colorBgContainer: '#CEFF77',
+            colorText: '#244C24',
           },
         }}
       >
-        <div className="recetas-container">
-          <div className="header">
+        <div className="recetas-container" style={{ color: '#244C24' }}>
+          <div className="header" style={{ color: '#244C24' }}>
             <Search
               placeholder="Buscar por nombre, calorías o tiempo"
               allowClear
               onSearch={handleSearch}
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: '80%' }}
+              style={{ width: '80%', color: '#244C24' }}
             />
-            <Button className="btA" onClick={() => navigate('/verR')}>Agregar</Button>
+            <Button
+              className="btA"
+              style={{ backgroundColor: '#CEFF77', color: '#244C24' }}
+              onClick={() => navigate('/verR')}
+            >
+              Agregar
+            </Button>
           </div>
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <div style={{ textAlign: 'center', marginTop: '20px', color: '#244C24' }}>
             <p>Cargando recetas...</p>
           </div>
         </div>
@@ -176,20 +178,27 @@ const Recetas: React.FC = (): JSX.Element => {
         token: {
           colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBgContainer: '#CAE2B5',
+          colorBgContainer: '#CEFF77',
+          colorText: '#244C24',
         },
       }}
     >
-      <div className="recetas-container">
-        <div className="header">
+      <div className="recetas-container" style={{ color: '#244C24' }}>
+        <div className="header" style={{ color: '#244C24' }}>
           <Search
             placeholder="Buscar por nombre, calorías o tiempo"
             allowClear
             onSearch={handleSearch}
             onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: '80%' }}
+            style={{ width: '80%', color: '#244C24' }}
           />
-          <Button className="btA" onClick={() => navigate('/verR')}>Agregar</Button>
+          <Button
+            className="btA"
+            style={{ backgroundColor: '#CEFF77', color: '#244C24' }}
+            onClick={() => navigate('/verR')}
+          >
+            Agregar
+          </Button>
         </div>
         <div
           style={{
@@ -198,6 +207,7 @@ const Recetas: React.FC = (): JSX.Element => {
             gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
             gap: '16px',
             padding: '16px',
+            color: '#244C24',
           }}
         >
           {//si es default y el usuario no es igual a 1, envia editar=false

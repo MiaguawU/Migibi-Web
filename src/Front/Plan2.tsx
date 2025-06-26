@@ -1,14 +1,10 @@
-import React, { useState, useEffect} from "react";
-import { Card, ConfigProvider, message, Button, Popconfirm  } from 'antd'; 
-import { Modo, Plan } from './Metodos/Enum';
+import React, { useState, useEffect } from "react";
+import { Button, Card, ConfigProvider, message } from 'antd'; 
 import axios from "axios";
 import PUERTO from "../config";
-import "./perfil.css";
 import {formatoFechaLegible} from "./Metodos/FormatoFecha";
 import PlanEditar from "./Componentes/PlanEditar";
 import PlanAgregar from "./Componentes/PlanAgregar";
-import PlanCrearPlan from "./Componentes/PlanCrearPlan";
-//import {FormatoSQL} from "./Metodos/FormatoSQL";
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
 //import imgdesayuno from "../Img/imgdesayuno.png";
@@ -26,30 +22,26 @@ interface CardData {
   calories: string;
   time: string;
   image: string;
-  editar: boolean;
 }
-
 interface comidaSemana {
   comida: string;
   recetas: CardData[];
 }
-
 interface semanaData {
   id: number;
   fecha: string; 
   comidas: comidaSemana[] 
 }
 
-const Inicio = () => { 
-  const [DiasPlan, setDiasPlan] = useState<semanaData[]>([]);
-  const [loading, setLoading] = useState(true);  
+export default function Inicio() {   
   const [weekIndex, setWeekIndex] = useState(0);
+  const [loading, setLoading] = useState(true);  
+  const [DiasPlan, setDiasPlan] = useState<semanaData[]>([]);
   const [isEditarOpen, setIsEditarOpen] = useState(false); // Estado del modal
-  const [isCrearOpen, setIsCrearOpen] = useState(false); // Estado del modal
   const [isAgregarOpen, setIsAgregarOpen] = useState(false); // Estado del modal
   const [diaSelected, setdiaSelected] = useState(0);
   const [comidaSelected, setcomidaSelected] = useState("");
-  const [modoSelected, setmodoSelected] = useState<Modo>(Modo.PlanRellenar);
+
 
   const weeks = [
     "Semana del 1 al 7 de noviembre",
@@ -57,16 +49,26 @@ const Inicio = () => {
     "Semana del 15 al 21 de noviembre",
     "Semana del 22 al 28 de noviembre",
   ];
+
+  const handlePrevious = () => {
+    if (weekIndex > 0) setWeekIndex(weekIndex - 1);
+  };
+
+  const handleNext = () => {
+    if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
+  };
+
   const datosRecetasSemana = async () => {
-    setLoading(true);
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
       message.warning("No hay un usuario logueado actualmente.");
       return;
     }
-    const idUsuario = Number(currentUser);
+    const id = Number(currentUser);
+  
+    setLoading(true);
     try {
-      const response = await axios.get(`${PUERTO}/planGeneral/${idUsuario}`);
+      const response = await axios.get(`${PUERTO}/hoyGeneral/${id}`);
   
       if (response.data) {
         const semanaData: semanaData[] = response.data.map((registro: any) => ({
@@ -86,7 +88,6 @@ const Inicio = () => {
                       image: registro.Imagen_Desayuno
                         ? `${PUERTO}${registro.Imagen_Desayuno}`
                         : "defRec.png",
-                      editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -104,7 +105,6 @@ const Inicio = () => {
                       image: registro.Imagen_Comida
                         ? `${PUERTO}${registro.Imagen_Comida}`
                         : "defRec.png",
-                        editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -122,7 +122,6 @@ const Inicio = () => {
                       image: registro.Imagen_Cena
                         ? `${PUERTO}${registro.Imagen_Cena}`
                         : "defRec.png",
-                      editar: !registro.Es_Default || registro.Id_Usuario_Alta === 1,
                     },
                   ]
                 : [],
@@ -130,29 +129,23 @@ const Inicio = () => {
           ],
         }));
   
-        console.log("Semana Data procesada:", semanaData);
+        console.log("HoyData procesada:", semanaData);
         setDiasPlan(semanaData);
         setLoading(false);
-        message.success("Recetas de la semana obtenidas exitosamente.");
+        message.success("Recetas del día obtenidas exitosamente.");
       }
     } catch (error) {
-      console.error("Error al obtener las recetas de la semana", error);
+      console.error("Error al obtener las recetas del día", error);
       setLoading(false);
       message.error("No se pudo conectar con el servidor.");
     }
   };
   
+  
   useEffect(() => {
     datosRecetasSemana();
   }, []);
 
-  const handlePrevious = () => {
-    if (weekIndex > 0) setWeekIndex(weekIndex - 1);
-  };
-
-  const handleNext = () => {
-    if (weekIndex < weeks.length - 1) setWeekIndex(weekIndex + 1);
-  };
 
   const handleEdit = (idDia: number, comidaNombre: string) => {
     setdiaSelected(idDia);
@@ -193,68 +186,46 @@ const Inicio = () => {
     }
   };
 
+
   return (  
-    <ConfigProvider
-  theme={{
-    token: {
-      colorPrimary: '#00b96b',
-      borderRadius: 10,
-      colorBgContainer: '#CEFF77',  // ✅ CAMBIO
-    },
-    components: {
-      Select: {
-        optionActiveBg: '#CEFF77',  // ✅ CAMBIO
-        algorithm: true
+  <ConfigProvider
+    theme={{
+      token: {
+        colorPrimary: '#00b96b',
+        borderRadius: 10,
+        colorBgContainer: '#CEFF77',  // ✅ CAMBIO
+      },
+      components: {
+        Select: {
+          optionActiveBg: '#CEFF77',  // ✅ CAMBIO
+          algorithm: true
+        }
       }
-    }
-  }}
->
+    }}
+  >
       <div style={{ paddingLeft: '15px', paddingRight: '15px' }}>
         <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex'}}>
           <div style={{height: '100%', display: 'flex', alignItems: 'center', padding: '15px'}}>
             <ConfigProvider
-            theme={{
-              token: {
-                fontFamily: "Jomhuria, Serif",
-                fontSize: 40,
-                colorText: "#244C24",       // ✅ CAMBIO de cam , antes #6B8762
-                colorPrimary: '#00b96b',
-                borderRadius: 10,
-                colorBgContainer: '#CEFF77' // ✅ CAMBIO de cam, antes #CAE2B5
-              },
-              components: {
-                Popconfirm: {
-                  fontSize: 25,
-                  borderRadius: 5,
-                  marginXS: 10
-                },
-              },
-              }}>
+  theme={{
+    token: {
+      fontFamily: "Jomhuria, Serif",
+      fontSize: 40,
+      colorText: "#244C24",       // ✅ CAMBIO
+      colorPrimary: '#00b96b',
+      borderRadius: 10,
+      colorBgContainer: '#CEFF77' // ✅ CAMBIO
+    }
+  }}
+>
+
               <Button
                 key={`AgregarNuevoPlan`}
                 style={{height: "40px", margin: '10px', marginTop: '5px',}}
                 onClick={() => {setIsAgregarOpen(true);}}>
                 Agregar receta
               </Button>
-              <Popconfirm
-                title="Elegir modo"
-                style={{fontSize: 25}}
-                description="¿Quieres usar solo lo que tienes?"
-                onConfirm={() => {setmodoSelected(Modo.PlanEstricto);setIsCrearOpen(true);}}
-                onCancel={() => {setmodoSelected(Modo.PlanRellenar);setIsCrearOpen(true);}}
-                okText="Sí"
-                cancelText="No, dame un plan completo."
-              >
-                <Button
-                  key={`CrearNuevoPlan`}
-                  style={{height: "40px", margin: '10px', marginTop: '5px',}}>
-                  Crear Plan
-                </Button>
-              </Popconfirm>
               </ConfigProvider>
-
-
-              
               {/**
                * 
             <img src={imgdesayuno} style={{height: '100px'}} />
@@ -291,8 +262,8 @@ const Inicio = () => {
               <div key={index}>
                 <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}>
                   <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#244C24'}}>
-  {comida.comida}
-</a>
+                    {comida.comida}
+                  </a>
                   <div>
                     <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px'}}>
                     {comida.recetas.length > 0 ? (
@@ -305,7 +276,7 @@ const Inicio = () => {
                           calories={card.calories}
                           time={card.time}
                           image={card.image}
-                          editar={card.editar}
+                          editar={false}
                           onEdit={() => handleEdit(dia.id, comida.comida)}
                           onDelete={() => handleDelete(dia.id, comida.comida)}
                         />
@@ -317,19 +288,22 @@ const Inicio = () => {
                         token: {
                           fontFamily: "Jomhuria, Serif",
                           fontSize: 40,
-                          colorText: "#244C24",       // ✅ CAMBIO antes #8BA577
+                          colorText: "#244C24",       // ✅ CAMBIO
                           colorPrimary: '#00b96b',
                           borderRadius: 10,
-                          colorBgContainer: '#CEFF77' // ✅ CAMBIO antes #CAE2B5
+                          colorBgContainer: '#CEFF77' // ✅ CAMBIO
                         }
                       }}
                     >
+
                       <Button
                         key={`add-recipe-${dia.id}-${comida.comida}`}
                         style={{height: "40px"}}
                         onClick={() => {
                           setdiaSelected(dia.id);
+                          console.log(dia.id);
                           setcomidaSelected(comida.comida);
+                          console.log(dia.id);
                           setIsEditarOpen(true); // Abre el modal para agregar receta
                         }}
                       >
@@ -347,7 +321,6 @@ const Inicio = () => {
             <br />
           </div>
         ))}
-        
         <PlanEditar
               visible= {isEditarOpen}
               onClose={() => setIsEditarOpen(false)}
@@ -360,16 +333,7 @@ const Inicio = () => {
               onClose={() => setIsAgregarOpen(false)}
               onSubmit={datosRecetasSemana}
             />
-        <PlanCrearPlan
-              visible= {isCrearOpen}
-              ModoSelected={modoSelected}
-              PlanSelected={Plan.PlanSemanal}
-              onClose={() => setIsCrearOpen(false)}
-              onSubmit={datosRecetasSemana}
-            />
       </div>
     </ConfigProvider>
   );
 }
-
-export default Inicio;
