@@ -14,12 +14,12 @@ router.get("/:id", (req, res) => {
       ca.Alimento AS Nombre,
       sd.Cantidad AS Cantidad,
       sd.Fecha_Caducidad AS Fecha,
-      ca.Id_Usuario_Alta
+      sd.Id_Usuario_Alta
     FROM stock_detalle sd
     LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
     WHERE ca.Es_Perecedero = 1 
       AND sd.Activo = 1 
-      AND ca.Id_Usuario_Alta = ?
+      AND sd.Id_Usuario_Alta = ?
     ORDER BY sd.Fecha_Caducidad ASC 
     LIMIT 10;
   `;
@@ -35,10 +35,7 @@ router.get("/:id", (req, res) => {
     if (result1.length === 0) {
       return res.status(404).json({ message: "No se encontraron alimentos por caducar" });
     }
-
-    console.log("Enviando alimentos por caducar:", result1);
     
-    // Enviar la respuesta correctamente
     return res.json({ porcaducar: result1 });
   });
 });

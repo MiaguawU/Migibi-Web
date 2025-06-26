@@ -1,5 +1,5 @@
 CREATE DATABASE  IF NOT EXISTS `migibi` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `migibi`; 
+USE `migibi`;
 
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
@@ -446,7 +446,7 @@ CREATE TABLE `receta_instrucciones` (
   `Id_Receta_Instrucciones` int NOT NULL AUTO_INCREMENT,
   `Id_Receta` int NOT NULL,
   `Instruccion` varchar(3000) NOT NULL,
-  `Orden` int NOT NULL auto_increment,
+  `Orden` int NOT NULL,
   `Activo` tinyint(1) NOT NULL DEFAULT (1),
   `Id_Usuario_Alta` int NOT NULL,
   `Fecha_Alta` datetime NOT NULL,
@@ -572,7 +572,7 @@ DROP TABLE IF EXISTS `stock_detalle`;
 CREATE TABLE `stock_detalle` (
   `Id_Stock_Detalle` int NOT NULL AUTO_INCREMENT,
   `Id_Unidad_Medida` int NOT NULL,
-  `Cantidad` decimal(10,0) DEFAULT NULL,
+  `Cantidad` DECIMAL(10,0) DEFAULT NULL,
   `Activo` tinyint(1) NOT NULL DEFAULT (1),
   `Id_Usuario_Alta` int NOT NULL,
   `Fecha_Alta` datetime NOT NULL,
@@ -771,7 +771,6 @@ BEGIN
 END$$
 
 DELIMITER ;
-
 
 --
 -- Temporary view structure for view `vw_cat_alimento`

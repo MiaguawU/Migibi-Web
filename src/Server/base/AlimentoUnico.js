@@ -117,7 +117,8 @@ router.get("/:id", async (req, res) => {
     const id = req.params.id;
   
     const query = `
-      SELECT 
+      SELECT
+        sd.Id_Alimento,  
         ca.Alimento AS Nombre,
         sd.Total AS Cantidad,
         sd.Id_Unidad_Medida AS id_unidad,
@@ -245,7 +246,9 @@ router.put("/original/:id", upload.single("image"), async (req, res) => {
 router.put("/alimentoEsPerecedero/:id_stock", upload.single("image"), async (req, res) => {
   
     const id_stock = req.params.id_stock;
+    
     const { id_alimento, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta } = req.body;
+    console.log('id_Al: ',id_alimento);
 
     const { error } = alimentoEsPerecederoSchema.validate({
       id_stock: Number(id_stock),
@@ -309,6 +312,7 @@ router.put("/alimentoNoPerecedero/:id_stock", upload.single("image"), async (req
   
     const id_stock = req.params.id_stock;
     const { id_alimento, id_unidad, cantidad, fecha_caducidad, Id_Usuario_Alta } = req.body;
+    console.log(cantidad)
 
     const { error } = alimentoNoPerecederoSchema.validate({
       id_stock: Number(id_stock),
@@ -350,6 +354,19 @@ router.put("/alimentoNoPerecedero/:id_stock", upload.single("image"), async (req
       WHERE Id_Stock_Detalle = ?`;
 
     const values2 = [id_unidad, cantidad, null, id_alimento, imagen, Id_Usuario_Alta, Fecha_Alta, id_stock];
+
+    const sanitizeValue = (value) => {
+        if (value === null) return 'NULL';
+        if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`; // Escapar comillas para SQL
+        if (typeof value === 'number' || typeof value === 'boolean') return value;
+        return `'${String(value).replace(/'/g, "''")}'`; // Convertir otros tipos a string y escapar
+    };
+
+    let fullQuery = query2;
+    // Reemplaza los placeholders '?' con los valores correspondientes
+    for (let i = 0; i < values2.length; i++) {
+        fullQuery = fullQuery.replace('?', sanitizeValue(values2[i]));
+    }
 
     await queryAsync(query2, values2);
 

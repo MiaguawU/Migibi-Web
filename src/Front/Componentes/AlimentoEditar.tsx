@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Space, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps } from 'antd';
-import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
 import moment from 'moment';
@@ -11,6 +11,21 @@ interface FormModalProps {
   visible: boolean;
   onClose: () => void;
   stockId: number | null;
+}
+
+// Ensure this interface correctly reflects the structure you receive from the backend
+interface alimentos {
+  Id_Alimento: number;
+  Alimento: string;
+  Activo: number;
+  Es_Perecedero: number;
+  // Add any other properties your backend sends for a single alimento fetch (alUn)
+  Fecha?: string; // Optional, as it might not be present if not perecedero or if null
+  Nombre: string; // The backend seems to return 'Nombre' for the specific item
+  Cantidad: number;
+  id_unidad: number;
+  id_tipo: number;
+  EsPerecedero: number; // The backend seems to use this for the single item fetch
 }
 
 interface Tipo {
@@ -36,14 +51,14 @@ const formItemLayout = {
 
 const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) => {
   const [form] = Form.useForm();
-  const [Tipos, setTipos] = useState<Tipo[]>([]);  
-  const [Unidades, setUnidad] = useState<Unidad[]>([]); 
-  const [alimentos, setAlimentos] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>(""); // Para la búsqueda
+  const [Tipos, setTipos] = useState<Tipo[]>([]);
+  const [Unidades, setUnidad] = useState<Unidad[]>([]);
+  const [alimentos, setAlimentos] = useState<any[]>([]); // This holds the list of all available foods
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [esNuevo, setEsNuevo] = useState(false);
   const [esPerecedero, setEsPerecedero] = useState<boolean | undefined>(undefined);
   const [imagen, setImagen] = useState<File | null>(null);
-  const [alimento, setAlimento] = useState<any | null>(null);
+  const [currentAlimentoData, setCurrentAlimentoData] = useState<alimentos | null>(null); // To store the full data of the currently edited/selected alimento
   const [isPerecederoModalOpen, setIsPerecederoModalOpen] = useState(false);
 
   const props: UploadProps = {
@@ -60,11 +75,11 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
       }
     },
   };
-  
+
   const filteredOptions = alimentos
-    .filter((alimento) => 
-      typeof searchTerm === "string" ? 
-       alimento.Alimento.toLowerCase().includes(searchTerm.toLowerCase()) : () => {}
+    .filter((alimento) =>
+      typeof searchTerm === "string" ?
+        alimento.Alimento.toLowerCase().includes(searchTerm.toLowerCase()) : true
     )
     .map((alimento) => ({
       value: alimento.Alimento,
@@ -104,95 +119,57 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
       obtenerTipos();
       obtenerUnidad();
       fetchAlimentos();
-      obtenerAlimento();
+      obtenerAlimento(); // Call to fetch specific food data if stockId exists
     }
   }, [visible, stockId]);
 
   const obtenerAlimento = async () => {
-    if (!stockId) return;
+    if (!stockId) {
+        // If no stockId, it's a new item creation flow
+        setCurrentAlimentoData(null);
+        setEsNuevo(true); // Default to new if no stockId
+        setEsPerecedero(undefined); // Reset perecedero state
+        form.resetFields(); // Clear form for new entry
+        setSearchTerm(""); // Clear search term for new entry
+        return;
+    }
     try {
       const response = await axios.get(`${PUERTO}/alUn/${stockId}`);
-      const alimento = response.data;
-      setEsPerecedero(alimento.EsPerecedero === 1);
-      console.log(esPerecedero);
-      // Configurar valores del formulario
+      const alimentoData = response.data;
+      console.log("Datos de alimento obtenidos (alUn):", alimentoData);
+
+      // Store the entire fetched alimento data
+      setCurrentAlimentoData(alimentoData);
+      setEsNuevo(false); // It's an existing item
+      setEsPerecedero(alimentoData.EsPerecedero === 1);
+      setSearchTerm(alimentoData.Nombre); // Pre-fill the search term
+
+      // Set form values
       form.setFieldsValue({
-        name: alimento.Nombre,
-        expirationDate: alimento.Fecha ? moment(alimento.Fecha, "YYYY-MM-DD") : null,
-        quantity: alimento.Cantidad,
-        unit: alimento.id_unidad,
-        type: alimento.id_tipo,
+        name: alimentoData.Nombre,
+        expirationDate: alimentoData.Fecha ? moment(alimentoData.Fecha, "YYYY-MM-DD") : null,
+        quantity: alimentoData.Cantidad,
+        unit: alimentoData.id_unidad,
+        type: alimentoData.id_tipo,
       });
 
     } catch (error) {
       message.error("No se pudo cargar el alimento.");
+      console.error("Error fetching individual alimento:", error);
     }
   };
-  
-  const pregunta = (isPerecedero: boolean) => {
+
+  const pregunta = () => {
     setIsPerecederoModalOpen(false);
     setEsPerecedero(true);
   };
 
-  const preguntaNO = (isPerecedero: boolean) => {
+  const preguntaNO = () => {
     setIsPerecederoModalOpen(false);
     setEsPerecedero(false);
-    form.setFieldsValue({ expirationDate: null });  // Asegura que la fecha esté vacía
-    //form.submit();
+    form.setFieldsValue({ expirationDate: null });
   };
-  
-  const handleSubmitOriginal = async (values: any) => {
 
-    const currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) {
-      message.warning("No hay un usuario logueado actualmente.");
-      return;
-    }
-  
-    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
-    const user = usuarios[currentUser];
-  
-    if (!user) {
-      message.warning("Usuario no encontrado en los datos locales.");
-      return;
-    }
-  
-    const formData = new FormData();
-        formData.append('nombre', values.name);
-        formData.append('tipo', values.type);
-        formData.append('id_unidad', values.unit);
-        formData.append('cantidad', values.quantity);
-        formData.append('fecha_caducidad', values.expirationDate ? values.expirationDate.format("YYYY-MM-DD") : ''); // Formatear la fecha
-        formData.append('Id_Usuario_Alta', currentUser);
-
-  
-    if (values.imgsrc && values.imgsrc.file) {
-      formData.append('image', values.imgsrc.file.originFileObj);
-    } else { 
-      
-    }
-    
-    try {
-      const response = await axios.put(`${PUERTO}/alimento/${stockId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      message.success('Producto actualizado');
-      form.resetFields();
-    } catch (error: any)  {
-          console.error("Error en la solicitud:", error);
-    
-        if (error.response) {
-              if (error.response.data && error.response.data.error) {
-                message.error(error.response.data.error); // Muestra el mensaje de error del backend
-              } else {
-                message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
-              }
-            } else {
-              message.error('Error de conexión con el servidor.');
-            }
-        }
-  };
-  
   const handleSubmit = async (values: any) => {
     const currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
@@ -202,51 +179,88 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
     const idUsuario = Number(currentUser);
 
     const formData = new FormData();
-    formData.append('id_stock', stockId? String(stockId) : '0');
-    if (esNuevo) { formData.append('nombre', values.name); } else { formData.append('id_alimento', alimento? String(alimento.Id_Alimento) : '0'); }
-    if (esNuevo) { formData.append('tipo', String(values.type)); }
-    formData.append('id_unidad', String(values.unit)); // AntD Select retorna string, pero multer lo maneja como string
+    formData.append('id_stock', stockId ? String(stockId) : '0'); // Always send id_stock
+
+    if (esNuevo) {
+      formData.append('nombre', values.name);
+      formData.append('tipo', String(values.type));
+      formData.append('es_perecedero', esPerecedero ? '1' : '0');
+    } else {
+      // If it's NOT a new food, we MUST send the Id_Alimento.
+      // Use currentAlimentoData.Id_Alimento if it exists, otherwise prompt an error.
+      if (currentAlimentoData && currentAlimentoData.Id_Alimento) {
+        formData.append('id_alimento', String(currentAlimentoData.Id_Alimento));
+      } else {
+        message.error("No se pudo obtener el Id_Alimento para actualizar.");
+        return;
+      }
+    }
+
+    formData.append('id_unidad', String(values.unit));
     formData.append('cantidad', String(values.quantity));
-    if (esPerecedero) { formData.append('fecha_caducidad', values.expirationDate); }
-    formData.append('Id_Usuario_Alta', idUsuario.toString()); // Siempre enviar como string en formData
-    if (imagen) { formData.append('image', imagen); }
+
+    if (esPerecedero && values.expirationDate) {
+      formData.append('fecha_caducidad', values.expirationDate.format("YYYY-MM-DD"));
+    } else if (stockId && !esPerecedero) {
+      formData.append('fecha_caducidad', ''); // Clear date if no longer perecedero
+    }
+
+    formData.append('Id_Usuario_Alta', idUsuario.toString());
+
+    if (imagen) {
+      formData.append('image', imagen);
+    }
 
     let query = "";
-    esNuevo ? query+= "nuevoAlimento" : query+= "alimento";
-    esPerecedero ? query+= "EsPerecedero" : query+= "NoPerecedero";
-    console.log(formData);
-    let response;
+    if (esNuevo) {
+      query = "nuevoAlimento"; // For creating a new food and adding to stock
+    } else {
+      query = "alimento"; // For updating an existing food in stock
+      if (esPerecedero) {
+        query += "EsPerecedero";
+      } else {
+        query += "NoPerecedero";
+      }
+    }
+
+    console.log("Sending formData:", Object.fromEntries(formData.entries())); // For debugging
+    console.log(`Sending to: ${PUERTO}/alUn/${query}/${stockId}`);
+
     try {
-      response = await axios.put(`${PUERTO}/alUn/${query}/${stockId}`, formData, {
+      const response = await axios.put(`${PUERTO}/alUn/${query}/${stockId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       message.success('Producto editado');
-  
-      form.resetFields();
-    } catch (error: any)  {
+      onClose(); // Close modal after successful submission
+      form.resetFields(); // Reset form
+      setEsNuevo(false); // Reset state
+      setEsPerecedero(undefined); // Reset state
+      setSearchTerm(""); // Reset search term
+      setCurrentAlimentoData(null); // Reset current alimento data
+    } catch (error: any) {
       console.error("Error en la solicitud:", error);
-
-      // Verificar si el backend envió un mensaje de error
       if (error.response) {
         if (error.response.data && error.response.data.error) {
-          message.error(error.response.data.error); // Muestra el mensaje de error del backend
+          message.error(error.response.data.error);
         } else {
           message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
         }
       } else {
         message.error('Error de conexión con el servidor.');
-      }}
+      }
+    }
   };
 
   const handleFinish = (values: any) => {
     handleSubmit(values);
-    onClose();
   };
 
   const handleClose = () => {
     onClose();
     setEsNuevo(false);
     setEsPerecedero(undefined);
+    setSearchTerm("");
+    setCurrentAlimentoData(null); // Reset current alimento data on close
     form.resetFields();
   };
 
@@ -306,32 +320,36 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
                 );
 
                 if (alimentoSeleccionado) {
-                  console.log("Alimento existente:", alimentoSeleccionado);
-                  setAlimento(alimentoSeleccionado)
+                  console.log("Alimento existente seleccionado del dropdown:", alimentoSeleccionado);
+                  // When an existing food is selected from the dropdown, update currentAlimentoData
+                  setCurrentAlimentoData(alimentoSeleccionado);
                   setEsNuevo(false);
                   setEsPerecedero(alimentoSeleccionado.Es_Perecedero === 1);
                 } else {
+                  console.log("Detectado nuevo alimento:", newValue);
                   setEsNuevo(true);
+                  setCurrentAlimentoData(null); // No Id_Alimento yet for new food
                   setIsPerecederoModalOpen(true);
                 }
               }}
               filterOption={false}
             />
           </Form.Item>
-          
-        {esPerecedero && (
-          <Form.Item name="expirationDate" label="Fecha de caducidad" 
-          rules={[
-            {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
-            ]}>
-            <DatePicker
-              style={{ width: '100%' }}
-              format="YYYY-MM-DD"
-              placeholder="Selecciona una fecha"
-            />
-          </Form.Item>
-          )}
 
+          {/* Rest of your form items (expirationDate, quantity, unit, type, imgsrc) remain the same */}
+          {esPerecedero !== undefined && (
+            <Form.Item name="expirationDate" label="Fecha de caducidad"
+            rules={[
+              {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
+              ]}>
+              <DatePicker
+                style={{ width: '100%' }}
+                format="YYYY-MM-DD"
+                placeholder="Selecciona una fecha"
+                disabled={!esPerecedero}
+              />
+            </Form.Item>
+            )}
 
           <Form.Item
             name="quantity"
@@ -401,19 +419,19 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
         </Form>
       </Modal>
       <Modal
-          title="¿Es perecedero?"
-          visible={isPerecederoModalOpen}
-          onCancel={() => setIsPerecederoModalOpen(false)}
-          footer={null}
-        >
-          <p>Confirma si el producto es perecedero.</p>
-          <Space size="small">
-            <Button type="primary" onClick={() => pregunta(true)}>
-              Sí
-            </Button>
-            <Button onClick={() => preguntaNO(false)}>No</Button>
-          </Space>
-        </Modal>
+        title="¿Es perecedero?"
+        visible={isPerecederoModalOpen}
+        onCancel={() => setIsPerecederoModalOpen(false)}
+        footer={null}
+      >
+        <p>Confirma si el producto es perecedero.</p>
+        <Space size="small">
+          <Button type="primary" onClick={pregunta}>
+            Sí
+          </Button>
+          <Button onClick={preguntaNO}>No</Button>
+        </Space>
+      </Modal>
     </ConfigProvider>
   );
 };
