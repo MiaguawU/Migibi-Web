@@ -36,7 +36,7 @@ const formItemLayout = {
 
 
 
-const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, alimentoId }) => {
+const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) => {
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);  
   const [Unidades, setUnidad] = useState<Unidad[]>([]); 
