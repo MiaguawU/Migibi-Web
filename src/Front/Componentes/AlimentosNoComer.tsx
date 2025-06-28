@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Button, Select, ConfigProvider, message, List, Avatar } from 'antd';
 import img from '../../Img/defRec.png';
+import { customColors } from '../Estilos/colores';
 import axios from "axios";
 import PUERTO from "../../config";
 import { any } from 'joi';
@@ -156,13 +157,35 @@ const AlimentosNoComer: React.FC<FormModalProps> = ({ visible, onClose, onSubmit
   }}
 
   return (
+    <>
+    <style>
+      {`
+        .ant-modal .ant-modal-content {
+          background-color: #fff;
+        }
+        .ant-modal .ant-modal-header {
+          background-color: #fff;
+        }
+        .ant-list-split .ant-list-item {
+          border-block-end: 1px solid #fff;
+        }
+      `}
+    </style>
     <ConfigProvider
       theme={{
         token: {
-          colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
+          colorBorder: '#3E7E1E', 
+          colorBgContainer: 'white',
+          colorBgElevated: "white",
+          colorText: customColors.colorFrio2,
           colorPrimary: '#3E7E1E',
+          colorBorderSecondary: customColors.colorFuerteFrio,
+        },
+        components: {
+          Button: {
+            solidTextColor: "#306430",
+            primaryColor: "#306430",
+          },
         },
       }}
     >
@@ -184,6 +207,7 @@ const AlimentosNoComer: React.FC<FormModalProps> = ({ visible, onClose, onSubmit
             rules={[{ required: true, message: 'Por favor, introduce el nombre del alimento.' }]}
           >
             <Select
+              style={{borderColor: 'white'}}
               showSearch
               placeholder="Buscar o escribir alimento"
               options={filteredOptions}
@@ -209,9 +233,23 @@ const AlimentosNoComer: React.FC<FormModalProps> = ({ visible, onClose, onSubmit
               offset: 0,
             }}
           >
+            
+    <ConfigProvider
+      theme={{
+        token: {
+      colorPrimary: '#96F20A',
+        },
+        components: {
+          Button: {
+            solidTextColor: "#306430",
+            primaryColor: "#306430",
+          },
+        },
+      }}
+    >
             <Button type="primary"  htmlType="submit" block>
               Agregar
-            </Button>
+            </Button></ConfigProvider>
           </Form.Item>
         </Form>
         <List
@@ -228,6 +266,7 @@ const AlimentosNoComer: React.FC<FormModalProps> = ({ visible, onClose, onSubmit
         />
       </Modal>
     </ConfigProvider>
+    </>
   );
 };
 

@@ -22,17 +22,17 @@
   }
   
   .save-button {
-    background-color: #C3DCA2; /* Rojo suave */
+    background-color: #CEFF77; /* Rojo suave */
     border: none;
-    color: #6D7868;
+    color: #306430;
     padding: 8px 15px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
   }
-  
+
   .save-button:hover {
-    background-color: #acc788; /* Rojo más oscuro al pasar el mouse */
+    background-color: #b3e65b; /* Rojo más oscuro al pasar el mouse */
   }
 
   .logout-button {
@@ -91,13 +91,15 @@
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border: solid #28a745 1px;
-    font-family: "Jomhuria", serif;
+    font-family: "Poppins", serif;
     font-size: x-large;
     gap: 10px
   }
+  
   .user-title {
     margin-bottom: 20px;
     color: #8BA577;
+    font-weight: 500;
   }
   
   .info-cards {
@@ -108,7 +110,7 @@
   }
   
   .info-card {
-    background-color: #C3DCA2;
+    background-color: #CEFF77;
     border-radius: 8px;
     padding: 10px 15px;
     display: flex;
@@ -117,7 +119,7 @@
     text-align: center;
     gap: 10px;
     min-width: 150px;
-    border: solid #3E7E1E 1px;
+    border: solid #4A7500 1px;
     color: #8BA577
     
   }
@@ -140,6 +142,8 @@
     border-radius: 5px;
     padding: 5px 10px;
     cursor: pointer;
+    font-size: large;
+    color: #244C24;
   }
   
   .highlight {

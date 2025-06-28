@@ -141,15 +141,17 @@ function App() {
       colorWarning: '#FFDA48',
       colorError: '#FF570F',
       colorInfo: '#5BC0DE',
-      colorTextBase: '#1F1F1F',
-      colorBgBase: 'white',
+      colorTextBase: '#1F1F1F', 
+      colorBgBase: '#fff',
       colorErrorActive: '#FFB948',
       colorErrorHover: '#FFB948',
       colorErrorBorder: '#FFB948',
       colorErrorBorderHover: '#FFDA48',
       fontFamily: 'Poppins, sans-serif',
-      
-      colorBgContainer: "white",
+      colorBorder: '#fff',
+      colorBgContainer: "#fff",
+      colorBorderSecondary: "rgba(240,240,240,0)",
+      colorBgElevated: '#f9f9f9',
     },
     components: {
       Button: {
@@ -161,6 +163,24 @@ function App() {
   };
 
   return (
+    <>
+    <style>
+      {`
+        .ant-modal .ant-modal-content {
+          background-color: #fff;
+        }
+        .ant-modal .ant-modal-header {
+          background-color: #fff;
+        }
+        .ant-list-split .ant-list-item {
+          border-block-end: 1px solid #fff;
+        }
+        .ant-select-outlined {
+        background-color: #fff,
+        border: 1px solid rgba(240,240,240,0),
+        }
+      `}
+    </style>
     <ConfigProvider theme={customTheme} locale={esES}>
 
     <MainLayout>
@@ -228,6 +248,7 @@ function App() {
     </MainLayout>
 
     </ConfigProvider>
+    </>
   );
 }
 

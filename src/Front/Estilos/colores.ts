@@ -11,5 +11,8 @@ export const customColors = {
     colorPrimarioClaro: '#B8F845',
     colorBgTarjeta: '#CEFF77',
     colorTextTarjeta: '#4A7500',
+    colorWarning: '#FFDA48',
+    colorError: '#FF570F',
+    colorInfo: '#5BC0DE',
   // ...
 };
