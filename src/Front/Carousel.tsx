@@ -21,7 +21,7 @@ const CarouselExample: React.FC = () => {
 
   return (
 
-    <Carousel autoplay style={{width: "100%", backgroundColor: "#C4EFC4",}}>
+    <Carousel autoplay style={{width: "100%", backgroundColor: "#C4EFC4", height: "400px"}}>
       {slides.map((slide, index) => (
         <div key={index} className="carousel-slide">
           <div className="carousel-content">

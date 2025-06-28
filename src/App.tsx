@@ -4,8 +4,6 @@ import { Menu, Button, Drawer, message, ConfigProvider, Grid } from 'antd';
 import type { MenuProps } from 'antd';
 import esES from 'antd/locale/es_ES'; // Opcional: español
 import './Front/Estilos/Nav.css';
-import PUERTO from './config';
-import axios from "axios";
 import Modal from './Front/Modal';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
@@ -27,10 +25,11 @@ import Usuarios from './Front/Usuarios';
 import Cat_Alimentos from './Front/Cat_Alimentos';
 import Catalogos from './Front/Catalogos';
 import CambiarContrasenia from './Front/CambiarContrasenia';
-import VerificarCorreo from './Front/CambiarContrasenia';
+import VerificarCorreo from './Front/VerificarCorreo';
 import Terminos from './Front/Términos_Condiciones';
 import AvisoPriv from './Front/AvisoPriv';
-
+import PUERTO from './config';
+import axios from "axios";
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -109,9 +108,6 @@ function App() {
       console.error("Error al obtener el rol del usuario:", error);
     }
   };
-
-
-
 
   useEffect(() => {
     const usuariosLocal = JSON.parse(localStorage.getItem("usuarios") || "{}");

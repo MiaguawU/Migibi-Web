@@ -154,7 +154,9 @@
 
 p,
 h3 {
-  font-family: 'Jomhuria';
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
   color: #244C24;
 }
 

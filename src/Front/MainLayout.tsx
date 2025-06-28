@@ -8,6 +8,8 @@ import {
   InstagramOutlined,
   FacebookOutlined,
 } from "@ant-design/icons";
+import './Estilos/MainLayout.css';
+//Aquí queremos importar el MainLayout.css y comprobar si funciona
 
 const { Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -30,8 +32,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Contenido principal */}
       <Content style={{ minHeight: "100vh", width: "100%" }}>{children}</Content>
 
-      {/* Pie de página */}
-      <Footer style={{ backgroundColor: "#9ED340", padding: "40px 200px" }}>
+      {/* Pie de página 336733*/}
+      <Footer style={{ backgroundColor: "#9ED340"}}>
         <Row justify="center" gutter={[32, 32]}>
           {/* Inicio */}
           <Col xs={24} sm={12} md={6}>
@@ -39,6 +41,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <ul style={{ listStyle: "none", padding: 0 }}>
               <li><Link to="/" style={linkStyle}>Bienvenida</Link></li>
               <li><Link to="/conocenos#proposito" style={linkStyle}>Propósito</Link></li>
+              {/*<li>Objetivos</li>*/}
               <li><Link to="/conocenos#mision" style={linkStyle}>Misión</Link></li>
               <li><Link to="/conocenos#vision" style={linkStyle}>Visión</Link></li>
             </ul>
@@ -48,6 +51,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Col xs={24} sm={12} md={6}>
             <Title level={4} style={{ color: "black" }}>Nosotros</Title>
             <ul style={{ listStyle: "none", padding: 0 }}>
+              {/*<li>Equipo</li>
+              <li>Organigrama</li>*/}
               <li><Link to="/conocenos#valoresss" style={linkStyle}>Valores</Link></li>
               <li><Link to="/conocenos#filosofiaaa" style={linkStyle}>Filosofía</Link></li>
               <li><Link to="/conocenos#politicasss" style={linkStyle}>Políticas</Link></li>
@@ -69,27 +74,31 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {/* Contáctanos */}
           <Col xs={24} sm={12} md={6}>
             <Title level={4} style={{ color: "black" }}>Contáctanos</Title>
-            <Text style={{ color: "black" }}>cincode.official@gmail.com</Text>
-            <div style={{ marginTop: "10px", fontSize: "20px" }}>
-              <Mail />
-              <a
-                href="https://www.instagram.com/cincode_official/"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ ...linkStyle, marginRight: "10px" }}
-              >
-                <InstagramOutlined />
-              </a>
-              <WhatsAppIcon />
-              <a
-                href="https://www.facebook.com/profile.php?id=61560896874235"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={linkStyle}
-              >
-                <FacebookOutlined />
-              </a>
-            </div>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              <li><a href="cincode.official@gmail.com" style={linkStyle}>cincode.official@gmail.com</a></li>
+              <li>
+                <div style={{ marginTop: "10px", fontSize: "20px" }}>
+                  <Mail />
+                  <a
+                    href="https://www.instagram.com/cincode_official/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ ...linkStyle, marginRight: "10px" }}
+                  >
+                    <InstagramOutlined />
+                  </a>
+                  <WhatsAppIcon />
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61560896874235"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ ...linkStyle, marginRight: "10px" }}
+                  >
+                    <FacebookOutlined />
+                  </a>
+                </div>
+            </li>
+            </ul>
           </Col>
         </Row>
 

@@ -246,7 +246,7 @@ router.post("/alimentoEsPerecedero", async (req, res) => {
         // Crear un nuevo registro en stock_detalle
         await queryAsync(
           `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             id_unidad,
             cantidad,
@@ -296,7 +296,7 @@ router.post("/alimentoNoPerecedero", async (req, res) => {
         // Crear un nuevo registro en stock_detalle
         await queryAsync(
           `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             id_unidad,
             cantidad,
@@ -363,7 +363,7 @@ router.post("/nuevoAlimentoEsPerecedero", async (req, res) => {
       // Insertar en stock_detalle
       await queryAsync(
         `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [id_unidad, cantidad, cantidad, Fecha_Caducidad, Id_Alimento, imagen, Id_Usuario_Alta, Fecha_Alta]
       );
 
@@ -416,7 +416,7 @@ router.post("/nuevoAlimentoNoPerecedero", async (req, res) => {
       // Insertar en stock_detalle
       await queryAsync(
         `INSERT INTO stock_detalle (Id_Unidad_Medida, Cantidad, Total, Fecha_Caducidad, Id_Alimento, Imagen_alimento, Id_Usuario_Alta, Fecha_Alta) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [id_unidad, cantidad, cantidad, null, Id_Alimento, imagen, Id_Usuario_Alta, Fecha_Alta]
       );
 
@@ -503,7 +503,7 @@ router.get("/:id", (req, res) => {
       cum.Abreviatura AS Unidad,
       sd.Imagen_alimento AS Imagen,
       sd.Fecha_Caducidad,
-      ca.Id_Usuario_Alta,
+      sd.Id_Usuario_Alta,
       cta.Tipo_Alimento AS Tipo_Alimento
     FROM stock_detalle sd
     LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
@@ -521,7 +521,7 @@ router.get("/:id", (req, res) => {
       sd.Total AS Cantidad,
       cum.Abreviatura AS Unidad,
       sd.Imagen_alimento AS Imagen,
-      ca.Id_Usuario_Alta,
+      sd.Id_Usuario_Alta,
       cta.Tipo_Alimento AS Tipo_Alimento
     FROM stock_detalle sd
     LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento

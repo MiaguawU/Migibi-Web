@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message, List } from "antd";
 import IngModal from "./IngredienteModal";
 import btAg from "../../Img/btagregar.png";
+import { toFraction } from "../Metodos/FormatoCantidad";
 import "../Estilos/ing.css";
 import axios from "axios";
 import PUERTO from "../../config";
@@ -148,7 +149,7 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
                     onChange={() => handleCheckboxChange(index)}
                     className="card-checkbox-text"
                   >
-                    {item.name} {item.cantidad} {item.unidad}
+                    {item.name} {toFraction(item.cantidad)} {item.unidad}
                   </Checkbox>
                   <Button danger onClick={() => handleDelete(index)}>
                     Eliminar
