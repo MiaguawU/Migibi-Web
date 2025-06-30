@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button, ConfigProvider, message } from 'antd';
+import { customColors } from '../Estilos/colores';
 import axios from "axios";
 import PUERTO from "../../config";
 
@@ -22,8 +23,7 @@ interface Item {
 }
 
 const formItemLayout = {
-  labelCol: { xs: { span: 24 }, sm: { span: 6 } },
-  wrapperCol: { xs: { span: 24 }, sm: { span: 14 } },
+  wrapperCol: { xs: { span: 24 }, sm: { span: 24 } },
 };
 
 const InsModal: React.FC<FormModalProps> = ({ visible, onClose, index, recetaId, onSubmit }) => {
@@ -74,14 +74,12 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, index, recetaId,
     <ConfigProvider
       theme={{
         token: {
-          colorBorder: "#3E7E1E",
-          colorBgContainer: "#CAE2B5",
-          colorText: "#3E7E1E",
-          colorPrimary: "#3E7E1E",
+          colorBorder: customColors.colorFuerteCalido,
+          colorBgContainer: customColors.colorClaroCalido,
         },
         components: {
           Form: {
-            labelFontSize: 22,
+            labelFontSize: 16,
             labelRequiredMarkColor: "white",
           },
         },
@@ -94,7 +92,7 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, index, recetaId,
             label="Instrucción"
             rules={[{ required: true, message: "Por favor, introduce la instrucción" }]}
           >
-            <TextArea rows={4} />
+            <TextArea />
           </Form.Item>
 
           <Form.Item wrapperCol={{ xs: { span: 24 }, sm: { span: 24 }, offset: 0 }}>

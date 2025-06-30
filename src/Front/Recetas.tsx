@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
 import RecipeCard from './Componentes/RecetaCard';
+import { customColors } from './Estilos/colores';
 
 
 const { Search } = Input;
@@ -140,10 +141,8 @@ const Recetas: React.FC = (): JSX.Element => {
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#00b96b',
             borderRadius: 10,
-            colorBgContainer: '#CEFF77',
-            colorText: '#244C24',
+            colorBgContainer: customColors.colorBgTarjeta,
           },
         }}
       >
@@ -158,14 +157,14 @@ const Recetas: React.FC = (): JSX.Element => {
             />
             <Button
               className="btA"
-              style={{ backgroundColor: '#CEFF77', color: '#244C24' }}
+              style={{ backgroundColor: customColors.colorBgTarjeta, color: customColors.colorTextTarjeta, borderColor: 'white'}}
               onClick={() => navigate('/verR')}
             >
               Agregar
             </Button>
           </div>
-          <div style={{ textAlign: 'center', marginTop: '20px', color: '#244C24' }}>
-            <p>Cargando recetas...</p>
+          <div style={{ textAlign: 'center', marginTop: '20px', }}>
+            <p style={{color: customColors.colorFrio2}}>Cargando recetas...</p>
           </div>
         </div>
       </ConfigProvider>
@@ -176,10 +175,8 @@ const Recetas: React.FC = (): JSX.Element => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBgContainer: '#CEFF77',
-          colorText: '#244C24',
+          colorBgContainer: customColors.colorBgTarjeta,
         },
       }}
     >

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, ConfigProvider, message } from "antd";
+import {PlusCircleOutlined} from '@ant-design/icons';
 import axios from "axios";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { DragEndEvent } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { customColors } from "../Estilos/colores";
 import PUERTO from "../../config";
-import btAg from "../../Img/btagregar.png";
 import InsModal from "./InstruccionModal";
 
 interface Item {
@@ -170,8 +171,8 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
   
 
   return (
-    <ConfigProvider theme={{ token: { colorPrimary: "#638552" } }}>
-      <Card title={<span style={{ fontSize: "18px", fontWeight: "bold" }}>Instrucciones</span>} style={{ borderRadius: "8px" }}>
+    <ConfigProvider theme={{ token: { } }}>
+      <Card title={<span style={{  }}>Instrucciones</span>} style={{ borderRadius: "8px" }}>
         {loading ? (
           <p>Cargando instrucciones...</p>
         ) : (
@@ -185,8 +186,10 @@ const ProcedimientoRecetaEditar: React.FC<ProcedimientoProps> = ({ recetaId, onS
             </SortableContext>
           </DndContext>
         )}
-        <Button style={{ marginTop: "10px" }} onClick={() => setIsModalOpen(true)}>
-          <img src={btAg} alt="Agregar" style={{ width: "20px" }} />
+        <Button shape= 'circle' style={{ marginTop: "10px", position: 'absolute', bottom: '10px',
+          left: '10px', maxWidth: '40px', maxHeight: '40px',border: 'none',backgroundColor: 'transparent',
+          marginRight: '200px',}} onClick={() => setIsModalOpen(true)}>
+          <PlusCircleOutlined style={{fontSize: 'xx-large', color: customColors.colorFrio2}} />
         </Button>
       </Card>
       

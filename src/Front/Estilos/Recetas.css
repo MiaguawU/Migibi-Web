@@ -70,20 +70,17 @@
 }
 
 .recetas-container .btA {
-  background-color: #CAE2B5;
-  border-color: #3E7E1E;
-  color: #86A071;
-  border: 1px solid #3E7E1E;
+  background-color: #CEFF77;
+  color: #416800;
   border-radius: 10px;
   position: relative;
   padding: 1% 5%;  /* Cambié 5px 20px a porcentaje */
 }
 
 .recetas-container .btA:hover {
-  border-color: #3E7E1E !important;
-  color: #86A071  !important;
-  border: 1px solid #3E7E1E  !important;
-  background-color: #CAE2B5!important;
+  color: #416800  !important;
+  border: 1px solid #8bbd30  !important;
+  background-color: #B8F845!important;
 }
 
 .recetas-container .btE {

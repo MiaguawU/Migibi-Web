@@ -153,14 +153,17 @@ function App() {
       colorBgContainer: "#fff",
       colorBorderSecondary: "rgba(240,240,240,0)",
       colorBgElevated: '#f9f9f9',
-      colorText: customColors.colorFrio3
+      colorText: customColors.colorFrio3,
+      colorLink: customColors.colorFuerteCalido,
     },
     components: {
       Button: {
         solidTextColor: "#B8F845",
         primaryColor: "#306430",
-
       },
+      Select: {
+        hoverBorderColor: customColors.colorTextTarjeta,
+      }
     },
   };
 

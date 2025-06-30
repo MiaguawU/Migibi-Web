@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message, List } from "antd";
 import IngModal from "./IngredienteModal";
-import btAg from "../../Img/btagregar.png";
+import {PlusCircleOutlined} from '@ant-design/icons';
+import { customColors } from "../Estilos/colores";
 import { toFraction } from "../Metodos/FormatoCantidad";
 import "../Estilos/ing.css";
 import axios from "axios";
@@ -115,14 +116,13 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: "#638552",
           },
         }}
       >
         <Card
-          title={<span className="card-title">Ingredientes</span>}
+          title={<span>Ingredientes</span>}
           extra={
-            <Button type="link" onClick={toggleDrawer} className="card-button-link">
+            <Button type="link" onClick={toggleDrawer}>
               Ver más
             </Button>
           }
@@ -159,24 +159,11 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
               )}
             />
             <Button className="btAg" onClick={() => setIsModalOpen(true)}>
-              <img className="img" src={btAg} alt="Agregar" />
+              <PlusCircleOutlined style={{fontSize: 'xx-large', color: customColors.colorFrio2}} />
             </Button>
             </div>
           )}
         </Card>
-{/**
- * 
-            <List
-              itemLayout="horizontal"
-              dataSource={items}
-              style= {{width: 300}}
-              renderItem={(item: Item, index) => (
-                <List.Item className="card-checkbox" key={index} actions={[<Button danger onClick={() => handleDelete(index)}>Eliminar</Button>]}>
-                  {item.name} {item.cantidad} {item.unidad}
-                </List.Item>
-              )}
-            />
- */}
         <Drawer
           title="Ingredientes"
           placement="right"
@@ -189,7 +176,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
               <Checkbox
                 checked={item.isChecked}
                 onChange={() => handleCheckboxChange(index)}
-                className="drawer-checkbox-text"
               >
                 {item.name} {item.cantidad} {item.unidad}
               </Checkbox>
@@ -204,14 +190,14 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
 
       {/* Modal para agregar ingredientes */}
       <IngModal
-  visible={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  recetaId={recetaId}
-  onSubmit={(newItem) => {
-    setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
-    setIsModalOpen(false);
-  }}
-/>
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        recetaId={recetaId}
+        onSubmit={(newItem) => {
+          setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
+          setIsModalOpen(false);
+        }}
+      />
 
     </>
   );

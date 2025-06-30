@@ -38,6 +38,8 @@ refri
 OP: avisar que va a cambiar la imagen
 
 Hoy, Plan, Lista de Compra
+- Arreglar Navigation en Plan y en Hoy
+- Revisar fechas en el navigation y en el modal de crearPlanCrear
 - Arreglar problema de conversiones para la lista de Compra
 
 Dashboard

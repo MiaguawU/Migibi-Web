@@ -86,7 +86,10 @@ p, li {
   font-size: 18px;
   line-height: 1.6;
 }
-
+.ant-select-borderless .ant-select-selector {
+  background: transparent;
+  border: 1px transparent;
+}
 /* Solo se aplicará donde se use la clase .raleway-forzado */
 .raleway-forzado, .raleway-forzado * {
   font-family: 'Raleway', sans-serif !important;

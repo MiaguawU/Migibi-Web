@@ -145,10 +145,6 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
     <ConfigProvider
       theme={{
         token: {
-          colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
-          colorPrimary: '#3E7E1E',
         },
       }}
     >
@@ -171,6 +167,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
           >
             <Select
               showSearch
+              variant="borderless"
               placeholder="Buscar o escribir ingrediente"
               options={filteredOptions}
               value={searchTerm}
@@ -204,7 +201,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
             label="Unidad"
             rules={[{ required: true, message: 'Por favor, selecciona una unidad' }]}
           >
-            <Select placeholder="Selecciona una unidad">
+            <Select variant="borderless" placeholder="Selecciona una unidad">
               {unidades.map((unidad) => (
                 <Option key={unidad.Id_Unidad_Medida} value={unidad.Id_Unidad_Medida}>
                   {unidad.Unidad_Medida}

@@ -309,9 +309,6 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 35,
-                        colorText: "#8BA577",
                       },
                     }}
                   >
@@ -327,9 +324,9 @@ export default function EDreceta() {
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                <Button htmlType="button" className='btEn' onClick={onSubmit}>
-                      <p className='tx2'>Guardar</p>
-                    </Button>
+                  <Button htmlType="button" className='btEn' onClick={onSubmit}>
+                    <p className='tx2'>Guardar</p>
+                  </Button>
 
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Limpiar</p></Button>
                 </div>
@@ -415,9 +412,6 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 35,
-                        colorText: "#8BA577",
                       },
                     }}
                   >
