@@ -101,7 +101,6 @@ const UserProfile: React.FC = () => {
       message.error("No se pudo cerrar la sesión. Inténtalo de nuevo más tarde.");
     }
   };
-  
 
   const handleSaveChanges = async () => {
     try {

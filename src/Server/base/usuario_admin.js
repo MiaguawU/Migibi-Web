@@ -7,6 +7,7 @@ const router = express.Router();
 const validator = require('validator');
 const xss = require('xss');
 const bcrypt = require('bcrypt');
+const axios = require('axios');
 
 const verificarPermisos = (id_usuario, res, callback) => {
   const query = 'SELECT Id_Rol FROM usuario WHERE Id_Usuario = ?';
@@ -15,12 +16,20 @@ const verificarPermisos = (id_usuario, res, callback) => {
       console.error("Error al evaluar permisos", err);
       return res.status(500).json({ error: "Error al verificar permisos" });
     }
-    if (!result.length || result[0].Id_Rol == 1) {
+
+    const rol = parseInt(result[0]?.Id_Rol);
+    console.log(`Usuario ${id_usuario} tiene rol:`, rol);
+
+    if (!result.length || rol !== 2) {
+      console.log('Acceso denegado a usuario:', id_usuario);
       return res.status(403).json({ error: "Acceso prohibido: No tienes permiso para realizar esta acción" });
     }
+
+    console.log('Acceso permitido a usuario:', id_usuario);
     callback();
   });
 };
+
 
 const uploadDir = path.join(__dirname, "../imagenes");
 if (!fs.existsSync(uploadDir)) {
@@ -77,15 +86,15 @@ const validatePassword = (password) => {
   return /^(?=(.*[a-z]){2,})(?=(.*[A-Z]){2,})(?=(.*\d){2,}).{7,}$/.test(password);
 };
 
-router.get('/', (req, res) => {
-  const { id_usuario_admin } = req.query; // ID del usuario que solicita los datos
+router.get('/:id_usuario_admin', (req, res) => {
+  const { id_usuario_admin } = req.params; // ID del usuario que solicita los datos
 
   if (!id_usuario_admin) {
     return res.status(400).json({ error: 'Se requiere el ID del usuario administrador' });
   }
 
   verificarPermisos(id_usuario_admin, res, () => {
-    const query = 'SELECT Id_Usuario, Nombre_Usuario, Email, foto_perfil, Cohabitantes, Id_Rol FROM usuario WHERE Activo = 1';
+    const query = 'SELECT * FROM usuario';
 
     db.query(query, (err, results) => {
       if (err) {
@@ -97,9 +106,30 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/unic/:id_usuario_admin/:id', (req, res) => {
+  const { id_usuario_admin, id } = req.params; // ID del usuario que solicita los datos
 
-router.post('/', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
-  const { Nombre_Usuario, Contrasena, Cohabitantes, Email, Id_Rol, id_usuario_admin } = req.body;
+  if (!id_usuario_admin) {
+    return res.status(400).json({ error: 'Se requiere el ID del usuario administrador' });
+  }
+
+  verificarPermisos(id_usuario_admin, res, () => {
+    const query = 'SELECT Nombre_Usuario, Cohabitantes, Email, Id_Rol, foto_perfil FROM usuario WHERE Id_Usuario=?';
+
+    db.query(query, [id], (err, results) => {
+      if (err) {
+        console.error('Error al obtener usuarios:', err);
+        return res.status(500).json({ error: 'Error al obtener usuarios' });
+      }
+      res.json(results);
+    });
+  });
+});
+
+router.post('/:id_usuario_admin', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
+  const { id_usuario_admin } = req.params;
+  const { Nombre_Usuario, Contrasena, Cohabitantes, Email, Id_Rol} = req.body;
+  
   verificarPermisos(id_usuario_admin, res, async () => {
     if (!Nombre_Usuario || !Contrasena || !Id_Rol) {
       return res.status(400).json({ error: 'Nombre de usuario, contraseña y rol son obligatorios' });
@@ -125,9 +155,8 @@ router.post('/', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
   });
 });
 
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  const { id_usuario_admin } = req.body;
+router.delete('/:id/:id_usuario_admin', (req, res) => {
+  const { id, id_usuario_admin } = req.params;
   verificarPermisos(id_usuario_admin, res, () => {
     if (!validator.isNumeric(id)) {
       return res.status(400).send("El ID debe ser numérico");
@@ -140,9 +169,9 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-router.put('/:id', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
-  const { id } = req.params;
-  const { Nombre_Usuario, Cohabitantes, Email, Id_Rol, id_usuario_admin } = req.body;
+router.put('/:id/:id_usuario_admin', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
+  const { id, id_usuario_admin } = req.params;
+  const { Nombre_Usuario, Cohabitantes, Email, Id_Rol } = req.body;
   verificarPermisos(id_usuario_admin, res, async () => {
     if (!validator.isNumeric(id)) {
       return res.status(400).json({ error: 'El ID debe ser numérico' });
@@ -169,6 +198,44 @@ router.put('/:id', upload.single('foto_perfil'), sanitizeInput, (req, res) => {
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
+});
+
+router.put("/act/:id", (req, res) => {
+    console.log("--- Inicio de la ruta /act/:id ---"); // Add this
+    const { id } = req.params;
+    const { id_usuario } = req.body; // id_usuario is the admin performing the action
+
+    console.log('Valores recibidos: id =', id, 'id_usuario =', id_usuario); // Add this for clarity
+
+    // Basic validation for id and id_usuario
+    if (!id || !validator.isNumeric(id)) {
+        console.log("Error: ID de usuario a activar inválido."); // Add this
+        return res.status(400).json({ error: "ID de usuario a activar inválido." });
+    }
+    if (!id_usuario || !validator.isNumeric(id_usuario)) {
+        console.log("Error: ID del usuario administrador inválido."); // Add this
+        return res.status(400).json({ error: "ID del usuario administrador inválido." });
+    }
+
+    console.log('Pasó validación inicial. Llamando a verificarPermisos...'); // Add this
+
+    verificarPermisos(id_usuario, res, () => {
+        console.log('Dentro del callback de verificarPermisos.'); // This is where your original logs are
+        console.log('id ',id, id_usuario);
+        console.log('ñiani');
+
+        const fecha_baja = new Date();
+        const query = `UPDATE usuario SET Activo = 1, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Usuario = ?`;
+
+        db.query(query, [id_usuario, fecha_baja, id], (err) => {
+            if (err) {
+                console.error("Error al activar usuario:", err);
+                return res.status(500).json({ error: "Error al activar usuario" });
+            }
+            console.log(`Usuario con ID ${id} activado con éxito en la base de datos.`); // Add this
+            res.json({ message: `Usuario con ID ${id} activado con éxito` });
+        });
+    });
 });
 
 module.exports = router;

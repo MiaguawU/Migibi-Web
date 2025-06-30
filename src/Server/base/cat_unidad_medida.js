@@ -50,7 +50,7 @@ const upload = multer({
 const unidadMedidaSchema = Joi.object({
   nombre: Joi.string().min(1).max(50).required(),
   abreviatura: Joi.string().min(1).max(10).required(),
-  id_usuario_alta: Joi.number().integer().required()
+  id_usuario: Joi.number().integer().required()
 });
 
 const unidadMedidaUpdateSchema = Joi.object({
@@ -67,11 +67,11 @@ router.post("/", (req, res) => {
   const { error } = unidadMedidaSchema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
-  const { nombre, abreviatura, id_usuario_alta } = req.body;
-  verificarPermisos(id_usuario_alta, res, () => {
+  const { nombre, abreviatura, id_usuario } = req.body;
+  verificarPermisos(id_usuario, res, () => {
     const fecha_alta = new Date();
     const query = `INSERT INTO cat_unidad_medida (Unidad_Medida, Abreviatura, Id_Usuario_Alta, Fecha_Alta) VALUES (?, ?, ?, ?)`;
-    db.query(query, [unidad_medida, abreviatura, id_usuario_alta, fecha_alta], (err, result) => {
+    db.query(query, [nombre, abreviatura, id_usuario, fecha_alta], (err, result) => {
       if (err) return res.status(500).send("Error al agregar unidad de medida");
       res.json({ id: result.insertId, message: "Unidad de medida agregada con éxito" });
     });
@@ -85,16 +85,25 @@ router.get("/", (req, res) => {
   });
 });
 
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("SELECT Unidad_Medida, Abreviatura FROM cat_unidad_medida WHERE Id_Unidad_Medida = ?", [id],(err, result) => {
+    if (err) return res.status(500).send("Error al obtener unidades de medida");
+    console.log(result)
+    res.json(result);
+  });
+});
+
 router.put("/:id", (req, res) => {
   const { error } = unidadMedidaUpdateSchema.validate(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { id } = req.params;
-  const { nombre, abreviatura, Id_Usuario } = req.body;
-  verificarPermisos(Id_Usuario, res, () => {
+  const { nombre, abreviatura, id_usuario_modif } = req.body;
+  verificarPermisos(id_usuario_modif, res, () => {
     const fecha_modif = new Date();
     const query = `UPDATE cat_unidad_medida SET Unidad_Medida = ?, Abreviatura = ?, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Unidad_Medida = ?`;
-    db.query(query, [nombre, abreviatura, Id_Usuario, fecha_modif, id], (err) => {
+    db.query(query, [nombre, abreviatura, id_usuario_modif, fecha_modif, id], (err) => {
       if (err) return res.status(500).send("Error al actualizar unidad de medida");
       res.json({ message: "Unidad de medida actualizada con éxito" });
     });
@@ -106,11 +115,11 @@ router.delete("/:id", (req, res) => {
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { id } = req.params;
-  const { Id_Usuario } = req.body;
-  verificarPermisos(Id_Usuario, res, () => {
+  const { id_usuario_baja } = req.body;
+  verificarPermisos(id_usuario_baja, res, () => {
     const fecha_baja = new Date();
     const query = `UPDATE cat_unidad_medida SET Activo = 0, Id_Usuario_Baja = ?, Fecha_Baja = ? WHERE Id_Unidad_Medida = ?`;
-    db.query(query, [Id_Usuario, fecha_baja, id], (err) => {
+    db.query(query, [id_usuario_baja, fecha_baja, id], (err) => {
       if (err) return res.status(500).send("Error al eliminar unidad de medida");
       res.json({ message: "Unidad de medida eliminada con éxito" });
     });
@@ -122,11 +131,11 @@ router.put("/activar/:id", (req, res) => {
   if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { id } = req.params;
-  const { Id_Usuario } = req.body;
-  verificarPermisos(Id_Usuario, res, () => {
+  const { id_usuario_baja } = req.body;
+  verificarPermisos(id_usuario_baja, res, () => {
     const fecha_baja = new Date();
     const query = `UPDATE cat_unidad_medida SET Activo = 1, Id_Usuario_Modif = ?, Fecha_Modif = ? WHERE Id_Unidad_Medida = ?`;
-    db.query(query, [Id_Usuario, fecha_baja, id], (err) => {
+    db.query(query, [id_usuario_baja, fecha_baja, id], (err) => {
       if (err) return res.status(500).send("Error al activar unidad de medida");
       res.json({ message: "Unidad de medida activada con éxito" });
     });

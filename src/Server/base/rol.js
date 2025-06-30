@@ -9,7 +9,7 @@ const xss = require('xss');
 const bcrypt = require('bcrypt');
 
 router.get("/", (req, res) => {
-    db.query("SELECT * FROM cat_rol", (err, result) => {
+    db.query("SELECT Id_Rol, Rol FROM cat_rol", (err, result) => {
       if (err) {
         console.error("Error al obtener roles:", err);
         return res.status(500).send("Error al obtener roles");

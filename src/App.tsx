@@ -36,7 +36,6 @@ const mainItems: ItemType[] = [
   { label: <Link to="/plan" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Plan</Link>, key: 'plan' },
   { label: <Link to="/recetas" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Recetas</Link>, key: 'recetas' },
   { label: <Link to="/refri" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Refri</Link>, key: 'refri' },
-  { label: <Link to="/modal" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Modal</Link>, key: 'modal' },
 ];
 
 const adminItems: ItemType[] = [
@@ -46,7 +45,6 @@ const adminItems: ItemType[] = [
   { label: <Link to="/usuarios" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Usuarios</Link>, key: 'usuarios' },
   { label: <Link to="/cat_alimentos" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Alimentos</Link>, key: 'alimentos' },
   { label: <Link to="/catalogos" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Catálogos</Link>, key: 'catalogos' },
-  { label: <Link to="/modal" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Modal</Link>, key: 'modal' },
 ];
 
 const profileItem: ItemType[] = [

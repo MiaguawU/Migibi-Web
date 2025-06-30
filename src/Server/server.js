@@ -40,6 +40,7 @@ const rateLimit = require("express-rate-limit");
 const planes = require("./base/Planes");
 const usuario_Alimento = require("./base/usuario_cat_alimento");
 const { OAuth2Client } = require('google-auth-library');
+const usuario_act = require('./base/usuario_activar');
 
 dotenv.config();
 
@@ -122,6 +123,7 @@ app.use("/rol", rol);
 app.use("/registro", registro);
 app.use("/password", recuperar);
 app.use("/usuario_cat_alimento", usuario_Alimento);
+app.use("/activar", usuario_act);
 
 // Ruta de autenticación con Google
 app.get(

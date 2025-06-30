@@ -120,6 +120,7 @@ CREATE TABLE `cat_tipo_alimento` (
   `Id_Usuario_Modif` int DEFAULT NULL,
   `Fecha_Modif` datetime DEFAULT NULL,
   `Id_Usuario_Baja` int DEFAULT NULL,
+  `Fecha_Baja` datetime DEFAULT NULL,
   PRIMARY KEY (`Id_Tipo_Alimento`),
   KEY `Id_Usuario_Alta` (`Id_Usuario_Alta`),
   KEY `Id_Usuario_Modif` (`Id_Usuario_Modif`),
@@ -136,7 +137,18 @@ CREATE TABLE `cat_tipo_alimento` (
 
 LOCK TABLES `cat_tipo_alimento` WRITE;
 /*!40000 ALTER TABLE `cat_tipo_alimento` DISABLE KEYS */;
-INSERT INTO `cat_tipo_alimento` VALUES (1,'Vegetal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(2,'Fruta',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(3,'Carne y pescado',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(4,'Lacteo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(5,'Otro de origen animal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(6,'Cereal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(7,'Legumbre',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(8,'Bebida',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(9,'Especia',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(10,'Azúcares y grasas',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL),(11,'Otros',1,1,'2024-04-30 04:24:30',NULL,NULL,NULL);
+INSERT INTO `cat_tipo_alimento` VALUES
+(1,'Vegetal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(2,'Fruta',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(3,'Carne y pescado',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(4,'Lacteo',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(5,'Otro de origen animal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(6,'Cereal',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(7,'Legumbre',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(8,'Bebida',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(9,'Especia',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(10,'Azúcares y grasas',1,1,'2024-04-28 02:34:41',NULL,NULL,NULL,NULL),
+(11,'Otros',1,1,'2024-04-30 04:24:30',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `cat_tipo_alimento` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -624,8 +636,9 @@ CREATE TABLE `usuario` (
   `foto_perfil` varchar(255) DEFAULT NULL,
   `Cohabitantes` int NOT NULL DEFAULT (1),
   `Email` varchar(250) DEFAULT NULL,
-  `Es_Gmail` tinyint(1) NOT NULL DEFAULT '0',
+  `Es_Gmail` tinyint(1) NOT NULL DEFAULT '1',
   `Id_Rol` int NOT NULL,
+  `Activo` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`Id_Usuario`),
   UNIQUE KEY `Email` (`Email`),
   KEY `Id_Rol` (`Id_Rol`),
@@ -639,7 +652,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'Habibi','Habibi1',NULL,1,'habi@gmail.com',0,1),(2,'Molina Castellanos Nisa Izel','$2b$10$BhrQFXPhc3LT.I6XHczgNu38vg/MIZt1J/Y85tzPyvUiQut5Y9ZlC','imagenes/1742592415494-Dokja con cuernitos.jpg',7,'molina.castellanos.nisa.izel2022@gmail.com',1,1),(5,'Jamón','fdsafdsa','fdsafdas',1,'jamon@gmail.com',1,1);
+INSERT INTO `usuario` VALUES (1,'Habibi','Habibi1',NULL,1,'habi@gmail.com',0,1,1),(2,'Molina Castellanos Nisa Izel','$2b$10$BhrQFXPhc3LT.I6XHczgNu38vg/MIZt1J/Y85tzPyvUiQut5Y9ZlC','imagenes/1742592415494-Dokja con cuernitos.jpg',7,'molina.castellanos.nisa.izel2022@gmail.com',1,1,1),(5,'Jamón','fdsafdsa','fdsafdas',1,'jamon@gmail.com',1,1,1);
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -767,6 +780,73 @@ BEGIN
   -- Eliminar de la tabla Receta al final
   DELETE FROM receta
   WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+-- Procedimiento para eliminar completamente un usuario por su ID
+-- Elimina registros en todas las tablas que contienen 'Id_Usuario' o 'Id_Usuario_Alta'
+-- y finalmente elimina el registro de la tabla 'usuario'.
+CREATE PROCEDURE eliminarUsuarioPorId(IN p_userIdToDelete INT)
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE tableName VARCHAR(255);
+    DECLARE columnName VARCHAR(255); -- Para almacenar qué columna coincidió ('Id_Usuario' o 'Id_Usuario_Alta')
+
+    -- Cursor para encontrar todas las tablas (excepto 'usuario' y vistas) que tienen 'Id_Usuario' o 'Id_Usuario_Alta'
+    DECLARE curTables CURSOR FOR
+        SELECT
+            C.TABLE_NAME,
+            C.COLUMN_NAME
+        FROM
+            INFORMATION_SCHEMA.COLUMNS C
+        JOIN
+            INFORMATION_SCHEMA.TABLES T ON C.TABLE_NAME = T.TABLE_NAME AND C.TABLE_SCHEMA = T.TABLE_SCHEMA
+        WHERE
+            C.TABLE_SCHEMA = 'migibi'
+            AND C.TABLE_NAME <> 'usuario' -- Excluir la tabla principal de usuarios, se eliminará al final
+            AND T.TABLE_TYPE = 'BASE TABLE' -- <-- ¡Corregido! Ahora usa T.TABLE_TYPE
+            AND (C.COLUMN_NAME = 'Id_Usuario' OR C.COLUMN_NAME = 'Id_Usuario_Alta')
+            AND C.TABLE_NAME NOT LIKE 'vw_%'; -- Excluir vistas que empiezan con 'vw_'
+
+    -- Manejador para el final del cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Deshabilitar temporalmente las comprobaciones de claves foráneas.
+    SET FOREIGN_KEY_CHECKS = 0;
+
+    -- Abrir el cursor
+    OPEN curTables;
+
+    -- Bucle para leer cada tabla y eliminar registros
+    read_loop: LOOP
+        FETCH curTables INTO tableName, columnName;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Construir la sentencia DELETE de forma dinámica
+        SET @sql = CONCAT('DELETE FROM `', tableName, '` WHERE `', columnName, '` = ', p_userIdToDelete);
+        
+        -- Preparar y ejecutar la sentencia SQL
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        -- Liberar la sentencia preparada
+        DEALLOCATE PREPARE stmt;
+
+    END LOOP;
+
+    -- Cerrar el cursor
+    CLOSE curTables;
+
+    -- Volver a habilitar las comprobaciones de claves foráneas
+    SET FOREIGN_KEY_CHECKS = 1;
+
+    -- Finalmente, eliminar el usuario de la tabla principal 'usuario'
+    DELETE FROM `usuario` WHERE `Id_Usuario` = p_userIdToDelete;
 
 END$$
 
