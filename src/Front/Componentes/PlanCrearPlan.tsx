@@ -3,6 +3,7 @@ import { Modal, Form, DatePicker, Button, Select, ConfigProvider, message, Flex,
 import { Modo, Plan } from '../Metodos/Enum';
 import { StarOutlined } from '@ant-design/icons';
 import { formatoFechaLegible } from '../Metodos/FormatoFecha';
+import { customColors } from '../Estilos/colores';
 import axios from "axios";
 import PUERTO from "../../config";
 
@@ -66,6 +67,17 @@ interface FormModalProps {
   onSubmit: () => void;
 }
 
+type ConfirmarAccionFunc = {
+  (
+    comida: string,
+    planId: number,
+    idReceta: number | null,
+    fecha: string,
+    receta: string
+  ): Promise<void>;
+  resolve?: () => void;
+  cancel?: () => void;
+};
 const formItemLayout = {
   labelCol: { xs: { span: 24 }, sm: { span: 6 } },
   wrapperCol: { xs: { span: 24 }, sm: { span: 14 } },
@@ -87,6 +99,16 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
   const [idUsuario, setIdUSuario] = useState(0);
   const [tipoConsumo, setTipoConsumo] = useState<string>("");
   const [dias, setDias] = useState<Dia[]>([]);
+  const [confirmResolve, setConfirmResolve] = useState<(() => void) | null>(null);
+  const [confirmReject, setConfirmReject] = useState<(() => void) | null>(null);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [confirmData, setConfirmData] = useState<{
+    comida: string;
+    planId: number;
+    idReceta: number | null;
+    fecha: string;
+    receta: string;
+  } | null>(null);
 
   {/**
     
@@ -327,21 +349,18 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
     }
   };
 
-  const confirmarAccion = (comida: string, planId: number, idReceta: number | null, fecha: string, receta: string) => {
-
+  const confirmarAccion = (
+    comida: string,
+    planId: number,
+    idReceta: number | null,
+    fecha: string,
+    receta: string
+  ): Promise<void> => {
     return new Promise<void>((resolve) => {
-      Modal.confirm({
-        title: '¿Estás seguro de programar esa comida?',
-        content: `Ya hay un(a) ${comida} programado(a) para el ${fecha} ${formatoFechaLegible(fecha)}: ${receta}.${planId}`,
-        okText: 'Sí',
-        cancelText: 'No',
-        onOk: async () => {
-          await EditarReceta(comida, planId, idReceta);
-          resolve();
-        },
-        onCancel: () => {
-          resolve();
-        },
+      setConfirmData({ comida, planId, idReceta, fecha, receta });
+      setConfirmModalVisible(true);
+      setConfirmResolve(() => () => {
+        resolve();
       });
     });
   };
@@ -360,10 +379,7 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
     <ConfigProvider
       theme={{
         token: {
-          colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
-          colorPrimary: '#3E7E1E',
+          colorBgContainer: customColors.colorClaroCalido,
         },
       }}
     >
@@ -390,7 +406,7 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
               key={index}
               title={diasSemana[index]}
               style={{ width: 200, marginBottom: 16 }}
-              actions={[<Text onClick={() => openEditModal(index)}>Edit</Text>]}
+              actions={[<Text onClick={() => openEditModal(index)}>Editar</Text>]}
             >
               <Flex vertical gap="small">
                 <Flex gap='5'  vertical>
@@ -477,6 +493,32 @@ const PlanCrearPlan: React.FC<FormModalProps> = ({ visible, ModoSelected, PlanSe
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        open={confirmModalVisible}
+        onCancel={() => {
+          setConfirmModalVisible(false);
+          setConfirmData(null);
+          confirmResolve?.(); // Se resuelve sin editar
+        }}
+        onOk={async () => {
+          if (confirmData) {
+            await EditarReceta(confirmData.comida, confirmData.planId, confirmData.idReceta);
+          }
+          setConfirmModalVisible(false);
+          setConfirmData(null);
+          confirmResolve?.(); // Se resuelve después de editar
+        }}
+        okText="Sí"
+        cancelText="No"
+        title="¿Estás seguro de programar esa comida?"
+      >
+        {confirmData && (
+          <Text>
+            Ya hay un(a) {confirmData.comida} programado(a) para el {confirmData.fecha}{' '}
+            {formatoFechaLegible(confirmData.fecha)}: {confirmData.receta}.
+          </Text>
+        )}
       </Modal>
     </ConfigProvider>
   );

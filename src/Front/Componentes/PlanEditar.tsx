@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, InputNumber, Select, ConfigProvider, message } from 'antd';
+import { customColors } from '../Estilos/colores';
 import axios from "axios";
 import PUERTO from "../../config";
 
@@ -104,8 +105,7 @@ const PlanEditar: React.FC<FormModalProps> = ({ visible, onClose, planId, comida
         token: {
           colorBorder: '#3E7E1E',
           colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
-          colorPrimary: '#3E7E1E',
+          colorText: customColors.colorFrio2,
         },
       }}
     >

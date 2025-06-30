@@ -4,6 +4,7 @@ import { Menu, Button, Drawer, message, ConfigProvider, Grid } from 'antd';
 import type { MenuProps } from 'antd';
 import esES from 'antd/locale/es_ES'; // Opcional: español
 import './Front/Estilos/Nav.css';
+import { customColors } from './Front/Estilos/colores';
 import Modal from './Front/Modal';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
@@ -137,11 +138,11 @@ function App() {
 
   const customTheme = {
     token: {
-      colorPrimary: '#96F20A',
-      colorWarning: '#FFDA48',
-      colorError: '#FF570F',
+      colorPrimary: customColors.colorPrimario,
+      colorWarning: customColors.colorWarning,
+      colorError: customColors.colorError,
       colorInfo: '#5BC0DE',
-      colorTextBase: '#1F1F1F', 
+      colorTextBase: customColors.colorFrio3,
       colorBgBase: '#fff',
       colorErrorActive: '#FFB948',
       colorErrorHover: '#FFB948',
@@ -152,10 +153,11 @@ function App() {
       colorBgContainer: "#fff",
       colorBorderSecondary: "rgba(240,240,240,0)",
       colorBgElevated: '#f9f9f9',
+      colorText: customColors.colorFrio3
     },
     components: {
       Button: {
-        solidTextColor: "#306430",
+        solidTextColor: "#B8F845",
         primaryColor: "#306430",
 
       },

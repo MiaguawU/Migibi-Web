@@ -1,7 +1,7 @@
 
 export const customColors = {
     colorClaroCalido: '#DFFFAF',
-    colorClaroFrio: '#673AB7',
+    colorClaroFrio: '#CFE2B2',
     colorFuerteCalido: '#6FB804',
     colorFuerteFrio: '#244C24',
     colorFrio1: '#EFF6EF',
@@ -10,7 +10,7 @@ export const customColors = {
     colorPrimario: '#96F20A',
     colorPrimarioClaro: '#B8F845',
     colorBgTarjeta: '#CEFF77',
-    colorTextTarjeta: '#4A7500',
+    colorTextTarjeta: '#416800',
     colorWarning: '#FFDA48',
     colorError: '#FF570F',
     colorInfo: '#5BC0DE',

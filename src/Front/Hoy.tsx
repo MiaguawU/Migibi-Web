@@ -9,6 +9,7 @@ import PlanAgregar from "./Componentes/PlanAgregar";
 import PlanCrearPlan from "./Componentes/PlanCrearPlan";
 import RecipeCard from './Componentes/RecetaCard';
 import Pagination from './Componentes/Pagination';
+import { customColors } from "./Estilos/colores";
 //import imgdesayuno from "../Img/imgdesayuno.png";
 //import relojarena from "../Img/relojarena.png";
 //import cuadros from "../Img/cuadros.png";
@@ -195,34 +196,28 @@ export default function Inicio() {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBgContainer: '#CAE2B5',
+          colorBgContainer: customColors.colorBgTarjeta,
         },
         components: {
           Select: {
-            optionActiveBg: '#CAE2B5',
+            optionActiveBg: customColors.colorClaroCalido,
             algorithm: true
-          }
+          },
+          Popconfirm: {
+            fontSize: 15,
+            borderRadius: 10,
+            marginXS: 10
+          },
         }
       }}
     >
       <div style={{ paddingLeft: '15px', paddingRight: '15px' }}>
         <div style={{height: 'Auto', justifyContent: 'space-between', display: 'flex'}}>
           <div style={{height: '100%', display: 'flex', alignItems: 'center', padding: '15px'}}>
-            <ConfigProvider
-            theme={{
-              token: {
-                fontFamily: "Jomhuria, Serif",
-                fontSize: 40,
-                colorText: "#6B8762",
-                colorPrimary: '#00b96b',
-                borderRadius: 10,
-                colorBgContainer: '#CAE2B5',
-              }}}>
               <Button
                 key={`AgregarNuevoPlan`}
-                style={{height: "40px", margin: '10px', marginTop: '5px',}}
+                style={{height: "40px", margin: '10px', marginTop: '5px', fontSize: 20}}
                 onClick={() => {setIsAgregarOpen(true);}}>
                 Agregar receta
               </Button>
@@ -236,11 +231,10 @@ export default function Inicio() {
               >
                 <Button
                   key={`CrearNuevoPlan`}
-                  style={{height: "40px", margin: '10px', marginTop: '5px',}}>
+                  style={{height: "40px", margin: '10px', marginTop: '5px', fontSize: 20}}>
                   Crear Plan
                 </Button>
               </Popconfirm>
-              </ConfigProvider>
               {/**
                * 
             <img src={imgdesayuno} style={{height: '100px'}} />
@@ -253,28 +247,30 @@ export default function Inicio() {
           </div>
         </div>
 
-        <div style={{backgroundColor: '#D3E2B4', height: 'auto', borderRadius: '10px'}}>
+        <div style={{backgroundColor: customColors.colorPrimarioClaro, height: 'auto', borderRadius: '10px'}}>
           <Pagination
             currentWeek={weeks[weekIndex]}
             onPrevious={handlePrevious}
             onNext={handleNext}
           />
-        </div>
-
-        <br />
+        </div> <br />
 
         {DiasPlan.map((dia, index) => (
           <div key={index}>
-            <div style={{backgroundColor: '#D3E2B4', height: '45px', borderRadius: '10px', display: "flex", alignItems: "center", flexWrap: "wrap"}}>
-              <div style={{margin: '10px', marginTop: '5px', alignItems: 'center'}}>
-                <a style={{fontFamily: 'Jomhuria', fontSize: '32px', color: '#86A071'}}>{formatoFechaLegible(dia.fecha)}</a>      
+            <div style={{backgroundColor: customColors.colorPrimarioClaro, height: '45px', borderRadius: '10px', 
+              display: "flex", alignItems: "center", flexWrap: "wrap", alignContent: 'flex-end',}}>
+              <div style={{margin: '10px', marginTop: '5px', alignItems: 'center', alignContent: 'center'}}>
+                <a style={{fontSize: '23px', color: customColors.colorFrio3,}}>{formatoFechaLegible(dia.fecha)}</a>   
               </div>
             </div>
             <br /><br />
             {dia.comidas.map((comida, index) => (
               <div key={index}>
-                <div style={{backgroundColor: '#D3E2B4', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}>
-                  <a style={{fontFamily: 'Jomhuria', fontSize: '45px', color: '#86A071'}}>{comida.comida}</a>
+                <div style={{backgroundColor: 'white', borderRadius: '8px', paddingRight: '15px', paddingLeft: '15px', paddingBottom: '10px'}}>
+                  <div style={{backgroundColor: customColors.colorBgTarjeta, height: '40px', display: 'flex', borderRadius: '10px',
+                    alignContent: "center", width: '165px', padding: '5px 20px', justifyItems: 'center',justifyContent: 'center', flexWrap: 'wrap',}}>
+                    <a style={{fontSize: '23px', color: customColors.colorFrio3, fontWeight: "600", display: 'flex'}}>{comida.comida}</a>
+                  </div>
                   <div>
                     <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px'}}>
                     {comida.recetas.length > 0 ? (
@@ -295,18 +291,16 @@ export default function Inicio() {
                     ) : (
                       
                     <ConfigProvider
-                    theme={{
-                      token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 40,
-                        colorText: "#8BA577",
-                        colorPrimary: '#00b96b',
-                        borderRadius: 10,
-                        colorBgContainer: '#CAE2B5',
+                      theme={{
+                        token: {
+                          fontSize: 25,
+                          colorText: customColors.colorFrio3,
+                          borderRadius: 10,
                       }}}>
                       <Button
                         key={`add-recipe-${dia.id}-${comida.comida}`}
-                        style={{height: "40px"}}
+                        style={{height: "40px", }}
+                        type="primary"
                         onClick={() => {
                           setdiaSelected(dia.id);
                           console.log(dia.id);
