@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PUERTO from '../config';
 import RecipeCard from './Componentes/RecetaCard';
+import { customColors } from './Estilos/colores';
+
 
 const { Search } = Input;
 
@@ -139,25 +141,30 @@ const Recetas: React.FC = (): JSX.Element => {
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#00b96b',
             borderRadius: 10,
-            colorBgContainer: '#CAE2B5',
+            colorBgContainer: customColors.colorBgTarjeta,
           },
         }}
       >
-        <div className="recetas-container">
-          <div className="header">
+        <div className="recetas-container" style={{ color: '#244C24' }}>
+          <div className="header" style={{ color: '#244C24' }}>
             <Search
               placeholder="Buscar por nombre, calorías o tiempo"
               allowClear
               onSearch={handleSearch}
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: '80%' }}
+              style={{ width: '80%', color: '#244C24' }}
             />
-            <Button className="btA" onClick={() => navigate('/verR')}>Agregar</Button>
+            <Button
+              className="btA"
+              style={{ backgroundColor: customColors.colorBgTarjeta, color: customColors.colorTextTarjeta, borderColor: 'white'}}
+              onClick={() => navigate('/verR')}
+            >
+              Agregar
+            </Button>
           </div>
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <p>Cargando recetas...</p>
+          <div style={{ textAlign: 'center', marginTop: '20px', }}>
+            <p style={{color: customColors.colorFrio2}}>Cargando recetas...</p>
           </div>
         </div>
       </ConfigProvider>
@@ -168,22 +175,27 @@ const Recetas: React.FC = (): JSX.Element => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBgContainer: '#CAE2B5',
+          colorBgContainer: customColors.colorBgTarjeta,
         },
       }}
     >
-      <div className="recetas-container">
-        <div className="header">
+      <div className="recetas-container" style={{ color: '#244C24' }}>
+        <div className="header" style={{ color: '#244C24' }}>
           <Search
             placeholder="Buscar por nombre, calorías o tiempo"
             allowClear
             onSearch={handleSearch}
             onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: '80%' }}
+            style={{ width: '80%', color: '#244C24' }}
           />
-          <Button className="btA" onClick={() => navigate('/verR')}>Agregar</Button>
+          <Button
+            className="btA"
+            style={{ backgroundColor: '#CEFF77', color: '#244C24' }}
+            onClick={() => navigate('/verR')}
+          >
+            Agregar
+          </Button>
         </div>
         <div
           style={{
@@ -192,6 +204,7 @@ const Recetas: React.FC = (): JSX.Element => {
             gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
             gap: '16px',
             padding: '16px',
+            color: '#244C24',
           }}
         >
           {filteredRecipes.map((card, index) => (
@@ -215,3 +228,4 @@ const Recetas: React.FC = (): JSX.Element => {
 };
 
 export default Recetas;
+

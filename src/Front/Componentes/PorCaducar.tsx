@@ -148,27 +148,31 @@ const PorCaducar: React.FC<PorCaducarProps> = ({ onUpdate }) => {
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: "#638552",
+            colorPrimary: "#CEFF77",
+            
           },
         }}
       >
         <Card
-          title="Por caducar"
-          extra={
-            <Button
-              type="primary"
-              onClick={enviarIdsSeleccionados}
-              disabled={selectedIds.length === 0}
-            >
-              Actualizar
-            </Button>
-          }
-          style={{
-            width: "auto",
-            backgroundColor: "#CEDFAC",
-            borderRadius: 8,
-            color: "#638552",
-          }}
+  title="Por caducar"
+  extra={
+    <Button
+  type="primary"
+  onClick={enviarIdsSeleccionados}
+  disabled={selectedIds.length === 0}
+  style={{ color: "#244C24" }} // 👈 Aquí el cambio
+>
+  Actualizar
+</Button>
+
+  }
+  style={{
+    width: "auto",
+    backgroundColor: "#CEFF77",  // ✅ NUEVO COLOR
+    borderRadius: 8,
+    color: "#244C24",
+  }}
+
           bodyStyle={{ padding: "16px" }}
         >
           <div
@@ -200,7 +204,7 @@ const PorCaducar: React.FC<PorCaducarProps> = ({ onUpdate }) => {
                     onChange={() => handleCheckboxChange(index)}
                     style={{
                       fontFamily: "Alice, serif",
-                      color: "#40632F",
+                      color: "#244C24",
                     }}
                   >
                     {item.name} - {item.dias}

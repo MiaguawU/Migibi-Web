@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, Input, Button, Radio, Typography, ConfigProvider, message } from "antd";
-import { GoogleOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Card, Input, Button, Typography, ConfigProvider, message, theme } from "antd";
+import { GoogleOutlined, UserOutlined, MailFilled, LockFilled } from "@ant-design/icons";
+import heart from '../../Img/CorazonPerfil.png';
+import { customColors } from '../Estilos/colores';
 import axios from 'axios';
 import PUERTO from '../../config';
 
 const { Title } = Typography;
 
 const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) => {
-  const [formMode, setFormMode] = useState<"register" | "login">("register");
+  const { token } = theme.useToken();
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const modo = queryParams.get('modo') as 'login' | 'register';
+  const [formMode, setFormMode] = useState<"register" | "login">(modo || 'register');
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -18,6 +25,12 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   const handleModeChange = (e: any) => {
     setFormMode(e.target.value);
   };
+
+  useEffect(() => {
+    if (modo === 'login' || modo === 'register') {
+      setFormMode(modo);
+    }
+  }, [modo]);
 
   const handleGoogleLogin = async (): Promise<void> => {
     window.location.href = `${PUERTO}/auth/google`;
@@ -45,11 +58,6 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
       .replace(/\s+/g, '') // Elimina espacios
       .replace(/@gmai\.com$/, '@gmail.com') // Corrige errores comunes
       .toLowerCase(); // Normaliza a minúsculas
-  };
-  
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const correctedEmail = correctEmailFormat(e.target.value);
-    setEmail(correctedEmail);
   };
 
   const validateUsername = (username: string): boolean => {
@@ -131,117 +139,128 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   };
 
   return (
+    <>
+  <style>
+    {`
+      .form-container {
+        flex-direction: column;
+        display: flex;
+        justify-content: space-around;
+        margin: 50px;
+        gap: 20px;
+        align-items: center;
+      }
+
+      @media (min-width: 768px) {
+        .form-container {
+          flex-direction: row;
+        }
+      }
+    `}
+  </style>
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBorder: "#3E7E1E",
-          colorBgContainer: '#E1EBCD',
+          colorBgContainer: 'white',
+          colorBorderSecondary: 'white',
+
         },
+        components: {
+          Input: {
+            borderRadius: 15,
+            controlHeight: 42,
+            lineWidth: 2,
+            activeBorderColor: '#6fb804',
+            hoverBorderColor: '#84d706',
+            activeShadow: '0 0 0 2px  rgba(150, 245, 12, 0.22)',
+            colorBorder: '#b8f845',
+            colorPrimaryActive: '#96f20a',
+            colorPrimaryHover: '#96f20a',
+          },
+          Button: {
+            borderRadius: 15,
+            controlHeight: 42,
+            lineWidth: 2,
+            colorBorder: customColors.colorFrio3,
+          }
+        },
+
       }}
     >
       {formMode === 'login' && (
         <div className="profile-container">
           <div className="logout-button-container">
-            <button className="logout-button" onClick={() => navigate('/cambiarContrasenia')}>Recuperar contraseña</button>
+            <button className="logout-button" onClick={() => navigate('/verificarCorreo')}>Recuperar contraseña</button>
           </div>
         </div>
       )}
-      <div style={{ display: "flex", justifyContent: "center", margin: "50px" }}>
-          
+      
+      <div className='form-container'>
+        <div style={{display: 'flex'}}>
+          <img src={heart} style={{width: '100%', height: 'auto', maxWidth: '100%', objectFit: 'contain'}}/>
+        </div>
         <Card
           style={{
             width: '80vw',
             maxWidth: '500px',
-            backgroundColor: "#CEDFAC",
-            borderRadius: 10,
+            backgroundColor: "white",
             padding: "16px",
           }}
-          bodyStyle={{ padding: "16px" }}
+          bodyStyle={{ padding: "16px", display: 'flex', gap: '12px', flexDirection: 'column' }}
         >
-          <Radio.Group
-            onChange={handleModeChange}
-            value={formMode}
-            style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}
-          >
-            <Radio.Button value="register" style={{ minWidth: "100px", maxWidth: "200px" }}>Registrarse</Radio.Button>
-            <Radio.Button value="login" style={{ minWidth: "100px", maxWidth: "200px" }}>Iniciar Sesión</Radio.Button>
-          </Radio.Group>
-
-          <Title level={4} style={{ textAlign: "center", color: "#669144" }}>
-            {formMode === "register" ? "Registrarse" : "Iniciar Sesión"}
+          <Title level={3} style={{ textAlign: "center", color: customColors.colorFuerteFrio}} className='poppins-semibold'>
+            {formMode === "register" ? "¡Regístrate!" : "Iniciar Sesión"}
           </Title>
 
           {formMode === "register" && (
             <>
-              <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-                Nombre de Usuario
-              </Title>
               <Input
                 placeholder="Nombre de Usuario"
-                style={{ marginBottom: "8px", borderRadius: "8px" }}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                prefix={<UserOutlined style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
               />
 
             </>
           )}
 
-          <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-            {formMode === "register" ? "Correo Electrónico" : "Correo Electrónico"}
-          </Title>
-
           <Input
             placeholder={formMode === "register" ? "Correo Electrónico" : "Correo Electrónico"}
-            style={{ marginBottom: "8px", borderRadius: "8px" }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            prefix={<MailFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
           />
-
-          <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-            Contraseña
-          </Title>
 
           <Input.Password
             placeholder="Contraseña"
-            style={{ marginBottom: "16px", borderRadius: "8px" }}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            prefix={<LockFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
           />
 
           {formMode === "register" && (
             <>
-              <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-                Confirmar Contraseña
-              </Title>
-
-              <Input.Password
-                placeholder="Confirmar Contraseña"
-                style={{ marginBottom: "16px", borderRadius: "8px" }}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+            <Input.Password
+              placeholder="Confirmar Contraseña"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              prefix={<LockFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
+            />
             </>
           )}
 
           <div style={{ textAlign: "center", marginBottom: "16px" }}>
             <Button
               shape="circle"
-              icon={<GoogleOutlined />}
-              style={{ backgroundColor: "#E1EBCD", border: "1px solid #3E7E1E" }}
+              icon={<GoogleOutlined style={{color: customColors.colorFuerteFrio}}/>}
+              style={{ backgroundColor: customColors.colorPrimarioClaro, border: `1px solid ${customColors.colorPrimarioClaro}` }}
               onClick={handleGoogleLogin}
             />
           </div>
 
           <Button
-            type="primary"
-            block
-            style={{
-              borderRadius: "8px",
-              backgroundColor: "#669144",
-              borderColor: "#669144",
-            }}
+            type="primary" className='poppins-semibold'
             onClick={handleSubmit}
           >
             {formMode === "register" ? "Registrarse" : "Iniciar Sesión"}
@@ -249,6 +268,8 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
         </Card>
       </div>
     </ConfigProvider>
+
+    </>
   );
 };
 

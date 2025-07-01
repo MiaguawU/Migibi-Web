@@ -1,18 +1,30 @@
 Funcionalidad de admin
 - Catálogos
+  - unidades
+  - Tipo de Consumo
+  - Tipo de alimentos
+  - Rol
 - Usuarios
+  - nombre
+  - imagen
+  - rol
+  - Cohabitantes
+  - Gmail
+- Alimentos
+ - Cat_Alimentos
 
 Receta
+Back
+
+Server
 - Puede editar debe considerar el rol del usuario en Recetas
-- Resaltar el nombre de la receta nueva
-- Botón de guardar en la receta
 - Rule obligatorio el nombre de la receta para guardar
-- Arreglar unidades en los ingredientes
-- Arreglar orden en las nuevas instrucciones
 - Revisar recetas
 - Arreglar Front
   - Arreglar diseño en las instrucciones
   - Arreglar diseño de ingredientes
+  - Resaltar el nombre de la receta nueva
+
 
 
 Lista de tareas para el proyecto
@@ -26,6 +38,8 @@ refri
 OP: avisar que va a cambiar la imagen
 
 Hoy, Plan, Lista de Compra
+- Arreglar Navigation en Plan y en Hoy
+- Revisar fechas en el navigation y en el modal de crearPlanCrear
 - Arreglar problema de conversiones para la lista de Compra
 
 Dashboard
@@ -35,3 +49,30 @@ Dashboard
 - fuentes de tráfico
 
 SR&!TPc8qhaGoeM
+
+Física
+Para reforzar la parte conceptual  o "de teoría"
+.
+Les comparto los siguientes enlaces: 
+Primer enlace
+ https://www.youtube.com/watch?v=NVmfz_cz6AU&list=PL6kQim6ljTJvMS8ZQJfDNlgWT-YJx0wlL&index=19
+.
+.
+Lucio Gallegos
+8:15 p.m.
+se invita a ver el video, e ir haciendo capturas de pantalla, de ahí elaborar apuntes:
+ de modelos matemáticos, diagramas y ecuaciones posteriormente, hacer lo mismo para el segundo y tercer enlace de video segundo enlace
+ https://www.youtube.com/watch?v=znZif0HdW7k&list=PL6kQim6ljTJvMS8ZQJfDNlgWT-YJx0wlL&index=20
+Lucio Gallegos
+8:16 p.m.
+tercer enlace
+ https://www.youtube.com/watch?v=17NhVJAoZd8&list=PL6kQim6ljTJvMS8ZQJfDNlgWT-YJx0wlL&index=21
+
+ 
+recuerden los contenidos
+capitulo 37
+y cap 34 hasta fuerza magnetica sobre una corriente
+Resnick
+una d elas  tareas
+del Capitulo 34 del 1 al 35 los impares
+

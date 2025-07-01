@@ -1,13 +1,17 @@
 import React from "react";
-import { Layout , Row, Col, Typography } from "antd";
+import { Link } from "react-router-dom";
+import Mail from "./Mail";
+import WhatsAppIcon from "./WhatsAppIcon";
+import { Layout, Row, Col, Typography } from "antd";
 import {
   MailOutlined,
   InstagramOutlined,
-  WhatsAppOutlined,
   FacebookOutlined,
 } from "@ant-design/icons";
+import './Estilos/MainLayout.css';
+//Aquí queremos importar el MainLayout.css y comprobar si funciona
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Title, Text } = Typography;
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -15,85 +19,94 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     container: {
       backgroundColor: "#6E9A65",
       padding: "40px 200px",
-      "@media (max-width: 768px)": {
-        padding: "20px 100px", // Cambia el color en pantallas pequeñas
-      },
-      "@media (max-width: 600px)": {
-        padding: "20px 50px", // Cambia el color en pantallas pequeñas
-      },
-    } as React.CSSProperties, // Necesario para TypeScript
+    } as React.CSSProperties,
+  };
+
+  const linkStyle: React.CSSProperties = {
+    color: "black",
+    textDecoration: "none",
   };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      {/* Encabezado */}
+      {/* Contenido principal */}
+      <Content style={{ minHeight: "100vh", width: "100%" }}>{children}</Content>
 
-      {/* Contenido */}
-      <Content style={{ minHeight: '100vh', width: '100%'}}>
-        {children}
-      </Content>
-
-      {/* Pie de página */}
-      <Footer style={{ backgroundColor: "#6E9A65", padding: "40px 200px" }}>
+      {/* Pie de página 336733*/}
+      <Footer style={{ backgroundColor: "#9ED340"}}>
         <Row justify="center" gutter={[32, 32]}>
-          {/* Sección Inicio */}
+          {/* Inicio */}
           <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Inicio
-            </Title>
-            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
-              <li>Bienvenida</li>
-              <li>Propósito</li>
-              <li>Objetivos</li>
-              <li>Misión</li>
-              <li>Visión</li>
+            <Title level={4} style={{ color: "black" }}>Inicio</Title>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              <li><Link to="/" style={linkStyle}>Bienvenida</Link></li>
+              <li><Link to="/conocenos#proposito" style={linkStyle}>Propósito</Link></li>
+              {/*<li>Objetivos</li>*/}
+              <li><Link to="/conocenos#mision" style={linkStyle}>Misión</Link></li>
+              <li><Link to="/conocenos#vision" style={linkStyle}>Visión</Link></li>
             </ul>
           </Col>
 
-          {/* Sección Nosotros */}
+          {/* Nosotros */}
           <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Nosotros
-            </Title>
-            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
-              <li>Equipo</li>
-              <li>Organigrama</li>
-              <li>Valores</li>
-              <li>Filosofía</li>
-              <li>Políticas</li>
+            <Title level={4} style={{ color: "black" }}>Nosotros</Title>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {/*<li>Equipo</li>
+              <li>Organigrama</li>*/}
+              <li><Link to="/conocenos#valoresss" style={linkStyle}>Valores</Link></li>
+              <li><Link to="/conocenos#filosofiaaa" style={linkStyle}>Filosofía</Link></li>
+              <li><Link to="/conocenos#politicasss" style={linkStyle}>Políticas</Link></li>
             </ul>
           </Col>
 
-          {/* Sección Migibi */}
+          {/* Migibi */}
           <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Migibi
-            </Title>
-            <ul style={{ listStyle: "none", padding: 0, color: "#fff" }}>
-              <li>Plan</li>
-              <li>Hoy</li>
+            <Title level={4} style={{ color: "black" }}>Migibi</Title>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              <li><Link to="/hoy" style={linkStyle}>Plan de hoy</Link></li>
+              <li><Link to="/plan" style={linkStyle}>Plan semanal</Link></li>
+              <li><Link to="/recetas" style={linkStyle}>Recetas</Link></li>
+              <li><Link to="/refri" style={linkStyle}>Refri</Link></li>
+              <li><Link to="/perfil" style={linkStyle}>Perfil</Link></li>
             </ul>
           </Col>
 
-          {/* Sección Contáctanos */}
+          {/* Contáctanos */}
           <Col xs={24} sm={12} md={6}>
-            <Title level={4} style={{ color: "#fff" }}>
-              Contáctanos
-            </Title>
-            <Text style={{ color: "#fff" }}>correo.ejemplo@gmail.com</Text>
-            <div style={{ marginTop: "10px", fontSize: "20px" }}>
-              <MailOutlined style={{ color: "#fff", marginRight: "10px" }} />
-              <InstagramOutlined style={{ color: "#fff", marginRight: "10px" }} />
-              <WhatsAppOutlined style={{ color: "#fff", marginRight: "10px" }} />
-              <FacebookOutlined style={{ color: "#fff" }} />
-            </div>
+            <Title level={4} style={{ color: "black" }}>Contáctanos</Title>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              <li><a href="cincode.official@gmail.com" style={linkStyle}>cincode.official@gmail.com</a></li>
+              <li>
+                <div style={{ marginTop: "10px", fontSize: "20px" }}>
+                  <Mail />
+                  <a
+                    href="https://www.instagram.com/cincode_official/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ ...linkStyle, marginRight: "10px" }}
+                  >
+                    <InstagramOutlined />
+                  </a>
+                  <WhatsAppIcon />
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61560896874235"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ ...linkStyle, marginRight: "10px" }}
+                  >
+                    <FacebookOutlined />
+                  </a>
+                </div>
+            </li>
+            </ul>
           </Col>
         </Row>
 
-        {/* Sección de términos y condiciones */}
+        {/* Términos */}
         <Row justify="center" style={{ marginTop: "30px" }}>
-          <Text style={{ color: "#fff", textAlign: "center" }}>
-            Términos y condiciones | Aviso de privacidad
+          <Text style={{ color: "black", textAlign: "center" }}>
+            <Link to="/terminos" style={linkStyle}>Términos y condiciones</Link> |{" "}
+            <Link to="/aviso" style={linkStyle}>Aviso de privacidad</Link>
           </Text>
         </Row>
       </Footer>

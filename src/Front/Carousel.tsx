@@ -4,6 +4,7 @@ import "./Carousel.css"; // CSS personalizado para estilos adicionales
 import migibi from "../Img/Carousel1.png";
 import dibujo from "../Img/Carousel.png";
 
+
 const CarouselExample: React.FC = () => {
   const slides = [
     {
@@ -20,13 +21,13 @@ const CarouselExample: React.FC = () => {
 
   return (
 
-    <Carousel autoplay style={{width: "100%", backgroundColor: "#C4EFC4",}}>
+    <Carousel autoplay style={{width: "100%", backgroundColor: "#C4EFC4", height: "400px"}}>
       {slides.map((slide, index) => (
         <div key={index} className="carousel-slide">
           <div className="carousel-content">
             {/* Imagen */}
             <div className="carousel-image-container">
-              <img src={slide.image} alt={slide.title} className="carousel-image" />
+              <img id="carruu1" src={slide.image} alt={slide.title} className="carousel-image" />
             </div>
 
             {/* Texto */}

@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Input, ConfigProvider, Button, Card, Typography, message } from "antd";
 import axios from "axios";
-import PUERTO from "../config";
+import { LockFilled } from '@ant-design/icons';
+import { customColors } from '../Front/Estilos/colores';
 import "./perfil.css";
+import PUERTO from "../config";
 
 const { Title } = Typography;
 
@@ -78,11 +80,31 @@ const CambiarContrasenia: React.FC = () => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBorder: "#3E7E1E",
-          colorBgContainer: '#E1EBCD',
+          colorBgContainer: 'white',
+          colorBorderSecondary: 'white',
+
         },
+        components: {
+          Input: {
+            borderRadius: 15,
+            controlHeight: 42,
+            lineWidth: 2,
+            activeBorderColor: '#6fb804',
+            hoverBorderColor: '#84d706',
+            activeShadow: '0 0 0 2px  rgba(150, 245, 12, 0.22)',
+            colorBorder: '#b8f845',
+            colorPrimaryActive: '#96f20a',
+            colorPrimaryHover: '#96f20a',
+          },
+          Button: {
+            borderRadius: 15,
+            controlHeight: 42,
+            lineWidth: 2,
+            colorBorder: customColors.colorFrio3,
+          }
+        },
+
       }}
     >
       <div style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}>
@@ -90,25 +112,25 @@ const CambiarContrasenia: React.FC = () => {
           style={{
             width: '80vw',
             maxWidth: '500px',
-            backgroundColor: "#CEDFAC",
-            borderRadius: 10,
+            backgroundColor: "white",
             padding: "16px",
           }}
-          bodyStyle={{ padding: "16px" }}
+          bodyStyle={{ padding: "16px", display: 'flex', gap: '12px', flexDirection: 'column' }}
         >
-          <Title level={4} style={{ textAlign: "center", color: "#669144" }}>
+
+          <Title level={3} style={{ textAlign: "center", color: customColors.colorFrio3 }}>
             Cambiar contraseña
           </Title>
 
-          <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
-            Contraseña
+          <Title level={5} style={{ textAlign: "center", color: customColors.colorFuerteCalido, fontWeight: 'light' }}>
+            Por favor, escriba su nueva contraseña.
           </Title>
 
           <Input.Password
             placeholder="Contraseña"
-            style={{ marginBottom: "16px", borderRadius: "8px" }}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            prefix={<LockFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
           />
 
           <Title level={3} style={{ textAlign: "center", color: "#6B8762", fontFamily: 'Jomhuria, sans-serif', fontWeight: 'lighter' }}>
@@ -117,9 +139,9 @@ const CambiarContrasenia: React.FC = () => {
 
           <Input.Password
             placeholder="Confirmar Contraseña"
-            style={{ marginBottom: "16px", borderRadius: "8px" }}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            prefix={<LockFilled style={{fontSize: '20px', color: customColors.colorPrimarioClaro, fontWeight: 'bolder'}}/>}
           />
 
           <Button
@@ -134,6 +156,7 @@ const CambiarContrasenia: React.FC = () => {
           >
             Cambiar contraseña
           </Button>
+
         </Card>
       </div>
     </ConfigProvider>

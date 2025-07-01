@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Space, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Modal, Form, Space, Button, DatePicker, InputNumber, Select, ConfigProvider, Upload, message, UploadProps, notification } from 'antd';
+import { CheckOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from "axios";
 import PUERTO from "../../config";
 import moment from 'moment';
@@ -48,6 +48,8 @@ const formItemLayout = {
     sm: { span: 14 },
   },
 };
+
+
 
 const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) => {
   const [form] = Form.useForm();
@@ -167,7 +169,59 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
   const preguntaNO = () => {
     setIsPerecederoModalOpen(false);
     setEsPerecedero(false);
-    form.setFieldsValue({ expirationDate: null });
+    form.setFieldsValue({ expirationDate: null });  // Asegura que la fecha esté vacía
+    //form.submit();
+  };
+  
+  const handleSubmitOriginal = async (values: any) => {
+
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      message.warning("No hay un usuario logueado actualmente.");
+      return;
+    }
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "{}");
+    const user = usuarios[currentUser];
+    if (!user) {
+      message.warning("Usuario no encontrado en los datos locales.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('nombre', values.name);
+    formData.append('tipo', values.type);
+    formData.append('id_unidad', values.unit);
+    formData.append('cantidad', values.quantity);
+    formData.append('fecha_caducidad', values.expirationDate ? values.expirationDate.format("YYYY-MM-DD") : '');
+    formData.append('Id_Usuario_Alta', currentUser);
+
+    if (values.imgsrc && values.imgsrc.file) {
+      formData.append('image', values.imgsrc.file.originFileObj);
+    }
+
+    try {
+      const response = await axios.put(`${PUERTO}/alimento/${stockId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      notification.success({
+        message: 'Guardado correctamente',
+        description: 'El producto ha sido actualizado con éxito.',
+        placement: 'topRight',
+        duration: 3,
+      });
+      form.resetFields();
+    } catch (error: any) {
+      console.error("Error en la solicitud:", error);
+      if (error.response) {
+        if (error.response.data && error.response.data.error) {
+          message.error(error.response.data.error);
+        } else {
+          message.error(`Error: ${error.response.status} - ${error.response.statusText}`);
+        }
+      } else {
+        message.error('Error de conexión con el servidor.');
+      }
+    }
   };
 
   const handleSubmit = async (values: any) => {
@@ -269,8 +323,8 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
       theme={{
         token: {
           colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
+          colorBgContainer: '#CEFF77',
+          colorText: '#244C24',
           colorPrimary: '#3E7E1E',
         },
         components: {

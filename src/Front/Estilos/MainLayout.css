@@ -1,0 +1,23 @@
+.ant-layout-footer {
+    background-color:#336733 ;
+    padding: 40px 200px;
+}
+
+.ant-layout-content {
+    background-color:white ;
+}
+@media (min-width: 769px) {
+    .ant-layout-footer {
+        padding: 40px 200px;
+    }
+}
+@media (max-width: 768px){
+    .ant-layout-footer {
+        padding: 20px 100px; 
+      }
+    }
+      @media (max-width: 600px) {
+    .ant-layout-footer {
+        padding: 20px 50px, 
+    }
+      }

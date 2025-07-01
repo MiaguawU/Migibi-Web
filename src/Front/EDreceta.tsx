@@ -19,6 +19,17 @@ import dayjs, { Dayjs } from 'dayjs';
 const { Option } = Select;
 const { TextArea } = Input;
 
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 6 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 14 },
+  },
+};
+
 interface Tipo {
   Id_Tipo_Consumo: number;
   Tipo_Consumo: string;
@@ -336,7 +347,10 @@ export default function EDreceta() {
 
     return (
       <div className='todo'>
-        <Form  form={form} >
+        <Form 
+          {...formItemLayout}
+          form={form} >
+
           <div className='receta'>
               { (isMobile || isTablet) && (
               <div className='rect'>
@@ -344,9 +358,6 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 35,
-                        colorText: "#8BA577",
                       },
                     }}
                   >
@@ -362,9 +373,9 @@ export default function EDreceta() {
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                <Button htmlType="button" className='btEn' onClick={onSubmit}>
-                      <p className='tx2'>Guardar</p>
-                    </Button>
+                  <Button htmlType="button" className='btEn' onClick={onSubmit}>
+                    <p className='tx2'>Guardar</p>
+                  </Button>
 
                   <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Limpiar</p></Button>
                 </div>
@@ -401,7 +412,7 @@ export default function EDreceta() {
                   placeholder="Seleccione tiempo"
                   />
                 </div>
-                <div className="tipo" style={{padding:'10px'}}>
+                <div className="tipo" style={{paddingRight: '10px'}}>
                   <p className="txi">Tipo:</p>
                   <Select
                     placeholder="Seleccione un tipo"
@@ -450,9 +461,6 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 35,
-                        colorText: "#8BA577",
                       },
                     }}
                   >
@@ -461,8 +469,8 @@ export default function EDreceta() {
                   </ConfigProvider>
                 </div>
                 <div className='divEnviarReset'>
-                  <Button htmlType="submit"  className='btEn' onClick={onSubmit}><p className='tx2'>Enviar</p></Button>
-                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Reset</p></Button>
+                  <Button htmlType="submit"  className='btEn' onClick={onSubmit}><p className='tx2'>Guardar</p></Button>
+                  <Button htmlType="button" onClick={onReset} className='btEn2' ><p className='tx2'>Limpiar</p></Button>
                 </div>
               </div>
               )}

@@ -239,7 +239,6 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
           colorBorder: '#3E7E1E',
           colorBgContainer: '#CAE2B5',
           colorText: '#758B63',
-          colorPrimary: '#3E7E1E',
         },
       }}
     >

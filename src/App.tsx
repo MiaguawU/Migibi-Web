@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Menu, Button, Drawer, message } from 'antd';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Menu, Button, Drawer, message, ConfigProvider, Grid } from 'antd';
 import type { MenuProps } from 'antd';
+import esES from 'antd/locale/es_ES'; // Opcional: español
 import './Front/Estilos/Nav.css';
-import PUERTO from './config';
-import axios from "axios";
+import { customColors } from './Front/Estilos/colores';
 import Modal from './Front/Modal';
 import btInicio from './Img/btInicio.png';
 import btPerfil from './Img/btPerfil.png';
@@ -26,6 +26,11 @@ import Usuarios from './Front/Usuarios';
 import Cat_Alimentos from './Front/Cat_Alimentos';
 import Catalogos from './Front/Catalogos';
 import CambiarContrasenia from './Front/CambiarContrasenia';
+import VerificarCorreo from './Front/VerificarCorreo';
+import Terminos from './Front/Términos_Condiciones';
+import AvisoPriv from './Front/AvisoPriv';
+import PUERTO from './config';
+import axios from "axios";
 
 type ItemType = Required<MenuProps>['items'][number];
 
@@ -52,24 +57,23 @@ const profileItem: ItemType[] = [
 ];
 
 const accederItem: ItemType[] = [
-  { label: <Link to="/acceder" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Acceder</Link>, key: 'acceder' },
+  { label: <Link to="/acceder?modo=login" style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Iniciar Sesión</Link>, key: 'iniciar' },
+  { label: <Link to="/acceder?modo=register" state={{ modo: 'register' }} style={{ fontFamily: 'Jomhuria', fontSize: 30 }}>Regístrate</Link>, key: 'registrar' },
 ];
+
+const { useBreakpoint } = Grid;
 
 function App() {
   const { session, setSession, clearSession } = useSession<{ userId: number; name: string }>();
   const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
   const [isAdmin, setisAdmin] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const [menuKey, setMenuKey] = useState(0);
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   useEffect(() => {
     // Forzar re-render después de 100ms
@@ -115,6 +119,7 @@ console.log("userId:", userId);
     const acceso = currentUser && usuariosLocal[currentUser] ? true : false;
     setHasAccess(acceso);
     rol();
+    rol();
   }, []);
 
   const onLogin = (userData: any) => {
@@ -134,7 +139,58 @@ console.log("userId:", userId);
     return hasAccess ? profileItem : accederItem;
   };
 
+  const customTheme = {
+    token: {
+      colorPrimary: customColors.colorPrimario,
+      colorWarning: customColors.colorWarning,
+      colorError: customColors.colorError,
+      colorInfo: '#5BC0DE',
+      colorTextBase: customColors.colorFrio3,
+      colorBgBase: '#fff',
+      colorErrorActive: '#FFB948',
+      colorErrorHover: '#FFB948',
+      colorErrorBorder: '#FFB948',
+      colorErrorBorderHover: '#FFDA48',
+      fontFamily: 'Poppins, sans-serif',
+      colorBorder: '#fff',
+      colorBgContainer: "#fff",
+      colorBorderSecondary: "rgba(240,240,240,0)",
+      colorBgElevated: '#f9f9f9',
+      colorText: customColors.colorFrio3,
+      colorLink: customColors.colorFuerteCalido,
+    },
+    components: {
+      Button: {
+        solidTextColor: "#B8F845",
+        primaryColor: "#306430",
+      },
+      Select: {
+        hoverBorderColor: customColors.colorTextTarjeta,
+      }
+    },
+  };
+
   return (
+    <>
+    <style>
+      {`
+        .ant-modal .ant-modal-content {
+          background-color: #fff;
+        }
+        .ant-modal .ant-modal-header {
+          background-color: #fff;
+        }
+        .ant-list-split .ant-list-item {
+          border-block-end: 1px solid #fff;
+        }
+        .ant-select-outlined {
+        background-color: #fff,
+        border: 1px solid rgba(240,240,240,0),
+        }
+      `}
+    </style>
+    <ConfigProvider theme={customTheme} locale={esES}>
+
     <MainLayout>
       <header>
         {!isMobile ? (
@@ -149,6 +205,8 @@ console.log("userId:", userId);
               mode="horizontal"
               items={getProfileItems(hasAccess)}
               className="profile-link"
+              style={!hasAccess ?{minWidth: "240px"} : {minWidth: '0px'}}
+
             />
           </div>
         ) : (
@@ -187,10 +245,18 @@ console.log("userId:", userId);
           <Route path="/cat_alimentos" element={<Cat_Alimentos />} />
           <Route path="/catalogos" element={<Catalogos />} />
           <Route path="/recetaVis" element={<RecetaVIS />} />
+          <Route path="/verificarCorreo" element={<VerificarCorreo />} />
           <Route path="/cambiarContrasenia" element={<CambiarContrasenia />} />
+          <Route path="/terminos" element={<Terminos />} />
+          <Route path="/aviso" element={<AvisoPriv />} />
+
+
         </Routes>
       </main>
     </MainLayout>
+
+    </ConfigProvider>
+    </>
   );
 }
 

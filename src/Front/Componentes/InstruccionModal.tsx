@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button, ConfigProvider, message } from 'antd';
+import { customColors } from '../Estilos/colores';
 import axios from "axios";
 import PUERTO from "../../config";
 
@@ -8,6 +9,7 @@ const { TextArea } = Input;
 interface FormModalProps {
   visible: boolean;
   onClose: () => void;
+  index: number;
   recetaId: number;
   onSubmit: (newInstruction: Item) => void;
 }
@@ -21,11 +23,10 @@ interface Item {
 }
 
 const formItemLayout = {
-  labelCol: { xs: { span: 24 }, sm: { span: 6 } },
-  wrapperCol: { xs: { span: 24 }, sm: { span: 14 } },
+  wrapperCol: { xs: { span: 24 }, sm: { span: 24 } },
 };
 
-const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubmit }) => {
+const InsModal: React.FC<FormModalProps> = ({ visible, onClose, index, recetaId, onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: { name: string }) => {
@@ -35,53 +36,50 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
     return;
   }
 
-  const data = {
-    instruccion: values.name,
-    Id_Usuario_Alta: Number(currentUser),
-    // Ya no se envía 'orden' desde el cliente
-  };
+    const data = {
+      orden: 0, // Se actualizará después con la respuesta
+      instruccion: values.name,
+      Id_Usuario_Alta: Number(currentUser),
+    };
 
-  try {
-    const response = await axios.post(`${PUERTO}/proED/${recetaId}`, data, {
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const response = await axios.post(`${PUERTO}/proED/${recetaId}`, data, {
+        headers: { "Content-Type": "application/json" },
+      });
 
-    if (response.status === 200) {
-      message.success("Instrucción agregada correctamente.");
-      form.resetFields();
+      if (response.status === 200) {
+        message.success("Instrucción agregada correctamente.");
+        form.resetFields();
 
-      const nuevaInstruccion: Item = {
-        id: response.data.id,
-        name: values.name,
-        isChecked: false,
-        Activo: 1,
-        orden: response.data.orden || 1, // Lo tomamos del backend
-      };
+        const nuevaInstruccion: Item = {
+          id: response.data.id,
+          name: values.name,
+          isChecked: false,
+          Activo: 1,
+          orden: response.data.orden || index,
+        };
 
-      onSubmit(nuevaInstruccion);
-      onClose();
-    } else {
-      message.error("Error al agregar la instrucción.");
+        onSubmit(nuevaInstruccion);
+        onClose();
+      } else {
+        message.error("Error al agregar la instrucción.");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      message.error("Error al procesar la solicitud. Intenta de nuevo.");
     }
-  } catch (error) {
-    console.error("Error en la solicitud:", error);
-    message.error("Error al procesar la solicitud. Intenta de nuevo.");
-  }
-};
-
+  };
 
   return (
     <ConfigProvider
       theme={{
         token: {
-          colorBorder: "#3E7E1E",
-          colorBgContainer: "#CAE2B5",
-          colorText: "#3E7E1E",
-          colorPrimary: "#3E7E1E",
+          colorBorder: customColors.colorFuerteCalido,
+          colorBgContainer: customColors.colorClaroCalido,
         },
         components: {
           Form: {
-            labelFontSize: 22,
+            labelFontSize: 16,
             labelRequiredMarkColor: "white",
           },
         },
@@ -94,7 +92,7 @@ const InsModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
             label="Instrucción"
             rules={[{ required: true, message: "Por favor, introduce la instrucción" }]}
           >
-            <TextArea rows={4} />
+            <TextArea />
           </Form.Item>
 
           <Form.Item wrapperCol={{ xs: { span: 24 }, sm: { span: 24 }, offset: 0 }}>

@@ -1,13 +1,15 @@
 .img{
     max-width: 40px;
     max-height: 40px;
-    position: absolute;
+    position: relative;
+    /*top: 10px; de Cam*/
+
 }
 .jomhuria-regular {
-    font-family: "Jomhuria", serif;
-    font-weight: 300;
-    font-style: normal;
-  }
+  font-family: "Jomhuria", serif;
+  font-weight: 300;
+  font-style: normal;
+}
 .btAg{
     position: absolute;
     bottom: 10px;
@@ -19,21 +21,11 @@
     margin-right: 200px;
 }
 
-.card-title {
-    color: #638552;  /* Color que desees para el título */
-    font-size: 30px; 
-    font-family: 'Jomhuria';
-    font-weight: normal;
-  }
 /* Estilos generales para el Card */
 .card-container {
   width: 100%;
   height: fit-content;
-  background-color: #CEDFAC;
   border-radius: 8px;
-  color: #638552;
-  border: 1px solid;
-  border-color: #3E7E1E;
   }
   
   .ant-card-body {
@@ -43,13 +35,9 @@
   .card-checkbox-container {
     display: flex;
     flex-direction: column;
-    margin: 6%;
-    padding: 5%;
-    background-color: white;
+    padding: 24px;
     border-radius: 20px;
     position: relative;
-    border: 1px solid;
-    border-color: #3E7E1E;
   }
   
   .card-checkbox {
@@ -58,23 +46,12 @@
     margin-bottom: 8px;
   }
   
-  .card-checkbox-text {
-    font-family: "Alice, serif";
-    color: #40632F;
-  }
-  
-  
   /* Estilos para el Drawer */
   .drawer-title {
     font-size: 18px;
     font-weight: bold;
   }
   
-  /* Estilo de la Button link */
-  .card-button-link {
-    color: #3E7E1E;
-    text-decoration: none;
-  }
   .ant-list .ant-list-item {
     padding: 0px;
   }
@@ -84,11 +61,6 @@
     margin-bottom: 8px;
   }
   
-  .drawer-checkbox-text {
-    font-family: "Alice, serif";
-    color: #40632F;
-  }
-  
   
 @media (max-width:900px) {
   
@@ -96,6 +68,4 @@
     padding: 24px;
   }
   
-  .card-checkbox-container {
-  }
 }

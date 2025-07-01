@@ -7,8 +7,95 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 @import url('https://fonts.googleapis.com/css2?family=Jomhuria&display=swap');
+.poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
 
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* index.css */
+
+body {
+  font-family: 'Raleway', sans-serif;
+  color: #3E7E1E;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  color: #6B8762;
+  margin-bottom: 10px;
+}
+
+p, li {
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.ant-select-borderless .ant-select-selector {
+  background: transparent;
+  border: 1px transparent;
+}
+/* Solo se aplicará donde se use la clase .raleway-forzado */
+.raleway-forzado, .raleway-forzado * {
+  font-family: 'Raleway', sans-serif !important;
+  color: #3E7E1E;
+}
+
+
+
+

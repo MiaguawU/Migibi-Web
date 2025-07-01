@@ -9,6 +9,7 @@ import AlimentosNoComer from "./Componentes/AlimentosNoComer";
 import PUERTO from "../config";
 import axios from "axios";
 import btPerfil from "../Img/btPerfil.png";
+import { customColors } from "./Estilos/colores";
 
 const UserProfile: React.FC = () => {
   const [IsModalOpen, setIsModalOpen] = useState(false);
@@ -147,7 +148,7 @@ const UserProfile: React.FC = () => {
 
   return (
     <>
-    <ConfigProvider theme={{ token: { fontFamily: "Jomhuria, Serif", fontSize: 35, colorText: "#8BA577" } }}>
+    <ConfigProvider theme={{ token: { fontFamily: "Poppins, Serif", fontSize: 30, colorText: "#8BA577", } }}>
       <div className="profile-container">
         <div className="logout-button-container">
           <button className="save-button" onClick={handleSaveChanges}>Guardar cambios</button>
@@ -175,20 +176,24 @@ const UserProfile: React.FC = () => {
 
           <div className="info-cards">
             <div className="info-card">
-              <span>Tipos de alimentos que no puedo comer:</span>
-              <button className="view-button" onClick={() => setIsModalOpen(true)}>Ver</button>
+              <span style={{fontSize: "small", color: customColors.colorTextTarjeta}}>Tipos de alimentos que no puedo comer:</span>
+              <Button className="view-button" onClick={() => setIsModalOpen(true)}>Ver</Button>
             </div>
             <div className="info-card">
-              <span>Cantidad de personas que viven conmigo:</span>
-              <NumericInput
-                style={{ width: 50, textAlign: "center" }}
-                value={formData.Cohabitantes}
-                onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
-              />
+              <span style={{fontSize: "small", color: customColors.colorTextTarjeta}}>Cantidad de personas que viven conmigo:</span>
+              
+              <ConfigProvider theme={{ token: { fontSize: 18, colorText: "#244C24", 
+                colorBorder: '#EEEEED', lineHeight: 1, colorBgContainer: '#EEEEED',} }}>
+                <NumericInput
+                  style={{ width: 50, textAlign: "center", }}
+                  value={formData.Cohabitantes}
+                  onChange={(value) => setFormData({ ...formData, Cohabitantes: value })}
+                />
+              </ConfigProvider>
             </div>
             <div className="info-card">
-              <span>Cambiar Contraseña:</span>
-              <button className="view-button" onClick={() => navigate('/cambiarContrasenia')}>Ver</button>
+              <span style={{fontSize: "small", color: customColors.colorTextTarjeta}}>Cambiar Contraseña:</span>
+              <Button className="view-button" onClick={() => navigate('/cambiarContrasenia')}>Ver</Button>
             </div>
           </div>
         </div>

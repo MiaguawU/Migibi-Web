@@ -62,20 +62,36 @@ router.post("/", sanitizeInput, (req, res) => {
     });
   }
 
-  const confirmationToken = uuidv4();
-  tempDatabase[confirmationToken] = { email, username, password };
+    const query = `select * from usuario where Email = ?;`;
+    const values = [email];
 
-  const confirmationLink = `${back}/registro/confirm/${confirmationToken}`;
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error al insertar en la base de datos:", err);
+        return res.status(400).json({
+          message: "Error al consultar usuario.",
+        });
+      }
+      if (result.length > 0) {
+        return res.status(409).json({
+          message: "Ya existe un usuario con ese correo.",
+        });
+      }
+      const confirmationToken = uuidv4();
+      tempDatabase[confirmationToken] = { email, username, password };
 
-  transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Confirma tu Registro",
-    html: `<p>Hola ${username}, haz clic en el siguiente enlace para confirmar tu registro:</p>
-           <a href="${confirmationLink}">Confirmar Registro</a>`,
-  });
+      const confirmationLink = `${back}/registro/confirm/${confirmationToken}`;
 
-  res.json({ message: "Correo de confirmación enviado" });
+      transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Confirma tu Registro",
+        html: `<p>Hola ${username}, haz clic en el siguiente enlace para confirmar tu registro:</p>
+              <a href="${confirmationLink}">Confirmar Registro</a>`,
+      });
+
+      return res.json({ message: "Correo de confirmación enviado" });
+    });
 });
 
 // Ruta para confirmar el correo y registrar el usuario en la BD

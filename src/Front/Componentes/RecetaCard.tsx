@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import type { PopconfirmProps } from "antd";
-import { Card, Button, Tooltip, Popconfirm, ConfigProvider } from "antd";
+import { Card, Button, Tooltip, Popconfirm, ConfigProvider, Space } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   ClockCircleOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
+import { customColors } from "../Estilos/colores";
 
 interface RecipeCardProps {
   id: number;
@@ -46,7 +47,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   
 
   return (
-    <ConfigProvider>
+    <ConfigProvider
+      theme={{
+        token: {
+          fontSize: 20
+        },
+      }}>
       <Card
         hoverable
         style={{
@@ -61,7 +67,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                 <Tooltip title="Editar" key="edit">
                   <Button
                     type="text"
-                    icon={<EditOutlined style={{ color: "#86A071" }} />}
+                    icon={<EditOutlined style={{ color: customColors.colorTextTarjeta}} />}
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit();
@@ -122,19 +128,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span
               style={{
-                fontSize: 35,
-                color: "#86A071",
-                fontFamily: "Jomhuria, sans-serif",
+                fontSize: 20,
+                color: customColors.colorTextTarjeta,
+                fontWeight: '500',
               }}
             >
               {title} / Porciones: {portions}
             </span>
           </div>
+          <Space size='large'></Space>
           <div
             style={{
-              fontFamily: "Jomhuria, sans-serif",
-              fontSize: "20px",
-              color: "#86A071",
+              fontSize: 15,
+              color: customColors.colorTextTarjeta,
             }}
           >
             <span style={{ marginRight: "10px" }}>

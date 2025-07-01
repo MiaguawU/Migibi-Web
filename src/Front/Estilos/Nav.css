@@ -7,16 +7,21 @@
 }
 
 label {
-  font-family: 'Jomhuria', serif;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
 }
-
+.ant-menu-light .ant-menu-horizontal {
+    background: white;
+}
 /* Estilos del menú */
 .custom-menu {
   width: 100%;
-  background-color: #6E9A65;  /* Fondo verde oscuro */
+  background-color: #527955;  /* Fondo verde oscuro */
   color: white;  /* Texto blanco */
-  font-family: 'Jomhuria', serif;  /* Aplicar la fuente personalizada */
-  font-weight: lighter;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
   height: 90px;
   /*border-bottom: none;*/  /* Eliminar bordes */
   display: flex;  /* Flexbox para alinear elementos */
@@ -29,20 +34,21 @@ label {
 
 /* Estilo general de los ítems del menú */
 .custom-menu .ant-menu-item {
-  background-color: #6E9A65 !important;  /* Fondo transparente */
+  background-color: #527955 !important;  /* Fondo transparente */
   color: white;  /* Texto blanco */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .custom-menu .ant-menu-item:hover {
-  background-color: #81c784 !important;  /* Fondo verde claro */
+  background-color: #609145 !important;  /* Fondo verde claro */
+  color: #0000 !important;  /* Fondo verde claro */
 }
 
 /* Fondo del ítem cuando está seleccionado */
 .custom-menu .ant-menu-item-selected {
-  background-color: #6E9A65 !important;  /* Fondo igual que el nav */
-  color: #CDFFAD !important;  /* Texto en verde claro para el seleccionado */
-  border-bottom: 2px solid #B3CD8F;  /* Línea verde clara debajo */
+  background-color: #527955 !important;  /* Fondo igual que el nav */
+  color: #EFF6EF !important;  /* Texto en verde claro para el seleccionado */
+  border-bottom: 2px solid #96F20A;  /* Línea verde clara debajo */
 }
 
 /* Estilo para enlaces dentro de los ítems */
@@ -54,13 +60,13 @@ label {
 
 /* Hover: cambia el color del texto */
 .custom-menu .ant-menu-item:hover a {
-  color: #C4FFB1;  /* Verde claro */
+  color: #DDEDDA;  /* Verde claro */
 }
 
 /* Activo o seleccionado: cambia el color del texto */
 .custom-menu .ant-menu-item-active a,
 .custom-menu .ant-menu-item-selected a {
-  color: #CDFFAD;  /* Verde intermedio */
+  color: #EFF6EF;  /* Verde intermedio */
 }
 
 /*
@@ -87,9 +93,10 @@ label {
 }
 
 .menu-links {
-  width: 100%;
-  background-color: #6E9A65;
+  flex-grow: 1;
+  background-color: #527955;
 }
+
 /* Responsividad del menú para dispositivos pequeños */
 @media (max-width: 768px) {
   .custom-menu {
@@ -128,7 +135,9 @@ label {
   background-color: #CAE2B5;  /* Fondo verde claro */
   border: 0.5px solid #388e3c;  /* Borde verde oscuro */
   color: #2c6b2f;  /* Texto verde oscuro */
-  font-family: 'Jomhuria', serif;  /* Usar la misma fuente personalizada */
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
   font-size: 16px;  /* Ajustar tamaño de la fuente */
   padding: 8px 15px;
   transition: all 0.3s ease;  /* Transición suave para bordes y fondo */
@@ -164,4 +173,5 @@ label {
 .recetas-container .ant-select-selector:hover,
 .recetas-container .ant-select-selector:focus {
   border-color: #66bb6a !important;  /* Borde verde claro al enfocar */
+  /* background-color: #3E7E1E !important;  /* Fondo verde claro */
 }

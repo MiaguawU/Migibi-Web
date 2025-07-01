@@ -5,7 +5,18 @@ import Ingredientes from './Componentes/IngredientesRecetaEditar';
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import type { UploadProps } from 'antd';
 import type { InputNumberProps } from 'antd';
-import { Button, Select, Input, Tooltip, Form, TimePicker, Upload, InputNumber, message, ConfigProvider } from "antd";
+import {
+  Button,
+  Select,
+  Input,
+  Tooltip,
+  Form,
+  TimePicker,
+  Upload,
+  InputNumber,
+  message,
+  ConfigProvider
+} from "antd";
 import Proceso from './Componentes/ProcedimientoEditar';
 import NumericInput from './Componentes/NumberInput';
 import PUERTO from "../config";
@@ -21,6 +32,7 @@ import useBlockShortcuts from "./hook/BloquearC";
 
 const { Option } = Select;
 const { TextArea } = Input;
+
 
 interface Tipo {
   Id_Tipo_Consumo: number;
@@ -61,8 +73,8 @@ export default function EDreceta() {
   const [syncedValue2, setSyncedValue2] = useState("Valor inicial 2");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-const location = useLocation();
-const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o null
+  const location = useLocation();
+  const [id, setId] = useState<number | null>(null);
   const [form] = Form.useForm();
   const [Tipos, setTipos] = useState<Tipo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,17 +113,17 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
-      event.returnValue = ""; // Prevenir la recarga o cierre.
+      event.returnValue = "";
     };
-  
+
     const initializeRecipe = async () => {
-      await agregar(); // Crear receta al cargar.
-      await obtenerId(); // Obtener el ID de la nueva receta.
+      await agregar();
+      await obtenerId();
     };
-  
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-    initializeRecipe(); // Ejecutar funciones iniciales.
-  
+    initializeRecipe();
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
@@ -125,25 +137,25 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
         message.error("Solo puedes subir archivos de imagen.");
         return false;
       }
-      setFormData((prev) => ({ ...prev, Imagen: URL.createObjectURL(file), FileImagen: file })); // Previsualización y guardado del archivo
-      return false; // Evitar subida automática
+      setFormData((prev) => ({ ...prev, Imagen: URL.createObjectURL(file), FileImagen: file }));
+      return false;
     },
-    
   };
 
-  const agregar = async () => {
+
+    const agregar = async () => {
     try {
       const currentUser = localStorage.getItem("currentUser");
       if (!currentUser) {
         message.warning("No hay un usuario logueado actualmente.");
         return;
       }
-  
+
       const id_us = Number(currentUser);
       const response = await axios.post(`${PUERTO}/RecetaGeneral/${id_us}`, {}, {
         headers: { "Content-Type": "application/json" },
       });
-  
+
       if (response.status === 200) {
         console.log("Receta creada correctamente.");
       } else {
@@ -159,47 +171,41 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       const response = await axios.get(`${PUERTO}/agReceta`, {
         headers: { "Content-Type": "application/json" },
       });
-      
-      console.log("Respuesta del servidor:", response);  // Aquí puedes ver qué datos están llegando
-      
+
       if (response.status === 200 && response.data?.id) {
-        const newId = response.data.id; // Verifica la estructura de la respuesta
-        setId(newId);  // Guarda el id en el estado
+        const newId = response.data.id;
+        setId(newId);
         console.log("ID de nueva receta:", newId);
-      } else {
       }
     } catch (error) {
       console.error("Error al obtener el ID:", error);
     }
   };
-  
-  // Obtener tipos de consumo
+
   const obtenerTipos = async () => {
     try {
       const response = await axios.get(`${PUERTO}/tipoC`, {
         headers: { "Content-Type": "application/json" },
       });
-      if(response){
-        setTipos(response.data );
+      if (response) {
+        setTipos(response.data);
         console.log("Tipos recibidos:", response.data);
-      }
-      else{
+      } else {
         message.error("No hay datos en los tipos");
       }
-      
     } catch (error) {
       console.error("Error al cargar tipos:", error);
       message.error("No se pudo cargar los tipos.");
     }
   };
 
-  // Inicialización del componente
   useEffect(() => {
     obtenerTipos();
   }, [id]);
+
   
 
-  const handleSyncedChange = (value: string) => {
+    const handleSyncedChange = (value: string) => {
     console.log("Nuevo valor para Nombre:", value);
     setFormData((prevData) => ({
       ...prevData,
@@ -207,12 +213,10 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     }));
   };
 
-  // Manejar cambios en el Select
   const handleSelectChange = (value: string | number) => {
     setFormData((prev) => ({ ...prev, id_Tipo: value }));
   };
 
-  // Manejar cambios en el TimePicker
   const handleTimeChange = (time: Dayjs | null) => {
     if (time && time.isValid()) {
       setFormData((prev) => ({ ...prev, Tiempo: time }));
@@ -221,7 +225,6 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
     }
   };
 
- 
   const actualizar = async () => {
       try {
         if (!id) {
@@ -294,8 +297,8 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
   };
 
   const onReset = () => {
-    obtenerTipos(); // Recargar tipos de consumo
-    setResetTrigger((prev) => !prev); // Cambiar trigger para componentes dependientes
+    obtenerTipos();
+    setResetTrigger((prev) => !prev);
   };
 
   const onSubmit = async () => {
@@ -304,8 +307,18 @@ const [id, setId] = useState<number | null>(null); // Cambiar tipo a número o n
       return;
     }
     await actualizar();
-    setenviarDatos((prev) => !prev); // Esto probablemente asegura que el componente Ingredientes se refresque.
+    setenviarDatos((prev) => !prev);
   };
+
+  useEffect(() => {
+    if (id !== null) {
+      actualizar();
+    } else {
+      console.log("No se ha obtenido el ID.");
+    }
+  }, [id]);
+
+  
   
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTablet, setIsTablet] = useState<boolean>(false);
