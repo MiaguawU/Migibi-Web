@@ -33,7 +33,6 @@ import useBlockShortcuts from "./hook/BloquearC";
 const { Option } = Select;
 const { TextArea } = Input;
 
-
 interface Tipo {
   Id_Tipo_Consumo: number;
   Tipo_Consumo: string;
@@ -141,7 +140,6 @@ export default function EDreceta() {
       return false;
     },
   };
-
 
     const agregar = async () => {
     try {
@@ -291,14 +289,23 @@ export default function EDreceta() {
   
   const [inputValue, setInputValue] = useState<string>("");
 
-  // Función para actualizar el estado
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
   const onReset = () => {
     obtenerTipos();
-    setResetTrigger((prev) => !prev);
+    const recetaCargada = {
+              Nombre: '',
+              Imagen: def,
+              Tiempo: dayjs().startOf('day'),
+              id_Tipo: '',
+              Porciones:  1,
+              Calorias:  1,
+            };
+            
+            setFormData(recetaCargada);        
+            setRecetaInicial(recetaCargada);
   };
 
   const onSubmit = async () => {
