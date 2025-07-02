@@ -15,6 +15,7 @@ import btEd from '../Img/btEditar.png';
 import btCom from '../Img/btCompartir.png';
 import './Estilos/EDrec.css';
 import dayjs, { Dayjs } from 'dayjs';
+import { customColors } from './Estilos/colores';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -309,6 +310,7 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
+                        fontSize: 5
                       },
                     }}
                   >
@@ -361,15 +363,23 @@ export default function EDreceta() {
                   hourStep={1} 
                   className='time' 
                   placeholder="Seleccione tiempo"
+                  style={{backgroundColor: customColors.colorBgTarjeta}}
                   />
                 </div>
                 <div className="tipo" style={{paddingRight: '10px'}}>
                   <p className="txi">Tipo:</p>
+                  <ConfigProvider
+                    theme={{
+                      token: {
+                        colorBgContainer: customColors.colorBgTarjeta
+                      },
+                    }}
+                  >
                   <Select
                     placeholder="Seleccione un tipo"
                     value={formData.id_Tipo}
                     onChange={handleSelectChange}
-                    style={{ width: 150 }}
+                    style={{ width: 150, }}
                   >
                     {Tipos.map((tipo) => (
                       <Option key={tipo.Id_Tipo_Consumo} value={tipo.Id_Tipo_Consumo}>
@@ -377,6 +387,7 @@ export default function EDreceta() {
                       </Option>
                     ))}
                   </Select>
+                  </ConfigProvider>
                 </div>
                 <div className='porciones'>
                   <p className='txp'>Porciones:</p>    
@@ -388,7 +399,8 @@ export default function EDreceta() {
                     onChange={(value) =>
                       setFormData({ ...formData, Porciones: value || 1 })
                     }
-                    defaultValue={3} />
+                    defaultValue={3} 
+                    style={{backgroundColor: customColors.colorBgTarjeta}}/>
                 </div>
                 <div className='calorias'>
                   <p className='txc'>Calorias:</p>
@@ -400,7 +412,8 @@ export default function EDreceta() {
                     value={formData.Calorias}
                     onChange={(value) =>
                       setFormData({ ...formData, Calorias: value || 0 })
-                    }/>
+                    }
+                    style={{backgroundColor: customColors.colorBgTarjeta}}/>
                    
                 </div>
               </div>
@@ -412,6 +425,7 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
+                        fontSize: 10
                       },
                     }}
                   >

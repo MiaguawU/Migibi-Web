@@ -59,7 +59,7 @@
   max-height: 50px;
   max-width: 250px;
   gap: 2.5%;
-  background-color: #B3D86E;
+  background-color: white;
   border-radius: 10px;
   border: 1px solid;
   border-color: #244C24;
@@ -99,7 +99,7 @@
 .rect {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   align-content: flex-start;
   flex-wrap: wrap;
@@ -110,6 +110,7 @@
 .nRecCom {
   display: flex;
   width: 100%;
+  justify-content: center;
   align-items: center;
   gap: 10px;
 }
@@ -161,7 +162,7 @@ h3 {
 }
 
 .nRec {
-  font-size: 40px;
+  font-size: 20px;
   display: flex;
   margin: 0px;
   flex-direction: row;
@@ -181,12 +182,10 @@ h3 {
 }
 
 .tx2 {
-  font-size: 30px;
   padding: 10px;
   position: relative;
-  top: 4px;
   margin: 0px;
-  color: #CEFF77;
+  color: #244C24;
 }
 
 .txi,
@@ -196,7 +195,6 @@ h3 {
   padding: 20px;
   position: relative;
   margin: 0px;
-  font-size: 25px;
   top: 1px;
   color: #244C24;
 }
@@ -220,7 +218,7 @@ h3 {
 .btUp {
   border: 1px solid;
   border-color: #244C24;
-  background-color: #B3D86E;
+  background-color: #B8F845;
   max-width: 46px;
   max-height: 30px;
   position: relative;
@@ -231,9 +229,11 @@ h3 {
 
 .btEn,
 .btEn2 {
-  background-color: #244C24 !important;
-  border: none !important;
-  color: #CEFF77 !important;
+  border: 1px solid #244C24;
+  color: #527955 !important;
+  align-content: center;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .ing {
@@ -249,7 +249,9 @@ h3 {
     flex-direction: column;
     gap: 10px;
   }
-
+  .rect {
+    justify-content: center;
+  }
   .f1 {
     flex-direction: column;
     gap: 10px;
@@ -341,7 +343,7 @@ h3 {
     .rect {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         align-content: flex-start;
         flex-wrap: wrap;
