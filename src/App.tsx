@@ -29,6 +29,7 @@ import CambiarContrasenia from './Front/CambiarContrasenia';
 import VerificarCorreo from './Front/VerificarCorreo';
 import Terminos from './Front/Términos_Condiciones';
 import AvisoPriv from './Front/AvisoPriv';
+import Recuperar from './Front/RecuperarCont';
 import PUERTO from './config';
 import axios from "axios";
 
@@ -249,8 +250,7 @@ console.log("userId:", userId);
           <Route path="/cambiarContrasenia" element={<CambiarContrasenia />} />
           <Route path="/terminos" element={<Terminos />} />
           <Route path="/aviso" element={<AvisoPriv />} />
-
-
+          <Route path="/recuperar" element={<Recuperar />} />
         </Routes>
       </main>
     </MainLayout>
