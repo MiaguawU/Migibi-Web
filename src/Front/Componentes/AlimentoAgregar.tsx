@@ -190,13 +190,9 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
       theme={{
         token: {
           colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
-          colorPrimary: '#3E7E1E',
         },
         components: {
           Form: {
-            labelFontSize: 22,
             labelRequiredMarkColor: 'white',
           },
         },
@@ -255,7 +251,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose }) => {
           </Form.Item>
           
         {esPerecedero && (
-          <Form.Item name="expirationDate" label="Fecha de caducidad" 
+          <Form.Item name="expirationDate" label="Caducidad" 
           rules={[
             {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
             ]}>

@@ -127,14 +127,10 @@ const AlimentoConsumir: React.FC<FormModalProps> = ({ visible, onClose, alimento
     <ConfigProvider
       theme={{
         token: {
-          colorBorder: '#3E7E1E',
-          colorBgContainer: '#CAE2B5',
-          colorText: '#758B63',
-          colorPrimary: '#3E7E1E',
+        colorBorder: '#3E7E1E',
         },
         components: {
           Form: {
-            labelFontSize: 22,
             labelRequiredMarkColor: 'white',
           },
         },

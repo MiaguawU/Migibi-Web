@@ -252,22 +252,18 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
+      <ConfigProvider
+        theme={{
+          token: {
           colorBorder: '#3E7E1E',
-          colorBgContainer: '#CEFF77',
-          colorText: '#244C24',
-          colorPrimary: '#3E7E1E',
-        },
-        components: {
-          Form: {
-            labelFontSize: 22,
-            labelRequiredMarkColor: 'white',
           },
-        },
-      }}
-    >
+          components: {
+            Form: {
+              labelRequiredMarkColor: 'white',
+            },
+          },
+        }}
+      >
       <Modal
         title={"Editar Producto"}
         visible={visible}
@@ -289,6 +285,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
               mode="tags"
               maxCount={1}
               showSearch
+              style={{borderColor: "white"}}
               placeholder="Buscar o escribir alimento"
               options={filteredOptions}
               value={searchTerm ? [searchTerm] : []}
@@ -321,7 +318,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
           </Form.Item>
           
         {esPerecedero && (
-          <Form.Item name="expirationDate" label="Fecha de caducidad" 
+          <Form.Item name="expirationDate" label="Caducidad" 
           rules={[
             {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
             ]}>

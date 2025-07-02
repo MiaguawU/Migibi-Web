@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './Estilos/Recetas.css';
+import { customColors } from './Estilos/colores';
 import axios from 'axios';
 import PUERTO from '../config';
 import PorCaducar from './Componentes/PorCaducar';
@@ -150,74 +152,79 @@ export default function Inicio() {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#00b96b',
           borderRadius: 10,
-          colorBgContainer: '#CEFF77',
-          colorText: '#244C24',
-        },
-        components: {
-          Select: {
-            optionActiveBg: '#CEFF77',
-            algorithm: true,
-          },
+          colorBgContainer: customColors.colorBgTarjeta,
         },
       }}
     >
-      <div style={{ width: '80vw', margin: '10px auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Input.Search
-            size="large"
-            placeholder="Buscar ingrediente"
-            onSearch={handleSearch}
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: '60%' }}
-          />
-          <Button style={{ color: '#244C24', backgroundColor: '#CEFF77' }} onClick={() => setIsModalOpen(true)}>Agregar</Button>
-        </div>
+    <div className="recetas-container" style={{ color: '#244C24' }}>
+      <div className="header" style={{ color: '#244C24' }}>
+        <Input.Search
+          placeholder="Buscar ingrediente"
+          allowClear
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: '80%', color: '#244C24' }}
+        />
+        <Button
+          className="btA"
+          style={{ backgroundColor: customColors.colorBgTarjeta, color: customColors.colorTextTarjeta, borderColor: 'white'}}
+          onClick={() => setIsModalOpen(true)}
+        >
+          Agregar
+        </Button>
       </div>
 
       {loading ? (
+        <>
         <Spin size="large" style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }} />
+        </>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px', padding: '16px' }}>
+          <div style={{ 
+            width: '100vw',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+            gap: '16px',
+            padding: '16px',
+            color: '#244C24', }}>
             <PorCaducar onUpdate={datosAlimento} />
             {filteredAlimentos.map((card, index) => (
               <Card
                 key={index}
                 hoverable
                 style={{
-                  border: '1px solid #244C24',
+                  border: '1px solid #3E7E1E',
                   borderRadius: '10px',
                   overflow: 'hidden',
                 }}
               >
-                <span style={{fontSize: 30, color: '#244C24', fontFamily: 'Jomhuria, sans-serif'}}>
+                <span style={{}}>
                   <img alt={card.image} src={card.image} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }} />
                   <Meta
-                    title={<span style={{ fontSize: '30px', color: '#244C24', fontFamily: 'Jomhuria, sans-serif', fontWeight: 'normal' }}>{card.ingrediente}</span>}
-                    description={`${card.cantidad} ${card.abreviatura}`}
-                    style={{ marginTop: '10px' }}
+                    title={<span style={{  }}>{card.ingrediente}</span>}
+                    description={<span style={{ color: customColors.colorFrio2 }}>{card.cantidad} {card.abreviatura}</span>}
+                    style={{ marginTop: '10px', color: customColors.colorFrio2 }}
                   />
-                  <div style={{ marginTop: '10px', color: card.caducidadPasada ? '#FF4D4F' : '#244C24' }}>
+                  <div style={{ marginTop: '10px', color: card.caducidadPasada ? customColors.colorError : customColors.colorFrio3 }}>
                     {card.fecha}
                   </div>
                   <div style={{display: 'flex', justifyContent: 'space-between'}}>
                     <Space size="small" style={{ marginTop: '10px' }}>
                       <Tooltip title="Editar">
-                        <EditOutlined style={{ color: '#6F895A', fontSize: 20 }}  onClick={() => setEdAlimento(card.id)}/>
+                        <EditOutlined style={{ color: customColors.colorFrio2, fontSize: 20 }}  onClick={() => setEdAlimento(card.id)}/>
                       </Tooltip>
                       {typeof card.diasRestantes === 'number' && card.diasRestantes <= 0 && (
                         <Tooltip title="Advertencia">
-                          <WarningOutlined style={{ color: '#E09134', fontSize: 20 }} />
+                          <WarningOutlined style={{ color: customColors.colorWarning, fontSize: 20 }} />
                         </Tooltip>
                       )}
                       <Tooltip title="Eliminar">
-                        <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
+                        <DeleteOutlined  onClick={() => eliminarAlimento(card.id)} style={{ color: customColors.colorError, fontSize: 20 }} />
                       </Tooltip>
                     </Space>
                     <Tooltip title="Consumir">
-                      <MinusSquareOutlined  onClick={() => setConAlimento(card.id)} style={{ color: '#6F895A', fontSize: 20 }} />
+                      <MinusSquareOutlined  onClick={() => setConAlimento(card.id)} style={{ color: customColors.colorFrio2, fontSize: 20 }} />
                     </Tooltip>
                   </div>
                 </span>
@@ -249,6 +256,7 @@ export default function Inicio() {
           </div>
         </>
       )}
+    </div>
     </ConfigProvider>
   );
 }

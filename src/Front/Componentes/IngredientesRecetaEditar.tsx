@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Checkbox, Button, Drawer, ConfigProvider, message, List } from "antd";
 import IngModal from "./IngredienteModal";
-import {PlusCircleOutlined} from '@ant-design/icons';
+import EditarIngredienteModal from "./EditarIngredienteModal";
+import {EditOutlined, PlusCircleOutlined} from '@ant-design/icons';
 import { customColors } from "../Estilos/colores";
 import { toFraction } from "../Metodos/FormatoCantidad";
 import "../Estilos/ing.css";
@@ -14,21 +15,21 @@ interface IngredientesProps {
   onReset?: boolean; // Indica si se debe reiniciar el estado
 }
 
-
 interface Item {
   id: number; // Representa el Id_Stock_Detalle
   name: string;
   isChecked: boolean;
   cantidad: string;
   unidad: string;
-  Activo: number;
 }
 
 const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSubmit, onReset }) => {
   const [items, setItems] = useState<Item[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [ingredienteEditando, setIngredienteEditando] = useState<Item | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
   const [tempDeleted, setTempDeleted] = useState<Item[]>([]);
 
@@ -46,7 +47,6 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
           isChecked: false,
           cantidad: ingrediente.Cantidad,
           unidad: ingrediente.Unidad,
-          Activo: ingrediente.Activo,
         }));
       setItems(ingredientes);
       setTempDeleted([]); // Reinicia los ingredientes eliminados temporalmente
@@ -90,6 +90,13 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
     setItems((prev) => prev.filter((_, i) => i !== index)); // Eliminar visualmente
   };
 
+  const handleEditClick = () => {
+    const ingrediente = items.find(item => item.id === selectedId);
+    if (ingrediente) {
+      setIngredienteEditando(ingrediente);
+      setIsEditModalOpen(true);
+    }
+  };
   // Guardar cambios automáticamente al activar onSubmit
   useEffect(() => {
     const guardarCambios = async () => {
@@ -143,10 +150,9 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
               }}
               renderItem={(item: Item, index) => (
                 <List.Item className="card-checkbox" key={index}>
-                  
                   <Checkbox
-                    checked={item.isChecked}
-                    onChange={() => handleCheckboxChange(index)}
+                    checked={item.id === selectedId}
+                    onChange={() => setSelectedId(item.id === selectedId ? null : item.id)}
                     className="card-checkbox-text"
                   >
                     {item.name} {toFraction(item.cantidad)} {item.unidad}
@@ -160,6 +166,13 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
             />
             <Button className="btAg" onClick={() => setIsModalOpen(true)}>
               <PlusCircleOutlined style={{fontSize: 'xx-large', color: customColors.colorFrio2}} />
+            </Button>
+            <Button
+              className="btEd"
+              disabled={selectedId === null}
+              onClick={() => handleEditClick() }
+            >
+              <EditOutlined style={{ fontSize: 'xx-large', color: customColors.colorFrio2 }} />
             </Button>
             </div>
           )}
@@ -196,6 +209,25 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
         onSubmit={(newItem) => {
           setItems((prev) => [...prev, newItem]); // Agregar directamente el nuevo ingrediente
           setIsModalOpen(false);
+        }}
+      />
+      {/* Modal para editar ingrediente */}
+      <EditarIngredienteModal
+        visible={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setIngredienteEditando(null);
+        }}
+        recetaId={recetaId}
+        ingrediente={ingredienteEditando}
+        onSubmit={(ingredienteActualizado) => {
+          setItems(prev =>
+            prev.map(item =>
+              item.id === ingredienteActualizado.id ? ingredienteActualizado : item
+            )
+          );
+          setIsEditModalOpen(false);
+          setIngredienteEditando(null);
         }}
       />
 
