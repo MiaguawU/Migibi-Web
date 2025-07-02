@@ -14,7 +14,6 @@ interface IngredientesProps {
   onReset?: boolean; // Indica si se debe reiniciar el estado
 }
 
-
 interface Item {
   id: number; // Representa el Id_Stock_Detalle
   name: string;
@@ -72,14 +71,14 @@ const IngredientesRecetaEditar: React.FC<IngredientesProps> = ({ recetaId, onSub
         
             if (data?.error) {
               // Mostrar mensaje enviado por el servidor
-              message.error(data.error);
+              console.log(data.error);
             } else {
               // Si no hay mensaje específico, mostrar código de error
-              message.error(`Error del servidor: ${status}`);
+              console.log(`Error del servidor: ${status}`);
             }
           } else {
             // Error sin respuesta del servidor (por ejemplo, red desconectada)
-            message.error("Error de red o el servidor no respondió.");
+            console.log("Error de red o el servidor no respondió.");
           }
         } finally {
       setLoading(false);
