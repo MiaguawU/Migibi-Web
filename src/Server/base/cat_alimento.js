@@ -38,10 +38,8 @@ const verificarPermisos = (id_usuario, res, callback) => {
   });
 };
 
-router.get("/nombres", (req, res) => {
-  const { id_usuario_admin } = req.query; // Get admin ID from query parameter
+router.get("/nombres", (req, res) => { // Get admin ID from query parameter
 
-  verificarPermisos(id_usuario_admin, res, () => {
     const query = `SELECT Id_Alimento, Alimento, Activo, Es_Perecedero FROM cat_alimento WHERE Activo = 1;`;
     db.query(query, (err, result) => {
       if (err) {
@@ -51,7 +49,6 @@ router.get("/nombres", (req, res) => {
       res.json(result);
     });
   });
-});
 
 router.post("/:id_usuario_accion", (req, res) => {
   const { id_usuario_accion } = req.params; // Get admin ID from URL parameter for permission check
