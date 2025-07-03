@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, message, Tag, Popconfirm } from 'antd';
+import { ConfigProvider ,Table, Button, message, Tag, Popconfirm } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
 import { formatoSQL } from './Metodos/FormatoSQL'; // Asegúrate de que este archivo exista y sea necesario
 import './Estilos/Catalogos.css';
@@ -8,6 +8,7 @@ import PUERTO from "../config";
 import UnidadModal from "./Componentes/Admin/Ag_EdUnidad";
 import ConsumoModal from "./Componentes/Admin/Ag_EdTConsumo";
 import TAlimentoModal from "./Componentes/Admin/Ag_EdTAlimento";
+import { customColors } from './Estilos/colores';
 
 const Catalogos: React.FC = () => {
   const [unidades, setUnidades] = useState([]);
@@ -71,9 +72,18 @@ const Catalogos: React.FC = () => {
             Eliminar
           </Button>
           </Popconfirm>
+          <ConfigProvider
+                                theme={{
+                                  token: {
+                                    colorPrimary: customColors.colorFuerteCalido,
+                                    colorPrimaryHover: customColors.colorPrimario
+                                  }
+                                }}  
+                              >
           <Button color="primary" variant="outlined" onClick={() => editUnidad(record.Id_Unidad_Medida)}>
             Editar
           </Button>
+          </ConfigProvider>
           <Button
             color="purple" 
             variant="outlined" 
@@ -126,9 +136,18 @@ const Catalogos: React.FC = () => {
             Eliminar
           </Button>
           </Popconfirm>
+          <ConfigProvider
+                                theme={{
+                                  token: {
+                                    colorPrimary: customColors.colorFuerteCalido,
+                                    colorPrimaryHover: customColors.colorPrimario
+                                  }
+                                }}  
+                              >
             <Button color="primary" variant="outlined" onClick={() => editCons(record.Id_Tipo_Consumo)}>
             Editar
           </Button>
+          </ConfigProvider>
           <Button
             color="purple" 
             variant="outlined" 
@@ -181,9 +200,18 @@ const Catalogos: React.FC = () => {
             Eliminar
           </Button>
           </Popconfirm>
+          <ConfigProvider
+                                theme={{
+                                  token: {
+                                    colorPrimary: customColors.colorFuerteCalido,
+                                    colorPrimaryHover: customColors.colorPrimario
+                                  }
+                                }}  
+                              >
           <Button color="primary" variant="outlined" onClick={() => editAli(record.Id_Tipo_Alimento)}>
             Editar
           </Button>
+          </ConfigProvider>
           <Button
             color="purple" 
             variant="outlined" 

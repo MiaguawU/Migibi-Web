@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Input, Popconfirm, message, Tag } from 'antd';
+import { ConfigProvider,Table, Button, Space, Input, Popconfirm, message, Tag } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import PUERTO from "../config";
 import axios from 'axios';
 import AlimentoModal from './Componentes/Admin/Ag_Ed_Alimento'
+import { customColors } from './Estilos/colores';
 
 interface Alimento {
     Id_Alimento: number;
@@ -286,7 +287,16 @@ const AlimentosTable: React.FC = () => {
             key: 'acciones',
             render: (text, record: Alimento) => (
                 <Space size="middle">
+                    <ConfigProvider
+                                theme={{
+                                  token: {
+                                    colorPrimary: customColors.colorFuerteCalido,
+                                    colorPrimaryHover: customColors.colorPrimario
+                                  }
+                                }}  
+                              >
                     <Button onClick={() => handleEdit(record)} color="primary" variant="outlined" >Editar</Button>
+                    </ConfigProvider>
                     <Popconfirm title={`¿Estás seguro de eliminar "${record.Alimento}"?`} onConfirm={() => handleDelete(record.Id_Alimento)} okText="Sí" cancelText="No">
                         <Button danger>Eliminar</Button>
                     </Popconfirm>

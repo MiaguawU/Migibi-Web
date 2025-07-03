@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Input, Popconfirm, message, Select, Tag } from 'antd';
+import { ConfigProvider ,Table, Button, Space, Input, Popconfirm, message, Select, Tag } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import PUERTO from "../config";
 import axios from 'axios';
 import EditUserModal from './Componentes/Admin/EdUsuario';
 import AddUserModal from './Componentes/Admin/AgUsuario';
+import { customColors } from './Estilos/colores';
 
 const { Option } = Select;
 
@@ -313,9 +314,18 @@ const UsersTable: React.FC = () => {
             Eliminar
           </Button>
           </Popconfirm>
-            <Button color="primary" variant="outlined" onClick={() => setEdUser(record.Id_Usuario)}>
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: customColors.colorFuerteCalido,
+                colorPrimaryHover: customColors.colorPrimario
+              }
+            }}  
+          >
+            <Button color={'primary'} variant="outlined" onClick={() => setEdUser(record.Id_Usuario)}>
             Editar
           </Button>
+          </ConfigProvider>
           <Button
             color="purple" 
             variant="outlined" 
