@@ -110,6 +110,7 @@ const IngModal: React.FC<FormModalProps> = ({ visible, onClose, recetaId, onSubm
         };
   
         onSubmit(nuevoIngrediente); // Pasar el nuevo ingrediente
+        setSearchTerm('');
         onClose();
       } else {
         message.error("Error al agregar el ingrediente.");

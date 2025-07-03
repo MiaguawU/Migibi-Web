@@ -319,22 +319,18 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
+      <ConfigProvider
+        theme={{
+          token: {
           colorBorder: '#3E7E1E',
-          colorBgContainer: '#CEFF77',
-          colorText: '#244C24',
-          colorPrimary: '#3E7E1E',
-        },
-        components: {
-          Form: {
-            labelFontSize: 22,
-            labelRequiredMarkColor: 'white',
           },
-        },
-      }}
-    >
+          components: {
+            Form: {
+              labelRequiredMarkColor: 'white',
+            },
+          },
+        }}
+      >
       <Modal
         title={"Editar Producto"}
         visible={visible}
@@ -356,6 +352,7 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
               mode="tags"
               maxCount={1}
               showSearch
+              style={{borderColor: "white"}}
               placeholder="Buscar o escribir alimento"
               options={filteredOptions}
               value={searchTerm ? [searchTerm] : []}
@@ -389,21 +386,20 @@ const ProductModal: React.FC<FormModalProps> = ({ visible, onClose, stockId }) =
               filterOption={false}
             />
           </Form.Item>
+          
+        {esPerecedero && (
+          <Form.Item name="expirationDate" label="Caducidad" 
+          rules={[
+            {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
+            ]}>
+            <DatePicker
+              style={{ width: '100%' }}
+              format="YYYY-MM-DD"
+              placeholder="Selecciona una fecha"
+            />
+          </Form.Item>
+          )}
 
-          {/* Rest of your form items (expirationDate, quantity, unit, type, imgsrc) remain the same */}
-          {esPerecedero !== undefined && (
-            <Form.Item name="expirationDate" label="Fecha de caducidad"
-            rules={[
-              {required: esPerecedero, message: 'Introduce la fecha de caducidad',},
-              ]}>
-              <DatePicker
-                style={{ width: '100%' }}
-                format="YYYY-MM-DD"
-                placeholder="Selecciona una fecha"
-                disabled={!esPerecedero}
-              />
-            </Form.Item>
-            )}
 
           <Form.Item
             name="quantity"

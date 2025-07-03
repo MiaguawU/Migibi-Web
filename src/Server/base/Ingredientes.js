@@ -16,6 +16,13 @@ const recetaDetalleSchema = Joi.object({
     Fecha_Alta: Joi.date().iso().required()
 });
 
+const recetaDetalleEditarSchema = Joi.object({
+    cantidad: Joi.number().positive().required(),
+    id_unidad: Joi.number().integer().required(),
+    Id_Usuario_Alta: Joi.number().integer().required(),
+    Fecha_Alta: Joi.date().iso().required()
+});
+
 const idSchema = Joi.object({
     id: Joi.number().integer().required()
 });
@@ -113,21 +120,24 @@ router.put("/:id", (req, res) => {
     const { error: paramError } = idSchema.validate(req.params);
     if (paramError) return res.status(400).send(paramError.details[0].message);
     
-    const { error: bodyError } = recetaDetalleSchema.validate(req.body);
+    const { error: bodyError } = recetaDetalleEditarSchema.validate(req.body);
     if (bodyError) return res.status(400).send(bodyError.details[0].message);
 
     const { id } = req.params;
-    const { id_alimento, cantidad, id_unidad, Id_Usuario_Alta, Fecha_Alta } = req.body;
+    const { cantidad, id_unidad, Id_Usuario_Alta, Fecha_Alta } = req.body;
 
     const query = `
         UPDATE receta_detalle
-        SET Id_Alimento = ?, Cantidad = ?, Id_Unidad_Medida = ?, Id_Usuario_Alta = ?, Fecha_Alta = ?
+        SET Cantidad = ?, Id_Unidad_Medida = ?, Id_Usuario_Alta = ?, Fecha_Alta = ?
         WHERE Id_Receta = ?
     `;
-    const values = [id_alimento, cantidad, id_unidad, Id_Usuario_Alta, Fecha_Alta, id];
+    const values = [cantidad, id_unidad, Id_Usuario_Alta, Fecha_Alta, id];
 
     db.query(query, values, (err, result) => {
-        if (err) return res.status(500).send("Error al actualizar el ingrediente");
+        if (err) {
+            console.error("Error en la operación:", err);
+            return res.status(500).send("Error al actualizar el ingrediente");
+        }
         if (result.affectedRows === 0) return res.status(404).send("Detalle de receta no encontrado");
         res.json({ message: "Ingrediente actualizado con éxito" });
     });

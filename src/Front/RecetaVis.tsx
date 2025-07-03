@@ -281,9 +281,7 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 35,
-                        colorText: "#8BA577",
+                        fontSize: 5,
                       },
                     }}
                   >
@@ -382,9 +380,7 @@ export default function EDreceta() {
                   <ConfigProvider
                     theme={{
                       token: {
-                        fontFamily: "Jomhuria, Serif",
-                        fontSize: 35,
-                        colorText: "#8BA577",
+                        fontSize: 10
                       },
                     }}
                   >

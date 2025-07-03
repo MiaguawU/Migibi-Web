@@ -739,47 +739,54 @@ DELIMITER $$
 
 CREATE PROCEDURE eliminarRecetasBasura()
 BEGIN
-  DECLARE done INT DEFAULT FALSE;
-  DECLARE tabla VARCHAR(255);
-  DECLARE cur CURSOR FOR
-    SELECT C.TABLE_NAME
-    FROM INFORMATION_SCHEMA.COLUMNS C
-    JOIN INFORMATION_SCHEMA.TABLES T ON C.TABLE_NAME = T.TABLE_NAME AND C.TABLE_SCHEMA = T.TABLE_SCHEMA
-    WHERE C.COLUMN_NAME = 'Id_Receta'
-      AND C.TABLE_SCHEMA = 'migibi'
-      AND T.TABLE_TYPE = 'BASE TABLE'       -- Solo tablas reales
-      AND C.TABLE_NAME NOT LIKE 'vw_%';     -- Evita vistas que empiezan con 'vw_'
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE tabla VARCHAR(255);
+    DECLARE cur CURSOR FOR
+        SELECT C.TABLE_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS C
+        JOIN INFORMATION_SCHEMA.TABLES T ON C.TABLE_NAME = T.TABLE_NAME AND C.TABLE_SCHEMA = T.TABLE_SCHEMA
+        WHERE C.COLUMN_NAME = 'Id_Receta'
+          AND C.TABLE_SCHEMA = 'migibi'
+          AND T.TABLE_TYPE = 'BASE TABLE'
+          AND C.TABLE_NAME NOT LIKE 'vw_%'
+          AND C.TABLE_NAME != 'receta'; -- <--- ¡IMPORTANTE! Excluye la tabla 'receta' del bucle
 
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-  -- Obtener los ids de recetas basura
-  DROP TEMPORARY TABLE IF EXISTS ids_receta_basura;
-  CREATE TEMPORARY TABLE ids_receta_basura (
-    id_receta INT
-  );
+    -- Obtener los ids de recetas basura
+    DROP TEMPORARY TABLE IF EXISTS ids_receta_basura;
+    CREATE TEMPORARY TABLE ids_receta_basura (
+        id_receta INT
+    );
 
-  INSERT INTO ids_receta_basura (id_receta)
-  SELECT id_receta FROM receta WHERE Nombre = 'Receta_nueva' AND Activo = 0;
+    -- Asegúrate de que esta condición capture *todas* las recetas que deseas eliminar
+    -- y que podrían tener dependencias.
+    INSERT INTO ids_receta_basura (id_receta)
+    SELECT id_receta FROM receta WHERE Nombre = 'Receta_nueva' AND Activo = 0;
 
-  OPEN cur;
+    OPEN cur;
 
-  leer_loop: LOOP
-    FETCH cur INTO tabla;
-    IF done THEN
-      LEAVE leer_loop;
-    END IF;
+    leer_loop: LOOP
+        FETCH cur INTO tabla;
+        IF done THEN
+            LEAVE leer_loop;
+        END IF;
 
-    SET @sql = CONCAT('DELETE FROM ', tabla, ' WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura)');
-    PREPARE stmt FROM @sql;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
-  END LOOP;
+        -- Construye y ejecuta la sentencia DELETE para las tablas hijas
+        SET @sql = CONCAT('DELETE FROM ', tabla, ' WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura)');
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END LOOP;
 
-  CLOSE cur;
+    CLOSE cur;
 
-  -- Eliminar de la tabla Receta al final
-  DELETE FROM receta
-  WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura);
+    -- Eliminar de la tabla Receta al final, una vez que todas las referencias en tablas hijas han sido eliminadas
+    DELETE FROM receta
+    WHERE id_receta IN (SELECT id_receta FROM ids_receta_basura);
+
+    -- Limpiar la tabla temporal
+    DROP TEMPORARY TABLE IF EXISTS ids_receta_basura;
 
 END$$
 

@@ -581,7 +581,6 @@ router.post("/nuevoAlimentoNoPerecedero", async (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  
 
   const query1 = `
     SELECT 
@@ -598,6 +597,7 @@ router.get("/", (req, res) => {
     LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
     LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
     LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+	  WHERE ca.Activo = 1
     ORDER BY sd.Fecha_Caducidad ASC;
   `;
 
@@ -615,6 +615,7 @@ router.get("/", (req, res) => {
     LEFT JOIN cat_alimento ca ON sd.Id_Alimento = ca.Id_Alimento
     LEFT JOIN cat_unidad_medida cum ON sd.Id_Unidad_Medida = cum.Id_Unidad_Medida
     LEFT JOIN cat_tipo_alimento cta ON ca.Id_Tipo_Alimento = cta.Id_Tipo_Alimento
+    WHERE ca.Activo = 1
     ORDER BY sd.Fecha_Caducidad ASC;
   `;
 

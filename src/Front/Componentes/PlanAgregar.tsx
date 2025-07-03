@@ -301,7 +301,7 @@ const PlanAgregar: React.FC<FormModalProps> = ({ visible, onClose, onSubmit }) =
             </Select>
           </Form.Item>
 
-          <Form.Item name="expirationDate" label="Fecha de caducidad">
+          <Form.Item name="expirationDate" label="Fecha">
             <DatePicker
               style={{ width: '100%' }}
               format="YYYY-MM-DD"

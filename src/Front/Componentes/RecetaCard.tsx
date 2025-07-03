@@ -77,7 +77,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                 <Tooltip title="Eliminar" key="delete">
                   <Popconfirm
                     title="Borrar la receta"
-                    description="¿Está seguro de borrar la receta de su plan?"
+                    description="¿Está seguro de borrar la receta"
                     onConfirm={handleDeleteConfirm}
                     onCancel={(e) => e?.stopPropagation()}
                     okText="Sí"
