@@ -143,9 +143,6 @@ const UserProfile: React.FC = () => {
     }
   };
   
-  
-  
-
   return (
     <>
     <ConfigProvider theme={{ token: { fontFamily: "Poppins, Serif", fontSize: 30, colorText: "#8BA577", } }}>
@@ -179,6 +176,7 @@ const UserProfile: React.FC = () => {
               <span style={{fontSize: "small", color: customColors.colorTextTarjeta}}>Tipos de alimentos que no puedo comer:</span>
               <Button className="view-button" onClick={() => setIsModalOpen(true)}>Ver</Button>
             </div>
+            {/**
             <div className="info-card">
               <span style={{fontSize: "small", color: customColors.colorTextTarjeta}}>Cantidad de personas que viven conmigo:</span>
               
@@ -191,6 +189,7 @@ const UserProfile: React.FC = () => {
                 />
               </ConfigProvider>
             </div>
+            */}
             <div className="info-card">
               <span style={{fontSize: "small", color: customColors.colorTextTarjeta}}>Cambiar Contraseña:</span>
               <Button className="view-button" onClick={() => navigate('/cambiarContrasenia')}>Ver</Button>

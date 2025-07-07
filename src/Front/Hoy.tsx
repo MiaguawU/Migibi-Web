@@ -247,13 +247,15 @@ export default function Inicio() {
           </div>
         </div>
 
-        <div style={{backgroundColor: customColors.colorPrimarioClaro, height: 'auto', borderRadius: '10px'}}>
+        {/**<div style={{backgroundColor: customColors.colorPrimarioClaro, height: 'auto', borderRadius: '10px'}}>
           <Pagination
             currentWeek={weeks[weekIndex]}
             onPrevious={handlePrevious}
             onNext={handleNext}
           />
-        </div> <br />
+        </div> 
+        */}
+        <br />
 
         {DiasPlan.map((dia, index) => (
           <div key={index}>
