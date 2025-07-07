@@ -182,7 +182,11 @@ async function performMySQLBackupAndRestore() {
                             if (val === null) return 'NULL';
                             if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`;
                             if (Buffer.isBuffer(val)) return `X'${val.toString('hex')}'`;
-                            if (typeof val === 'object' && val instanceof Date) return `'${val.toISOString().slice(0, 19).replace('T', ' ')}'`;
+                            if (val instanceof Date) {
+                              const iso = val.toISOString?.();
+                              if (!iso || iso === 'Invalid Date') return 'NULL';
+                              return `'${iso.slice(0, 19).replace('T', ' ')}'`;
+                            }
                             return val;
                         }).join(', ');
                         sqlCommands.push(`INSERT INTO \`${tableName}\` (${columns}) VALUES (${values});`);
