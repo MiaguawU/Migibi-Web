@@ -150,11 +150,74 @@ router.post('/scanner', async (req, res) => {
 });
 
 //informacion renocer imagen
-const FATSECRET_ACCESS_TOKEN = process.env.ID_FAT; // ¡REEMPLAZA ESTO CON TU TOKEN REAL!
+let fatSecretAccessToken = null;
+let fatSecretTokenExpiry = 0; 
 
-// Información para reconocer imagen
+// --- Credenciales para obtener el token (desde variables de entorno) ---
+const FATSECRET_CLIENT_ID = process.env.ID_FAT;
+const FATSECRET_CLIENT_SECRET = process.env.SECRET_FAT;
+const FATSECRET_TOKEN_URL = 'https://oauth.fatsecret.com/connect/token';
+const FATSECRET_API_URL = 'https://platform.fatsecret.com/rest/image-recognition/v2';
+const FATSECRET_SCOPE = 'basic';
+
+// --- Función para obtener o refrescar el token de acceso ---
+async function getFatSecretAccessToken() {
+    // Si no tenemos un token o si el token actual está a punto de expirar
+    // Le damos un margen de 5 minutos (300,000 ms) antes de la expiración real para refrescar
+    if (!fatSecretAccessToken || Date.now() >= fatSecretTokenExpiry - 300000) {
+        console.log('Obteniendo o refrescando el token de acceso de FatSecret...');
+
+        if (!FATSECRET_CLIENT_ID || !FATSECRET_CLIENT_SECRET) {
+            throw new Error('FATSECRET_CLIENT_ID y FATSECRET_CLIENT_SECRET no están configurados en las variables de entorno.');
+        }
+
+        try {
+            const response = await axios.post(FATSECRET_TOKEN_URL, new URLSearchParams({
+                grant_type: 'client_credentials',
+                scope: FATSECRET_SCOPE
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                auth: {
+                    username: FATSECRET_CLIENT_ID,
+                    password: FATSECRET_CLIENT_SECRET
+                }
+            });
+
+            const { access_token, token_type, expires_in } = response.data;
+
+            fatSecretAccessToken = access_token;
+            // expires_in viene en segundos, lo convertimos a milisegundos y lo sumamos al tiempo actual
+            fatSecretTokenExpiry = Date.now() + (expires_in * 1000);
+
+            console.log('Token de FatSecret obtenido/refrescado exitosamente.');
+            console.log(`Próxima expiración del token: ${new Date(fatSecretTokenExpiry).toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}`);
+
+            return fatSecretAccessToken;
+
+        } catch (error) {
+            console.error('Error al obtener/refrescar el token de FatSecret:');
+            if (error.response) {
+                console.error('Status:', error.response.status);
+                console.error('Data:', error.response.data);
+            } else {
+                console.error('Mensaje de error:', error.message);
+            }
+            throw new Error('No se pudo obtener el token de FatSecret.');
+        }
+    } else {
+        console.log('Usando token de FatSecret existente (aún válido).');
+        return fatSecretAccessToken;
+    }
+}
+
+getFatSecretAccessToken().catch(err => {
+    console.error("Fallo al obtener el token inicial de FatSecret:", err.message);
+    // Considera si tu aplicación debe fallar al iniciar si no puede obtener el token
+});
+
 router.post('/recognize-food-image', async (req, res) => {
-    // Solo esperamos image_b64 del frontend.
     const { image_b64 } = req.body;
 
     if (!image_b64) {
@@ -162,6 +225,10 @@ router.post('/recognize-food-image', async (req, res) => {
     }
 
     try {
+        // --- Paso clave: Obtener un token válido antes de la solicitud a la API ---
+        const currentValidAccessToken = await getFatSecretAccessToken();
+        // --- Fin del paso clave ---
+
         // Convierte la Base64 a Buffer para el procesamiento con Sharp
         const imageBuffer = Buffer.from(image_b64, 'base64');
 
@@ -183,30 +250,30 @@ router.post('/recognize-food-image', async (req, res) => {
         // Prepara el cuerpo de la solicitud para FatSecret
         const fatSecretRequestBody = {
             image_b64: processedImageB64,
-            region: "MX",          // Fijo para México
-            language: "es",        // Fijo para español
-            include_food_data: false, // Establecido en `false` si solo quieres el nombre
-            eaten_foods: []       // Dejar vacío si no usas esta funcionalidad
+            region: "MX",
+            language: "es",
+            include_food_data: false,
+            eaten_foods: []
         };
 
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${FATSECRET_ACCESS_TOKEN}`
+            'Authorization': `Bearer ${currentValidAccessToken}` // ¡Aquí usamos el token válido!
         };
 
         console.log('Enviando solicitud a FatSecret...');
         const fatSecretResponse = await axios.post(
-            'https://platform.fatsecret.com/rest/image-recognition/v2',
+            FATSECRET_API_URL, // Usamos la URL de la API directamente
             fatSecretRequestBody,
             { headers }
         );
+
         console.log(fatSecretResponse);
 
         // --- Procesamiento de la respuesta de FatSecret ---
         if (fatSecretResponse.data && fatSecretResponse.data.food_response && fatSecretResponse.data.food_response.length > 0) {
             const recognizedFoodsDetailed = [];
 
-            // Agrupar y contar los alimentos detectados
             const foodCounts = {};
             fatSecretResponse.data.food_response.forEach(foodItem => {
                 if (foodItem.food_entry_name) {
@@ -228,31 +295,32 @@ router.post('/recognize-food-image', async (req, res) => {
 
         } else {
             console.log('No se detectaron alimentos en la imagen.');
-            res.status(200).json({ // 200 OK si la operación fue exitosa pero no se encontró nada
+            res.status(200).json({
                 mensaje: 'No se detectaron alimentos en la imagen.',
                 recognizedFoodsDetailed: []
             });
         }
 
     } catch (error) {
-        console.error('Error al procesar la imagen para FatSecret:', error.response ? error.response.data : error.message);
+        console.error('Error en la ruta /recognize-food-image:', error.message); // Mensaje de error general
 
         let errorMessage = 'Error al reconocer la imagen de alimentos con FatSecret.';
         let statusCode = 500;
 
-        // Comprobación específica para errores de Axios
         if (axios.isAxiosError(error) && error.response) {
-            if (error.response.status === 401) { // Unauthorized
-                errorMessage = 'Error de autenticación con FatSecret. Verifica tu Access Token.';
+            if (error.response.status === 401) {
+                errorMessage = 'Error de autenticación con FatSecret. El token pudo haber expirado o ser inválido. Intenta de nuevo.';
                 statusCode = 401;
             } else if (error.response.data && error.response.data.message) {
-                 // Capturar mensajes de error de FatSecret como el "Error 211"
                 errorMessage = `Error de FatSecret: ${error.response.data.message}`;
-                statusCode = error.response.status; // Usa el status devuelto por FatSecret
+                statusCode = error.response.status;
             } else {
                 errorMessage = `Error de la API de FatSecret: ${error.response.status} - ${JSON.stringify(error.response.data)}`;
                 statusCode = error.response.status;
             }
+        } else if (error.message.includes('No se pudo obtener el token')) { // Captura el error de nuestra función getFatSecretAccessToken
+            errorMessage = 'No se pudo obtener el token de autenticación para FatSecret. Verifica tus credenciales.';
+            statusCode = 500;
         }
 
         res.status(statusCode).json({

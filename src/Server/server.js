@@ -165,8 +165,36 @@ async function performMySQLBackupAndRestore() {
 
         for (const tableName of tableNames) {
             // Obtener la declaración CREATE TABLE
-            const [createTableResult] = await primaryConnection.execute(`SHOW CREATE TABLE \`${tableName}\``);
-            sqlCommands.push(createTableResult[0]['Create Table'] + ';');
+            const [createResult] = await primaryConnection.execute(`SHOW CREATE TABLE \`${tableName}\``);
+            const createTableOrView = createResult[0];
+
+            if (createTableOrView['Create Table']) {
+                // Es una tabla
+                sqlCommands.push(createTableOrView['Create Table'] + ';');
+
+                // Obtener datos
+                const [rows] = await primaryConnection.execute(`SELECT * FROM \`${tableName}\``);
+                if (rows.length > 0) {
+                    const columns = Object.keys(rows[0]).map(col => `\`${col}\``).join(', ');
+                    for (const row of rows) {
+                        const values = Object.values(row).map(val => {
+                            if (val === null) return 'NULL';
+                            if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`;
+                            if (Buffer.isBuffer(val)) return `X'${val.toString('hex')}'`;
+                            if (typeof val === 'object' && val instanceof Date) return `'${val.toISOString().slice(0, 19).replace('T', ' ')}'`;
+                            return val;
+                        }).join(', ');
+                        sqlCommands.push(`INSERT INTO \`${tableName}\` (${columns}) VALUES (${values});`);
+                    }
+                }
+            } else if (createTableOrView['Create View']) {
+                // Es una vista
+                sqlCommands.push(createTableOrView['Create View'] + ';');
+                console.log(`Vista detectada y agregada: ${tableName}`);
+            } else {
+                console.warn(`No se reconoció si es tabla o vista: ${tableName}`);
+            }
+
 
             // Obtener los datos y generar sentencias INSERT
             const [rows] = await primaryConnection.execute(`SELECT * FROM \`${tableName}\``);
