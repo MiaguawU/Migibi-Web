@@ -83,6 +83,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.FRONTM2, // si estás usando Expo Go en un dispositivo físico
   process.env.FRONT_APK,
+  process.env.CRONO_REQ,
 ];
 
 app.use(cors({
