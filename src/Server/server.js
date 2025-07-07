@@ -59,6 +59,8 @@ const BACKUP_DB_NAME = process.env.DB_DATABASE_BACKUP;
 
 const CRON_SECRET_TOKEN = process.env.CRON_SECRET_TOKEN ;
 
+const URIRED = process.env.FRONTEND_URL;
+
 // Configuración de multer
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -311,7 +313,7 @@ app.get(
         message: "Sesión iniciada con éxito",
       });
 
-      const origin = req.headers.origin || "http://localhost:3000";
+      const origin = URIRED || "https://migibi-web.onrender.com";
       const redirectURL = getRedirectUrl(origin);
       res.redirect(`${redirectURL}/dashboard?${queryParams}`);
     } catch (error) {
