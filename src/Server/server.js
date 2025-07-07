@@ -315,7 +315,7 @@ app.get(
 
       const origin = URIRED || "https://migibi-web.onrender.com";
       const redirectURL = getRedirectUrl(origin);
-      res.redirect(`${redirectURL}/dashboard?${queryParams}`);
+      res.redirect(`${URIRED}/dashboard?${queryParams}`);
     } catch (error) {
       console.error("Error durante el callback de Google:", error);
       res.redirect("/error?message=Error durante la autenticación");
