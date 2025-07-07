@@ -65,28 +65,44 @@ const AuthForm: React.FC<{ onLogin: (userData: any) => void }> = ({ onLogin }) =
   };
 
   const sesionNormal = async () => {
-    try {
-      const data = { identifier: email, password };
-      const response = await axios.post(`${PUERTO}/login`, data, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-  
-      const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
-      localStorage.setItem("currentUser", id);
-      message.success(`Bienvenido, ${username}. ${serverMessage}`);
-      onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
-      window.location.href = "/";
-    } catch (error: unknown) {
-      console.error('Error al iniciar sesión:', error);
-      
-      if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message || "Cuenta bloqueada temporalmente (15 min))";
-        message.error(errorMsg);
-      } else {
-        message.error("Ocurrió un error inesperado.");
+  try {
+    const data = { identifier: email, password };
+    const response = await axios.post(`${PUERTO}/login`, data, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const { id, username, foto_perfil, Cohabitantes, Email, message: serverMessage } = response.data;
+    localStorage.setItem("currentUser", id);
+    message.success(`Bienvenido, ${username}. ${serverMessage}`);
+    onLogin({ id, username, email: Email, foto_perfil, Cohabitantes });
+    window.location.href = "/";
+  } catch (error: unknown) {
+    console.error('Error al iniciar sesión:', error);
+
+    if (axios.isAxiosError(error)) {
+      // Intenta obtener el mensaje de error directamente de la respuesta del servidor.
+      // Si tu backend envía solo un string (como "Contraseña incorrecta"), Axios lo pondrá aquí.
+      const serverErrorMessage = error.response?.data;
+
+      // Por defecto, un mensaje genérico.
+      let displayMessage = "Ocurrió un error inesperado.";
+
+      // Si el serverErrorMessage es un string, lo usamos.
+      if (typeof serverErrorMessage === 'string') {
+        displayMessage = serverErrorMessage;
       }
+      // Opcional: Si esperas un objeto JSON con una propiedad 'message', puedes añadir:
+      // else if (serverErrorMessage && typeof serverErrorMessage === 'object' && serverErrorMessage.message) {
+      //   displayMessage = serverErrorMessage.message;
+      // }
+
+      message.error(displayMessage);
+    } else {
+      // Error que no es de Axios (ej. de red, JavaScript)
+      message.error("Ocurrió un error inesperado.");
     }
-  };
+  }
+};
   
 
 

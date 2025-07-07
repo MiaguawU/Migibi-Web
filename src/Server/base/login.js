@@ -6,7 +6,24 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const router = express.Router();
-const redis = new Redis(); // Asegúrate de tener Redis corriendo
+
+const redisConfig = {
+  host: process.env.REDIS_HOST || "127.0.0.1", // Usa el host de la variable de entorno o localhost por defecto
+  port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379, // Usa el puerto de la variable de entorno o 6379 por defecto
+  password: process.env.REDIS_PASSWORD || undefined, // Usa la contraseña si está definida
+  tls: process.env.REDIS_TLS === 'true' ? {} : undefined // Habilita TLS si la variable REDIS_TLS es 'true'
+};
+
+const redis = new Redis(redisConfig);
+
+redis.on("connect", () => {
+  console.log("Conectado a Redis con éxito!");
+});
+
+redis.on("error", (err) => {
+  console.error("Error al conectar a Redis:", err);
+  // Considera cómo manejar errores de conexión graves, como salir del proceso o intentar reconectar.
+}); // Asegúrate de tener Redis corriendo
 
 // Configuración de Nodemailer
 const transporter = nodemailer.createTransport({
