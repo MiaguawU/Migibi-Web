@@ -41,9 +41,23 @@ const planes = require("./base/Planes");
 const usuario_Alimento = require("./base/usuario_cat_alimento");
 const { OAuth2Client } = require('google-auth-library');
 const usuario_act = require('./base/usuario_activar');
+const mysql = require('mysql2/promise');
 
 dotenv.config();
 
+const PRIMARY_DB_HOST = process.env.DB_HOST;
+const PRIMARY_DB_PORT = parseInt(process.env.DB_PORT || '3306');
+const PRIMARY_DB_USER = process.env.DB_USER;
+const PRIMARY_DB_PASS = process.env.DB_PASSWORD;
+const PRIMARY_DB_NAME = process.env.DB_NAME;
+
+const BACKUP_DB_HOST = process.env.DB_HOST_BACKUP;
+const BACKUP_DB_PORT = parseInt(process.env.DB_PORT_BACKUP || '3306');
+const BACKUP_DB_USER = process.env.DB_USER_BACKUP;
+const BACKUP_DB_PASS = process.env.DB_PASSWORD_BACKUP;
+const BACKUP_DB_NAME = process.env.DB_DATABASE_BACKUP;
+
+const CRON_SECRET_TOKEN = process.env.CRON_SECRET_TOKEN ;
 
 // Configuración de multer
 const upload = multer({
@@ -110,6 +124,129 @@ app.use(passport.session());
 
 app.use(express.json({ limit: '500tb' })); // Permite payloads JSON de hasta 500 MB
 app.use(express.urlencoded({ limit: '500tb', extended: true }));
+
+async function performMySQLBackupAndRestore() {
+    console.log('Iniciando proceso de backup y restauración de MySQL (programático)...');
+
+    let primaryConnection;
+    let backupConnection;
+
+    try {
+        // --- 1. Conectar a la DB principal ---
+        primaryConnection = await mysql.createConnection({
+            host: PRIMARY_DB_HOST,
+            port: PRIMARY_DB_PORT,
+            user: PRIMARY_DB_USER,
+            password: PRIMARY_DB_PASS,
+            database: PRIMARY_DB_NAME,
+            ssl: { rejectUnauthorized: false } // Considera la seguridad de esto. Render DBs a menudo tienen SSL.
+        });
+        console.log('Conectado a la base de datos principal.');
+
+        // --- 2. Obtener el esquema y los datos (recreando la lógica de mysqldump) ---
+        // Esto es una simplificación. Para un dump completo y robusto,
+        // esto debería manejar vistas, procedimientos, triggers, etc.
+        // También debería manejar transacciones para asegurar la consistencia.
+
+        const [tablesResult] = await primaryConnection.execute("SHOW TABLES");
+        const tableNames = tablesResult.map(row => row[Object.keys(row)[0]]);
+        console.log('Tablas encontradas:', tableNames);
+
+        let sqlCommands = [];
+
+        // Asegúrate de eliminar la DB de respaldo primero si quieres una copia limpia
+        // Estos comandos se ejecutarán en la base de datos de respaldo
+        sqlCommands.push(`DROP DATABASE IF EXISTS \`${BACKUP_DB_NAME}\`;`);
+        sqlCommands.push(`CREATE DATABASE \`${BACKUP_DB_NAME}\`;`);
+        // No podemos usar USE `DB_NAME`; aquí directamente para la conexión
+        // La conexión de respaldo se establecerá directamente en la nueva DB.
+
+        for (const tableName of tableNames) {
+            // Obtener la declaración CREATE TABLE
+            const [createTableResult] = await primaryConnection.execute(`SHOW CREATE TABLE \`${tableName}\``);
+            sqlCommands.push(createTableResult[0]['Create Table'] + ';');
+
+            // Obtener los datos y generar sentencias INSERT
+            const [rows] = await primaryConnection.execute(`SELECT * FROM \`${tableName}\``);
+            if (rows.length > 0) {
+                const columns = Object.keys(rows[0]).map(col => `\`${col}\``).join(', ');
+                for (const row of rows) {
+                    const values = Object.values(row).map(val => {
+                        if (val === null) return 'NULL';
+                        if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`; // Escapar comillas simples
+                        // Handle Buffer for BLOB/BINARY types (convert to hex or base64 if needed)
+                        if (Buffer.isBuffer(val)) return `X'${val.toString('hex')}'`;
+                        return val;
+                    }).join(', ');
+                    sqlCommands.push(`INSERT INTO \`${tableName}\` (${columns}) VALUES (${values});`);
+                }
+            }
+        }
+        console.log(`Generados ${sqlCommands.length} comandos SQL para backup.`);
+
+        // --- 3. Conectar a la DB de respaldo ---
+        backupConnection = await mysql.createConnection({
+            host: BACKUP_DB_HOST,
+            port: BACKUP_DB_PORT,
+            user: BACKUP_DB_USER,
+            password: BACKUP_DB_PASS,
+            // IMPORTANTE: Conéctate a una base de datos existente inicialmente (ej. 'mysql' o una dummy)
+            // antes de DROP/CREATE, o simplemente no especifiques `database` aquí
+            // y luego usa `USE \`${BACKUP_DB_NAME}\`;` o especifica la DB en cada query.
+            // Para simplificar, asumiremos que se conectará y luego recreará la DB.
+            database: PRIMARY_DB_NAME, // Conéctate a una DB temporalmente si es necesario para crear/dropear la DB de respaldo.
+            multipleStatements: true, // Permite ejecutar múltiples sentencias SQL en un solo query
+            ssl: { rejectUnauthorized: false }
+        });
+        console.log('Conectado a la base de datos de respaldo.');
+
+        // --- 4. Ejecutar comandos de Restauración ---
+        // Aquí ejecutas todos los comandos generados en un solo batch para la DB de respaldo.
+        // Asegúrate de cambiar a la base de datos correcta después de DROP/CREATE.
+        console.log('Iniciando restauración en la base de datos de respaldo...');
+
+        // Ejecutar los comandos de creación/inserción
+        for (const command of sqlCommands) {
+            if (command.trim()) { // Asegúrate de que el comando no esté vacío
+                try {
+                    await backupConnection.execute(command);
+                } catch (cmdErr) {
+                    console.error(`Error ejecutando comando SQL en backup DB: ${command.substring(0, 100)}...`, cmdErr.message);
+                    // Decide si quieres relanzar el error o continuar
+                }
+            }
+        }
+        console.log('Restauración completada.');
+
+    } catch (error) {
+        console.error('Error general en el proceso de backup/restauración:', error);
+        throw new Error(`Fallo el proceso de backup: ${error.message || error}`);
+    } finally {
+        if (primaryConnection) {
+            await primaryConnection.end();
+            console.log('Conexión primaria cerrada.');
+        }
+        if (backupConnection) {
+            await backupConnection.end();
+            console.log('Conexión de respaldo cerrada.');
+        }
+    }
+}
+
+app.post('/api/run-mysql-backup', async (req, res) => {
+    // Validar el token secreto
+    if (req.headers['x-cron-token'] !== CRON_SECRET_TOKEN && req.query.token !== CRON_SECRET_TOKEN) {
+        return res.status(403).send('Acceso denegado: Token secreto no válido.');
+    }
+
+    try {
+        await performMySQLBackupAndRestore();
+        res.status(200).send('Backup y restauración completados con éxito.');
+    } catch (error) {
+        console.error('Error en el endpoint de backup:', error);
+        res.status(500).send(error.message);
+    }
+});
 
 // Rutas de usuarios
 app.use("/usuarios", usuarioRouter);
